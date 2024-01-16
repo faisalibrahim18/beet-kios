@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes zoomIn {
+    from {
+      opacity: 0;
+      transform: scale3d(.6, .6, .6);
+    }
+  
+    50% {
+      opacity: 4;
+    }
+  }
+  
+  .zoomIn {
+    animation-name: zoomIn;
+  }
+  
+  @keyframes zoomOut {
+    from {
+      opacity: 1;
+    }
+  
+    50% {
+      opacity: 0;
+      transform: scale3d(.3, .3, .3);
+    }
+  
+    to {
+      opacity: 0;
+    }
+  }
+  .swiper {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    background: #fff;
+  
+    /* Center slide text vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+
+/* Misalnya, mengubah ukuran ikon panah */
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 15px;
+}
+.cart-dropdown {
+  max-height: 370px !important;
+  overflow-y: auto !important;
+  margin-left: 100px;
+}
+.cart-dropdown-show {
+  opacity: 1;
+  transform: scaleY(1);
+  transform-origin: top;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.cart-dropdown-animation {
+  animation: scale-up-ver-top 0.2s ease-in-out; /* Sesuaikan durasi dan easing sesuai kebutuhan Anda */
+  transform-origin: 100% 0;
+  transform-origin: 100% 0;
+}
+
+@-webkit-keyframes scale-up-ver-top {
+  0% {
+    -webkit-transform: scaleY(0.4);
+    transform: scaleY(0.4);
+    -webkit-transform-origin: 100% 0;
+    transform-origin: 100% 0;
+  }
+  100% {
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
+    -webkit-transform-origin: 100% 0;
+    transform-origin: 100% 0;
+  }
+}
+
+@keyframes scale-up-ver-top {
+  0% {
+    -webkit-transform: scaleY(0.4);
+    transform: scaleY(0.4);
+    -webkit-transform-origin: 100% 0;
+    transform-origin: 100% 0;
+  }
+  100% {
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
+    -webkit-transform-origin: 100% 0;
+    transform-origin: 100% 0;
+  }
+}
+.responsive-image {
+  max-width: 100%; 
+  height: auto; 
+  display: block; 
+  margin: 0 auto; 
+}
+
+/* Gaya gambar untuk layar kecil (misalnya, < 768px) */
+@media (max-width: 767px) {
+  .responsive-image {
+    max-width: 80%; 
+  }
+}
+
+/* Gaya gambar untuk layar sedang (misalnya, 768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .responsive-image {
+    max-width: 60%; 
+  }
+}
+
+/* Gaya gambar untuk layar besar (misalnya, > 1023px) */
+@media (min-width: 1024px) {
+  .responsive-image {
+    max-width: 50%; 
+  }
+}
