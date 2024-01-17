@@ -261,7 +261,7 @@ const ProductDetail = () => {
                 Rp {detail.price.toLocaleString("id-ID")}
               </div>
               <div className="lg:flex md:flex hidden  mr-5 right-0">
-                <div className="bg-[#6E205E] rounded-xl flex items-center justify-between py-2 mr-4 ">
+                <div className="bg-[#091F4B] rounded-xl flex items-center justify-between py-2 mr-4 ">
                   <button
                     className={`px-4 pl-5 text-white cursor-pointer hover:opacity-70 duration-500 ${
                       quantity === 1 ? "opacity-50 cursor-not-allowed" : ""
@@ -306,7 +306,7 @@ const ProductDetail = () => {
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="rounded-md text-sm p-1.5 w-full border border-gray-400 focus:border-[#6E205E] focus:ring-[#6E205E] focus:outline-none focus:ring focus:ring-opacity-5"
+              className="rounded-md text-sm p-1.5 w-full border border-gray-400 focus:border-[#091F4B] focus:ring-[#091F4B] focus:outline-none focus:ring focus:ring-opacity-5"
               rows={4}
               cols={50}
               placeholder="Ketik sesuatu di sini..."
@@ -336,7 +336,7 @@ const ProductDetail = () => {
 
           <div className="lg:block flex justify-center lg:p-2 p-4">
             <div className="lg:hidden md:hidden block lg:ml-10 lg:mr-0 mr-2">
-              <div className="bg-[#6E205E] rounded-xl flex items-center justify-between py-2 ">
+              <div className="bg-[#091F4B] rounded-xl flex items-center justify-between py-2 ">
                 <button
                   className={`px-4 pl-5 text-white  cursor-pointer hover:opacity-70 duration-500 ${
                     quantity === 1 ? "opacity-50 cursor-not-allowed" : ""
@@ -361,7 +361,7 @@ const ProductDetail = () => {
               <div className="">
                 {" "}
                 <button
-                  className="text-white bg-[#6E205E] rounded-xl  font-semibold lg:pl-20 lg:pr-20 md:pl-20 md:pr-20 pl-8 pr-8 py-2"
+                  className="text-white bg-[#091F4B] rounded-xl  font-semibold lg:pl-20 lg:pr-20 md:pl-20 md:pr-20 pl-8 pr-8 py-2"
                   onClick={handleAddToCart}
                 >
                   Masukkan ke keranjang
