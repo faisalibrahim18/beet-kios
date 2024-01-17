@@ -5,6 +5,8 @@ import Dash from "../../components/Dashboard/Dash";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { checkTokenExpiration } from "../../utils/token";
+import Topbar2 from "../../components/topbar/Topbar2";
+import Iklan from "../../components/iklan/Iklan";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -28,10 +30,13 @@ const Dashboard = () => {
   });
   return (
     <>
-      {/* <Topbar/> */}
-      <div className="">
+      <Topbar2 />
+      <div className="mb-[230px]">
         <Dash />
       </div>
+      {/* <div className="md:pl-[150px] pl-[120px]">
+        <Iklan />
+      </div> */}
       {/* <BottomBar/> */}
     </>
   );

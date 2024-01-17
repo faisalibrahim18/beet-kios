@@ -7,6 +7,8 @@ import ProductList_ from "../Data/ProductList_";
 import { debounce } from "lodash";
 import axios from "axios";
 import Category from "../Category/Category";
+import Iklan from "../iklan/Iklan";
+
 const Dash = () => {
   const [searchTerm, setSearchTerm] = useState([]);
   const [products, setProducts] = useState([]);
@@ -21,65 +23,6 @@ const Dash = () => {
         const dataTableParsed = JSON.parse(localStorage.getItem("data_table"));
         const token = localStorage.getItem("token");
 
-        //   const outletResponse = await axios.get(
-        //     `${API_URL}/api/v1/table-management/table-guest/${dataTableParsed.tableId}/${dataTableParsed.businessId}`,
-        //     {
-        //       headers: {
-        //         "Content-Type": "application/json",
-        //         Authorization: `Bearer ${token}`,
-        //       },
-        //     }
-        //   );
-        // console.log(outletResponse)
-        //   const outletId = outletResponse.data.data.outlet_id;
-
-        // 201
-        const productResponse = await axios.get(
-          `${API_URL}/api/v1/transaction?outlet_id=207&business_id=152`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("sayuitsau", productResponse);
-
-        //   const result = productResponse.data.data.filter(
-        //     (val) => val.outlet_id === outletId
-        //   );
-
-        // console.log("data result", result);
-        // console.log(productResponse);
-        // console.log("category", resCategoryProduct);
-
-        //   setProducts(result);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getProduct();
-  }, []);
-  useEffect(() => {
-    const getProduct = async () => {
-      try {
-        const API_URL = import.meta.env.VITE_API_KEY;
-        const dataTableParsed = JSON.parse(localStorage.getItem("data_table"));
-        const token = localStorage.getItem("token");
-
-        //   const outletResponse = await axios.get(
-        //     `${API_URL}/api/v1/table-management/table-guest/${dataTableParsed.tableId}/${dataTableParsed.businessId}`,
-        //     {
-        //       headers: {
-        //         "Content-Type": "application/json",
-        //         Authorization: `Bearer ${token}`,
-        //       },
-        //     }
-        //   );
-        // console.log(outletResponse)
-        //   const outletId = outletResponse.data.data.outlet_id;
-        // b 223 o 304
-        // b 152 o 207
         const productResponse = await axios.get(
           `${API_URL}/api/v1/product/emenu?outlet_id=207&business_id=152`,
           {
@@ -89,7 +32,7 @@ const Dash = () => {
             },
           }
         );
-        console.log(productResponse);
+
         const categoryProductResponse = await axios.get(
           `${API_URL}/api/v1/product-category/lite?outlet_id=207&business_id=152`,
           {
@@ -99,20 +42,13 @@ const Dash = () => {
             },
           }
         );
+
         const resCategoryProduct = categoryProductResponse.data.data.filter(
           (value) => value.Products.length > 0 && !value.hidden
         );
 
-        //   const result = productResponse.data.data.filter(
-        //     (val) => val.outlet_id === outletId
-        //   );
-
-        // console.log("data result", result);
-        // console.log(productResponse);
-        // console.log("category", resCategoryProduct);
         setSearchTerm(productResponse.data.data);
         setCategory(resCategoryProduct);
-        //   setProducts(result);
       } catch (error) {
         console.log(error);
       }
@@ -143,12 +79,13 @@ const Dash = () => {
       setShowScrollButton(false);
     }
   }, 100);
+
   return (
     <>
       {showScrollButton && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-20 z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
+          className="fixed bottom-[340px] z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -166,25 +103,31 @@ const Dash = () => {
           </svg>
         </button>
       )}
-      <div className="flex">
-        <div>
-          <div className=" bg-gray-100 shadow h-full pt-4 md:w-[150px] ">
-            <Category
-              category={category}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-          </div>
+      <div className="flex pt-[50px]">
+        <div
+          className={`bg-gray-100 flex-grow  pt-5 shadow h-full mt-[50px] md:w-[150px] z-50 fixed ${
+            category.length > 0
+              ? "overflow-auto scroll-m-1.5"
+              : "overflow-hidden"
+          }`}
+        >
+          <Category
+            category={category}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
         </div>
-        <div>
-          <div>
-            {/* Use the ProductList_ component and pass searchTerm and selectedCategory */}
-            <ProductList_
-              searchTerm={searchTerm}
-              selectedCategory={selectedCategory}
-            />
-          </div>
+        <div className="flex-grow mt-[40px] pl-[110px] md:pl-[150px]">
+          {/* Gunakan komponen ProductList_ dan teruskan searchTerm dan selectedCategory */}
+          <ProductList_
+            searchTerm={searchTerm}
+            selectedCategory={selectedCategory}
+          />
         </div>
+      </div>
+
+      <div className="md:pl-[150px] pl-[120px]">
+        <Iklan />
       </div>
     </>
   );

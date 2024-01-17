@@ -4,8 +4,9 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Pro from "../../assets/pro.jpg";
 import Lg from "../../assets/logo.png";
 import { BsCartPlus } from "react-icons/bs";
-import { FaMinus, FaPlus } from "react-icons/fa";
+import { FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 import Swal from "sweetalert2";
+import Iklan from "../iklan/Iklan";
 
 const ProductList_ = ({ searchTerm, selectedCategory }) => {
   const [loadingInitial, setLoadingInitial] = useState(true);
@@ -197,7 +198,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
     }
   };
   return (
-    <div className="px-3 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6">
+    <div className="px-3 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
       <div className="font-bold text-gray-900 mb-3 text-xl">Daftar Produk</div>
 
       <div>
@@ -243,7 +244,9 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                     >
                       <FaMinus />
                     </button>
-                    <p className="font-bold text-sm text-white md:pl-4 md:pr-4 pr-2 pl-2">{quantity}</p>
+                    <p className="font-bold text-sm text-white md:pl-4 md:pr-4 pr-2 pl-2">
+                      {quantity}
+                    </p>
                     <button
                       className=" hover:opacity-70 text-white cursor-pointer duration-500"
                       onClick={incrementQuantity}
@@ -265,14 +268,19 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
 
         <div>
           {cart.length > 0 && (
-            <div className=" fixed bottom-6 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-md shadow-xl focus:outline-none">
+            <div className=" fixed bottom-[270px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-md shadow-xl focus:outline-none">
               {/* Tambahkan komponen untuk menampilkan item di dalam keranjang */}
               <Link
                 to={"/products/keranjang"}
-                className="flex items-center justify-between w-full max-w-screen-md"
+                className="flex items-center justify-between w-full max-w-screen-md p-2"
               >
-                <div>Total Items : {cart.length} </div>
-                <p className="ml-2">Cart</p>
+                <div>
+                  {" "}
+                  <FaShoppingCart size={30} />
+                  <span className="absolute bottom-[35px] right-3 bg-red-500 text-white rounded-full px-1.5 text-sm">
+                    {cart.length}
+                  </span>{" "}
+                </div>
               </Link>
             </div>
           )}
@@ -303,6 +311,9 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
           )}
         </div>
       </div>
+     
+
+     
     </div>
   );
 };

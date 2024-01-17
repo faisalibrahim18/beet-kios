@@ -9,6 +9,7 @@ import { checkTokenExpiration } from "../../utils/token";
 import { Link, useNavigate } from "react-router-dom";
 import ProductNavbar from "../topbar/ProductNavbar";
 import { BsArrowLeft } from "react-icons/bs";
+import PrintReceipt from "../print/PrintReceipt ";
 
 const ProductKeranjang = () => {
   const [cart, setCart] = useState([]);
@@ -249,6 +250,46 @@ const ProductKeranjang = () => {
     setCart(cartData);
     setLoading(false);
   }, []);
+  const receiptData = {
+    items: [
+      { name: "Nasi Goreng", price: "Rp 25,000" },
+      { name: "Ayam Goreng", price: "Rp 30,000" },
+      { name: "Es Teh Manis", price: "Rp 5,000" },
+    ],
+    subtotal: "Rp 60,000",
+    tax: "Rp 6,000",
+    total: "Rp 66,000",
+    paymentMethod: "Tunai",
+    transactionDate: "2024-01-16 14:30:00",
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open("", "_blank");
+    const styles = Array.from(document.styleSheets)
+      .map((styleSheet) => Array.from(styleSheet.cssRules))
+      .flat()
+      .map((rule) => rule.cssText)
+      .join("\n");
+
+    const paperWidth = "80mm";
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <style>
+            ${styles}
+          </style>
+        </head>
+        <body style="width: ${paperWidth}; margin: 0;">
+          ${document.getElementById("printReceipt").outerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.close(); // Menutup jendela cetak setelah selesai mencetak
+  };
 
   return (
     <>
@@ -391,7 +432,20 @@ const ProductKeranjang = () => {
           {cart && cart.length === 0 ? (
             <div></div>
           ) : (
-            <div className="lg:w-1/3  md:w-1/2 md:pt-4">
+            <div className="lg:w-1/3 md:w-1/2 md:pt-4">
+              <div>
+                <h1 className="text-2xl font-bold mb-4">Struk Pembelian</h1>
+                <PrintReceipt receiptData={receiptData} />
+
+                <div className="mt-4">
+                  <button
+                    onClick={handlePrint}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Cetak Struk
+                  </button>
+                </div>
+              </div>
               <div className="lg:pl-10 md:pl-5 w-full">
                 <div className="border border-[#091F4B] mt-8 p-3 rounded-2xl">
                   <div className="flex">
@@ -412,7 +466,7 @@ const ProductKeranjang = () => {
                       onClick={openModal}
                       className="bg-[#091F4B] w-full text-white px-20 py-2 rounded-2xl hover-bg-[#8f387d]"
                     >
-                      CheckOut
+                     Bayar
                     </button>
                   </div>
                 </div>

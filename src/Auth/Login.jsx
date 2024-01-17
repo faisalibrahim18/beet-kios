@@ -54,13 +54,19 @@ const Login = () => {
   );
 
   useEffect(() => {
-    if (user || isSuccess) {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      // If the user has a token, redirect to the dashboard
       navigate("/dashboard");
-      // window.location.reload();
+    } else if (user || isSuccess) {
+      // If the user is logged in, redirect to the dashboard
+      navigate("/dashboard");
     } else if (userRegister || isSuccess) {
       navigate("/");
       window.location("/");
     }
+
     dispatch(reset());
   }, [user, isSuccess, userRegister, dispatch, navigate]);
   // useEffect(() => {

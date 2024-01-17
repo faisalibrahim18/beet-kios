@@ -70,9 +70,9 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
   );
   return (
     <>
-      <div className=" mb-5 md:w-full ">
+      <div className=" md:w-full mb-[350px]">
         <div className="text-gray-800 text-center mt-2 font-semibold pb-2">
-          Pilihan Category
+          Pilihan Kategori
         </div>
         <div className="">
           <div className=" whitespace-nowrap py-3">
@@ -88,7 +88,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
                   }`}
                   onClick={() => setSelectedCategory("all")}
                 >
-                  all
+                  semua
                 </div>
               </Link>
             </div>

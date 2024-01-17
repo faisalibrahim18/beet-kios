@@ -31,7 +31,7 @@ const ProductsDetail = () => {
       <div className="">
         <ProductDetail2 />
       </div>
-      <BottomBar />
+      {/* <BottomBar /> */}
     </>
   );
 };

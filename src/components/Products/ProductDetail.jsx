@@ -15,6 +15,7 @@ const ProductDetail = () => {
   const [cart, setCart] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const API_URL = import.meta.env.VITE_API_KEY;
+  const [notes, setNotes] = useState("");
   useEffect(() => {
     const getData = async () => {
       try {
@@ -121,8 +122,9 @@ const ProductDetail = () => {
         image: detail.image,
         price: detail.price,
         quantity: quantity,
+        notes: notes, // Menambahkan notes ke dalam objek item
       };
-
+      console.log("add", itemToAdd);
       const existingItemIndex = cart.findIndex(
         (item) => item.id === itemToAdd.id
       );
@@ -151,7 +153,7 @@ const ProductDetail = () => {
           },
         }).then(() => {
           // Setelah SweetAlert ditutup, muat ulang halaman
-          window.location.reload();
+          // window.location.reload();
         });
       } else {
         // Jika item belum ada dalam keranjang, kita akan menambahkannya.
@@ -256,7 +258,7 @@ const ProductDetail = () => {
               </div>
 
               <div className="inline-flex items-center lg:pt-16 md:pt-16 py-2 text-2xl font-medium text-center text-[#F20000]">
-                Rp {detail.price.toLocaleString('id-ID')}
+                Rp {detail.price.toLocaleString("id-ID")}
               </div>
               <div className="lg:flex md:flex hidden  mr-5 right-0">
                 <div className="bg-[#6E205E] rounded-xl flex items-center justify-between py-2 mr-4 ">
@@ -281,18 +283,35 @@ const ProductDetail = () => {
             </div>
           </div>
           <div className="bg-white p-5 lg:p-12  lg:mt-8 pt-5 lg:pl-12 pr-12 lg:pb-12 pb-6 block">
-            <div className="font-semibold mb-2">Description :</div>
+            <div className="font-semibold mb-2">Keterangan :</div>
             <div className="">
               {detail.description === "null" ? (
-                <p>Tidak Ada Description</p>
+                <p>Tidak Ada Keterangan </p>
               ) : detail.description === null ? (
-                <p>Tidak Ada Description</p>
+                <p>Tidak Ada Keterangan</p>
               ) : (
                 <p>{detail.description}</p>
               )}
             </div>
           </div>
-
+          {/* notes */}
+          <div className="pl-2 mr-2 bg-white">
+            <label className="flex mb-1.5">
+              <div className="font-semibold">Catatan</div>
+              <div className="font-semibold ml-1 text-gray-400">
+                (opsional)
+              </div>{" "}
+            </label>
+            <textarea
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="rounded-md text-sm p-1.5 w-full border border-gray-400 focus:border-[#6E205E] focus:ring-[#6E205E] focus:outline-none focus:ring focus:ring-opacity-5"
+              rows={4}
+              cols={50}
+              placeholder="Ketik sesuatu di sini..."
+            />
+          </div>
           {/* Modal gambar */}
           <div
             id="imageModal"
@@ -337,15 +356,15 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            <div className="lg:flex">
-              <div className="lg:w-4/5"></div>
+            <div className="lg:flex lg:justify-center">
+              <div className=""></div>
               <div className="">
                 {" "}
                 <button
                   className="text-white bg-[#6E205E] rounded-xl  font-semibold lg:pl-20 lg:pr-20 md:pl-20 md:pr-20 pl-8 pr-8 py-2"
                   onClick={handleAddToCart}
                 >
-                  Add To Cart
+                  Masukkan ke keranjang
                 </button>
               </div>
             </div>
