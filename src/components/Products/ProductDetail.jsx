@@ -16,6 +16,12 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const API_URL = import.meta.env.VITE_API_KEY;
   const [notes, setNotes] = useState("");
+  const [allAddons, setAllAddons] = useState([]);
+  const [allSelectAddOns, setAllSelectAddOns] = useState([]);
+  const [handleSelect, setHandleSelect] = useState([]);
+  const [product, setProduct] = useState({});
+  const [totalItem, setTotalItem] = useState(1);
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -87,99 +93,90 @@ const ProductDetail = () => {
   }, [id]);
 
   const incrementQuantity = () => {
-    setQuantity(quantity + 1);
+    setTotalItem(totalItem + 1);
   };
 
   const decrementQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
+    if (totalItem > 1) {
+      setTotalItem(totalItem - 1);
     }
   };
   const navigate = useNavigate();
-  const handleAddToCart = () => {
-    checkTokenExpiration();
-    const token = localStorage.getItem("token");
-    if (!token) {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-right",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-      });
-      Toast.fire({
-        icon: "warning",
-        text: "Anda harus Login Terlebih dahulu!",
-      });
-      navigate("/");
-    } else if (detail) {
-      const itemToAdd = {
-        id: detail.id,
-        business_id: detail.business_id,
-        business: detail.Business.name,
-        outlet_id: detail.outlet_id,
-        name: detail.name,
-        image: detail.image,
-        price: detail.price,
-        quantity: quantity,
-        notes: notes, // Menambahkan notes ke dalam objek item
-      };
-      console.log("add", itemToAdd);
-      const existingItemIndex = cart.findIndex(
-        (item) => item.id === itemToAdd.id
+
+  const isSameCartItem = (itemA, itemB) => {
+    // return item1.idItem === item2.idItem;
+    return (
+      (itemA.id && itemA.id === itemB.id) ||
+      (itemA.idItem && itemA.idItem === itemB.id)
+    );
+  };
+
+  const handleAddCart = () => {
+    try {
+      // Calculate the total price including addons
+      const addonsTotalPrice = allSelectAddOns.reduce(
+        (total, addon) => total + addon.price,
+        0
       );
 
-      if (existingItemIndex !== -1) {
-        // Jika item dengan ID yang sama sudah ada dalam keranjang,
-        // kita akan membuat salinan keranjang dan menambahkan item ke dalamnya.
-        const updatedCart = [...cart];
-        updatedCart[existingItemIndex].quantity += quantity;
-        setCart(updatedCart);
+      const amount = product.price + addonsTotalPrice;
 
-        // Perbarui quantity menjadi 1 setelah ditambahkan ke keranjang
-        setQuantity(1);
+      const cartItem = {
+        id: product.id,
+        business_id: product.business_id,
+        outlet_id: product.outlet_id,
+        nameItem: product.name,
+        priceItem: product.price,
+        descriptionItem: product.description || null,
+        imageItem: product.image || null,
+        totalItem: totalItem,
+        updateAddons: handleSelect,
+        fullDataAddons: allSelectAddOns,
+        fullDataProduct: product,
+        allAddons: allSelectAddOns,
+        totalAmount: amount * totalItem,
+        notes: notes,
+      };
+      console.log("cartItem", cartItem);
 
-        // Simpan keranjang belanja di localStorage setelah diperbarui
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+      // Get existing cart data from localStorage
+      const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
 
-        // Tampilkan SweetAlert untuk memberi tahu bahwa item telah ditambahkan ke keranjang
-        Swal.fire({
-          icon: "success",
-          title: "Item Ditambahkan ke Keranjang",
-          showConfirmButton: false,
-          timer: 1500, // Menampilkan alert selama 1,5 detik
-          customClass: {
-            title: "text-sm", // Mengatur ukuran teks judul menjadi lebih kecil
-          },
-        }).then(() => {
-          // Setelah SweetAlert ditutup, muat ulang halaman
-          // window.location.reload();
-        });
+      // Check if the item already exists in the cart
+      const existingCartItem = existingCart.find((item) =>
+        isSameCartItem(item, cartItem)
+      );
+
+      if (existingCartItem) {
+        // If the item already exists, update the totalItem and total amount
+        // const existingCartItem = existingCart[existingCartItemIndex];
+        existingCartItem.totalItem += totalItem;
+        existingCartItem.totalAmount += cartItem.totalAmount;
+        existingCartItem.notes = notes;
       } else {
-        // Jika item belum ada dalam keranjang, kita akan menambahkannya.
-        const updatedCart = [...cart, itemToAdd];
-        setCart(updatedCart);
-
-        // Perbarui quantity menjadi 1 setelah ditambahkan ke keranjang
-        setQuantity(1);
-
-        // Simpan keranjang belanja di localStorage setelah diperbarui
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-        // Tampilkan SweetAlert untuk memberi tahu bahwa item telah ditambahkan ke keranjang
-        Swal.fire({
-          icon: "success",
-          title: "Item Ditambahkan ke Keranjang",
-          showConfirmButton: false,
-          timer: 1500, // Menampilkan alert selama 1,5 detik
-          customClass: {
-            title: "text-lg", // Mengatur ukuran teks judul menjadi lebih kecil
-          },
-        }).then(() => {
-          // Setelah SweetAlert ditutup, muat ulang halaman
-          window.location.reload();
-        });
+        // If it's a new item, add it to the cart
+        existingCart.push(cartItem);
       }
+
+      // Save the updated cart data to localStorage
+      localStorage.setItem("cart", JSON.stringify(existingCart));
+
+      // Show success message or perform other actions
+      Swal.fire({
+        icon: "success",
+        title: "Item Ditambahkan ke Keranjang",
+        showConfirmButton: false,
+        timer: 1000,
+        customClass: {
+          title: "text-lg",
+        },
+      }).then(() => {
+        // You might want to navigate back or perform other actions
+        navigate("/dashboard");
+      });
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+      // Handle errors as needed
     }
   };
 
@@ -187,41 +184,73 @@ const ProductDetail = () => {
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
+    handleGetProduct();
   }, []);
+  const handleSelectAllAddons = (data2, index, data) => {
+    const data2_temp = { ...data2, group_id: data.id };
 
-  const handleRemoveFromCart = (itemId) => {
-    const updatedCart = cart.filter((item) => item.id !== itemId);
-    setCart(updatedCart);
+    // Check if the add-on is already selected
+    const isSelected = allSelectAddOns.some(
+      (element) => element.id === data2_temp.id
+    );
 
-    // Simpan keranjang belanja di localStorage
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    if (isSelected) {
+      // If already selected, remove it from the selection
+      setHandleSelect((prevHandleSelect) =>
+        prevHandleSelect.filter(
+          (element) => element !== `${index},${data2_temp.id}`
+        )
+      );
+
+      setAllSelectAddOns((prevAllSelectAddOns) =>
+        prevAllSelectAddOns.filter((element) => element.id !== data2_temp.id)
+      );
+    } else {
+      // If not selected, add it to the selection
+      setHandleSelect((prevHandleSelect) => [
+        ...prevHandleSelect,
+        `${index},${data2_temp.id}`,
+      ]);
+
+      setAllSelectAddOns((prevAllSelectAddOns) => [
+        ...prevAllSelectAddOns,
+        data2_temp,
+      ]);
+    }
   };
-
-  const handleCheckout = () => {
-    // Kirim pesanan ke database (gunakan Axios atau metode lainnya)
-    const API_URL = import.meta.env.VITE_API_KEY;
-    const token = localStorage.getItem("token");
-
-    axios
-      .post(
-        `${API_URL}/api/v1/order/checkout`,
-        { cart },
+  const handleGetProduct = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${API_URL}/api/v1/product/find-product/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
-      )
-      .then((response) => {
-        console.log("Pesanan berhasil dikirim ke database:", response.data);
+      );
+      setProduct(response.data.data);
 
-        // Hapus keranjang belanja dari localStorage setelah checkout
-        localStorage.removeItem("cart");
-      })
-      .catch((error) => {
-        console.error("Pesanan gagal:", error);
-      });
+      console.log("data.data", response);
+      const groupAddons = JSON.parse(
+        JSON.stringify(response.data.data.Group_Addons)
+      );
+      console.log("groupAddons", groupAddons);
+      // groupAddons.forEach((value) => {
+      //   setAllAddons((prevAllAddons) => [...prevAllAddons, value]);
+      // });
+      setAllAddons(groupAddons);
+      if (response.data.data.image) {
+        response.data.data.image;
+      } else {
+        response.data.data.image = "";
+      }
+      // console.log("data ===>", response.data.data);
+      // setProduct(data.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -264,14 +293,14 @@ const ProductDetail = () => {
                 <div className="bg-[#091F4B] rounded-xl flex items-center justify-between py-2 mr-4 ">
                   <button
                     className={`px-4 pl-5 text-white cursor-pointer hover:opacity-70 duration-500 ${
-                      quantity === 1 ? "opacity-50 cursor-not-allowed" : ""
+                      totalItem === 1 ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                     onClick={decrementQuantity}
-                    disabled={quantity === 1}
+                    disabled={totalItem === 1}
                   >
                     <FaMinus />
                   </button>
-                  <p className="font-bold text-white pl-4 pr-4">{quantity}</p>
+                  <p className="font-bold text-white pl-4 pr-4">{totalItem}</p>
                   <button
                     className="px-5 hover:opacity-70 text-white cursor-pointer duration-500"
                     onClick={incrementQuantity}
@@ -291,6 +320,87 @@ const ProductDetail = () => {
                 <p>Tidak Ada Keterangan</p>
               ) : (
                 <p>{detail.description}</p>
+              )}
+            </div>
+          </div>
+
+          <hr className="" />
+          <div className="pt-2 pl-2 bg-white pb-3 ">
+            {" "}
+            {/* add-On */}
+            <div className="">
+              {allAddons.length > 0 ? (
+                <>
+                  <h5 className="font-semibold">Tambahan</h5>
+                  <hr />
+                  {allAddons.map((data, index) => (
+                    <div key={index}>
+                      <h6 className="mb-2 font-semibold">{data.name}</h6>
+                      {data.type === "single" ? (
+                        <div>
+                          {data.Addons.map((data2, index2) => (
+                            <div
+                              key={index2}
+                              onClick={() =>
+                                handleSelectAllAddons(data2, index, data)
+                              }
+                            >
+                              <div
+                                className={`border cursor-pointer md:w-[400px] border-[#091F4B] flex mb-2 mr-2 rounded-lg p-1 pl-3 text-sm text-gray-700 hover:bg-[#091F4B] hover:text-white ${
+                                  handleSelect.some(
+                                    (element) =>
+                                      element === `${index},${data2.id}`
+                                  )
+                                    ? "bg-[#091F4B] text-white"
+                                    : ""
+                                }`}
+                              >
+                                <div className="flex-grow">
+                                  <p className="">{data2.name}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="items-end flex ml-2 mr-1.5">
+                                    Rp. {data2.price.toLocaleString("id-ID")}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div>
+                          {data.Addons.map((data2, index2) => (
+                            <div
+                              key={index2}
+                              onClick={() =>
+                                handleSelectAllAddons(data2, index, data)
+                              }
+                            >
+                              <div
+                                className={`border cursor-pointer   md:w-[400px] border-[#6E205E] flex mb-2 mr-2 rounded-lg p-1 pl-3 text-sm text-gray-700 hover:bg-[#6E205E] hover:text-white ${
+                                  allSelectAddOns.some(
+                                    (element) => element.id === data2.id
+                                  )
+                                    ? "selected "
+                                    : ""
+                                }`}
+                              >
+                                <p className="title-choose-size">
+                                  {data2.name}
+                                </p>
+                                <p className="justify-end items-end flex text-right">
+                                  Rp. {data2.price}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <h5 className="available-addon">Tambahan tidak Tersedia.</h5>
               )}
             </div>
           </div>
@@ -339,14 +449,14 @@ const ProductDetail = () => {
               <div className="bg-[#091F4B] rounded-xl flex items-center justify-between py-2 ">
                 <button
                   className={`px-4 pl-5 text-white  cursor-pointer hover:opacity-70 duration-500 ${
-                    quantity === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    totalItem === 1 ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   onClick={decrementQuantity}
-                  disabled={quantity === 1}
+                  disabled={totalItem === 1}
                 >
                   <FaMinus />
                 </button>
-                <p className="font-bold text-white pl-4 pr-4">{quantity}</p>
+                <p className="font-bold text-white pl-4 pr-4">{totalItem}</p>
                 <button
                   className="px-5 hover:opacity-70 text-white  cursor-pointer duration-500"
                   onClick={incrementQuantity}
@@ -362,7 +472,7 @@ const ProductDetail = () => {
                 {" "}
                 <button
                   className="text-white bg-[#091F4B] rounded-xl  font-semibold lg:pl-20 lg:pr-20 md:pl-20 md:pr-20 pl-8 pr-8 py-2"
-                  onClick={handleAddToCart}
+                  onClick={handleAddCart}
                 >
                   Masukkan ke keranjang
                 </button>

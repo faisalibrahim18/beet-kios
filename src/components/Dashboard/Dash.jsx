@@ -23,8 +23,9 @@ const Dash = () => {
         const dataTableParsed = JSON.parse(localStorage.getItem("data_table"));
         const token = localStorage.getItem("token");
 
+        // o_id:207
         const productResponse = await axios.get(
-          `${API_URL}/api/v1/product/emenu?outlet_id=207&business_id=152`,
+          `${API_URL}/api/v1/product/emenu?outlet_id=201&business_id=152`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -85,7 +86,7 @@ const Dash = () => {
       {showScrollButton && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-[340px] z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
+          className="fixed bottom-[330px] z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -126,7 +127,7 @@ const Dash = () => {
         </div>
       </div>
 
-      <div className="md:pl-[150px] pl-[120px]">
+      <div className="">
         <Iklan />
       </div>
     </>

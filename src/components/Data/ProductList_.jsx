@@ -16,11 +16,12 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const { id } = useParams();
   const [cart, setCart] = useState([]);
+  const [notes, setNotes] = useState("");
 
   const [itemsToShow, setItemsToShow] = useState(
     showMore ? searchTerm.length : 12
   );
-  const [quantity, setQuantity] = useState(1);
+  const [totalItem, setTotalItem] = useState(1);
   const API_URL = import.meta.env.VITE_API_KEY;
   // console.log("dasyidtuas", selectedCategory);
 
@@ -40,7 +41,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
     const fetchProductDetail = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/api/v1/product/find-product/${id}`,
+          `${API_URL}/api/v1/item/find-item/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -51,7 +52,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
         const data = await response.json();
         setDetail(data.detail);
       } catch (error) {
-        console.error("Error fetching product details:", error);
+        console.error("Error fetching item details:", error);
       }
     };
 
@@ -72,8 +73,8 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
           filteredData = searchTerm.slice(0, itemsToShow);
         } else {
           const filtered = searchTerm.filter(
-            (product) =>
-              product.Product_Category?.name?.toLowerCase() === selectedCategory
+            (item) =>
+              item.Product_Category?.name === selectedCategory
           );
           filteredData = filtered.slice(0, itemsToShow);
         }
@@ -113,10 +114,17 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
         id: item.id,
         business_id: item.business_id,
         outlet_id: item.outlet_id,
-        name: item.name,
-        image: item.image,
-        price: item.price,
-        quantity: quantity,
+        nameItem: item.name,
+        priceItem: item.price,
+        descriptionItem: item.description || null,
+        imageItem: item.image || null,
+        totalItem: totalItem,
+        updateAddons: [],
+        fullDataAddons: [],
+        fullDataProduct: item,
+        allAddons: [],
+        totalAmount: item.price * totalItem,
+        notes: notes,
       };
 
       const existingItemIndex = cart.findIndex(
@@ -128,7 +136,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
         const updatedCart = [...cart];
         updatedCart[existingItemIndex].quantity += quantity;
         setCart(updatedCart);
-        setQuantity(1);
+        setTotalItem(1);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
 
         Swal.fire({
@@ -144,7 +152,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
         // Jika item belum ada di keranjang, tambahkan sebagai item baru
         const updatedCart = [...cart, itemToAdd];
         setCart(updatedCart);
-        setQuantity(1);
+        setTotalItem(1);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
 
         Swal.fire({
@@ -189,12 +197,12 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
   //   );
   // }
   const incrementQuantity = () => {
-    setQuantity(quantity + 1);
+    setTotalItem(totalItem + 1);
   };
 
   const decrementQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
+    if (totalItem > 1) {
+      setTotalItem(totalItem - 1);
     }
   };
   return (
@@ -212,11 +220,11 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
               <div className="flex justify-center items-center">
                 <img
                   src={item.image == null ? Lg : `${API_URL}/${item.image}`}
-                  className="w-auto object-cover md:h-52 h-32 rounded-t-lg"
+                  className="w-auto object-cover sm:h-40 md:h-52 h-32 rounded-t-lg"
                   alt={item.name}
                 />
               </div>
-              <div className="pl-1.5 pr-1.5 pb-1.5 relative">
+              <div className="pl-3 pr-3 pb-1.5 relative">
                 <Link to={`/products/detail/${item.id}`}>
                   <div className=" text-sm tracking-tight font-semibold text-gray-900">
                     {item.name}
@@ -233,22 +241,22 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                   Rp {item.price.toLocaleString("id-ID")}
                   {/* Move the button here */}
                 </div>
-                <div className="flex mt-2 mb-1 text-sm md:justify-evenly">
-                  <div className=" md:px-2 px-0.5 py-1 bg-[#091F4B] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none   flex items-center justify-between  md:mr-4 mr-3 ">
+                <div className="flex mt-2 mb-2 text-sm md:justify-evenly sm:justify-between">
+                  <div className=" md:px-2 sm:px-6 px-0.5 py-1 bg-[#091F4B] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none   flex items-center justify-between  md:mr-4  sm:mr-4 mr-3 ">
                     <button
-                      className={` text-white cursor-pointer hover:opacity-70 duration-500 ${
-                        quantity === 1 ? "opacity-50 cursor-not-allowed" : ""
+                      className={`sm:mr-2 text-white cursor-pointer hover:opacity-70 duration-500 ${
+                        totalItem === 1 ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                       onClick={decrementQuantity}
-                      disabled={quantity === 1}
+                      disabled={totalItem === 1}
                     >
                       <FaMinus />
                     </button>
                     <p className="font-bold text-sm text-white md:pl-4 md:pr-4 pr-2 pl-2">
-                      {quantity}
+                      {totalItem}
                     </p>
                     <button
-                      className=" hover:opacity-70 text-white cursor-pointer duration-500"
+                      className="sm:ml-2 hover:opacity-70 text-white cursor-pointer duration-500"
                       onClick={incrementQuantity}
                     >
                       <FaPlus />
@@ -258,7 +266,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                     className="top-2 right-2 px-2 py-1 bg-[#091F4B] hover:bg-[#0C376A] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none"
                     onClick={() => handleAddToCart(item)}
                   >
-                    <BsCartPlus size={20} />
+                    <BsCartPlus size={25} />
                   </button>
                 </div>
               </div>
@@ -268,7 +276,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
 
         <div>
           {cart.length > 0 && (
-            <div className=" fixed bottom-[270px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-md shadow-xl focus:outline-none">
+            <div className=" fixed bottom-[255px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-md shadow-xl focus:outline-none">
               {/* Tambahkan komponen untuk menampilkan item di dalam keranjang */}
               <Link
                 to={"/products/keranjang"}
@@ -311,9 +319,6 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
           )}
         </div>
       </div>
-     
-
-     
     </div>
   );
 };

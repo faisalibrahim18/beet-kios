@@ -1,8 +1,31 @@
 /* PrintReceipt.css */
-@page {
-    size: 80mm auto;
-    margin: 5mm;
+/* @page {
+  size: 80mm auto;
+  margin: 5mm;
+} */
+/* .receipt-container {
+  font-family: Arial, sans-serif;
+  text-align: left;
+  padding: 20px;
+  border: 1px solid #ccc;
+  margin-top: 20px;
+} */
+/* Tambahkan gaya desain untuk struk di sini */
+/* @media print {
+  body * {
+    visibility: visible;
   }
-  
-  /* Tambahkan gaya desain untuk struk di sini */
-  
+} */
+/* PrintReceipt.css */
+
+/* @page {
+  size: 80mm;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+} */
+
+/* Add Tailwind styles as needed */

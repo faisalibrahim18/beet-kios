@@ -61,6 +61,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
     };
     getData();
   }, [id]);
+
   const uniqueCategories = categoryData.filter(
     (category, index, self) =>
       index ===
@@ -68,11 +69,12 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
         (c) => c.Product_Category?.name === category.Product_Category?.name
       )
   );
+  // console.log("kategori", uniqueCategories);
   return (
     <>
-      <div className=" md:w-full mb-[350px]">
+      <div className=" md:w-full sm:w-[120px] mb-[210px]">
         <div className="text-gray-800 text-center mt-2 font-semibold pb-2">
-          Pilihan Kategori
+          Pilihan Kategorid
         </div>
         <div className="">
           <div className=" whitespace-nowrap py-3">
@@ -88,7 +90,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
                   }`}
                   onClick={() => setSelectedCategory("all")}
                 >
-                  semua
+                  Semua
                 </div>
               </Link>
             </div>
@@ -96,16 +98,13 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
             {uniqueCategories.map((category) => (
               <div className="">
                 <div
-                  className={`bg-gray-100 text-sm  font-semibold hover:bg-gray-300 w-full p-5 lowercase cursor-pointer mb-4  text-center ${
-                    selectedCategory ===
-                    category.Product_Category?.name.toLowerCase()
+                  className={`bg-gray-100 text-sm  font-semibold hover:bg-gray-300 w-full p-5  cursor-pointer mb-4  text-center ${
+                    selectedCategory === category.Product_Category?.name
                       ? " bg-gray-300 text-[#091F4B]"
                       : ""
                   }`}
                   onClick={() =>
-                    setSelectedCategory(
-                      category.Product_Category?.name.toLowerCase()
-                    )
+                    setSelectedCategory(category.Product_Category?.name)
                   }
                 >
                   {category.Product_Category?.name}

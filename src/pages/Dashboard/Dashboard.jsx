@@ -31,7 +31,7 @@ const Dashboard = () => {
   return (
     <>
       <Topbar2 />
-      <div className="mb-[230px]">
+      <div className="mb-[250px] ">
         <Dash />
       </div>
       {/* <div className="md:pl-[150px] pl-[120px]">

@@ -6,6 +6,9 @@ import Mt from "../../assets/mt.jpg";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import { Navigate, useNavigate } from "react-router-dom";
+import { BsRecordFill } from "react-icons/bs";
+import PrintReceipt from "../print/PrintReceipt ";
+import ReactDOMServer from "react-dom/server";
 
 function CheckOut({
   isOpen,
@@ -23,6 +26,11 @@ function CheckOut({
   const [nominal, setNominal] = useState(0);
   const [urlVendor, setUrlVendor] = useState("");
   const [taxAndService, setTaxAndService] = useState({ tax: 0, charge: 0 });
+  const [transactionData, setTransactionData] = useState(null);
+
+  const [showPrintReceipt, setShowPrintReceipt] = useState(false);
+
+  // console.log("show", showPrintReceipt);
   // Mendefinisikan urlVendor sebagai state dengan nilai awal kosong
   // ...
   // console.log("data", selectedOutlets);
@@ -30,6 +38,9 @@ function CheckOut({
     const interval = setInterval(() => {
       setCheckoutTime(new Date());
     }, 1000);
+  }, []);
+  useEffect(() => {
+    handleCheckTaxAndService();
   }, []);
   const handleCheckTaxAndService = async () => {
     try {
@@ -66,6 +77,49 @@ function CheckOut({
       console.log("error handleCheckTaxAndService");
     }
   };
+  const checkStatusPaymentCz = async () => {
+    try {
+      const result = await axios.post(
+        "https://api-link.cashlez.com/validate_url",
+        {
+          status: "",
+          message: "",
+          data: {
+            request: {
+              generatedUrl: urlVendor,
+            },
+          },
+        }
+      );
+      console.log("vendor", urlVendor);
+      console.log("result.data.data2222", result.data.data);
+
+      // Check if the process status has changed
+      // if (
+      //   result.data.data &&
+      //   result.data.data.response.processStatus === "SUCCESS"
+      // ) {
+      //   // If the process status is SUCCESS, update the URL vendor and clear the interval
+      //   setUrlVendor(result.data.data.response.generatedUrl);
+      //   clearInterval(intervalId);
+      // }
+    } catch (error) {
+      console.error("Error in checkStatusPaymentCz:", error);
+    }
+  };
+
+  useEffect(() => {
+    // handlePaymentApprovalActions();
+    // setShowPrintReceipt(true);
+    // Set an interval to check the status every few seconds (adjust the interval as needed)
+    const intervalId = setInterval(() => {
+      // checkStatusPaymentCz();
+    }, 1000); // Check every 5 seconds
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array ensures that this effect runs once after the initial render
+
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(cartData);
@@ -104,10 +158,6 @@ function CheckOut({
     fetchData();
   }, []);
 
-  useEffect(() => {
-    handleCheckTaxAndService();
-  }, []);
-
   const calculateTotalPrice = () => {
     let totalTax = 0;
     let totalService = 0;
@@ -115,11 +165,20 @@ function CheckOut({
     let totalResultTotal = 0;
 
     cart.forEach((item) => {
-      const resultTotal = item.price * item.quantity;
+      const resultTotal = item.priceItem * item.totalItem;
       const tax = Math.ceil((resultTotal * taxAndService.tax) / 100);
       const service = Math.ceil((resultTotal * taxAndService.charge) / 100);
 
-      const paymentTotal = resultTotal;
+      // Calculate addons total
+      let addonsTotal = 0;
+      if (item.fullDataAddons) {
+        addonsTotal = item.fullDataAddons.reduce(
+          (accumulator, addon) => accumulator + addon.price,
+          0
+        );
+      }
+
+      const paymentTotal = resultTotal + addonsTotal;
 
       // Hitung resultAmount
       const resultTotalValue = Math.ceil(paymentTotal + tax + service);
@@ -131,11 +190,6 @@ function CheckOut({
       totalResultTotal += resultTotalValue;
     });
 
-    // console.log("Total Tax:", totalTax);
-    // console.log("Total Service:", totalService);
-    // console.log("Total Payment Total:", totalPaymentTotal);
-    // console.log("Total Result Total:", totalResultTotal);
-
     return {
       totalTax,
       totalService,
@@ -144,38 +198,6 @@ function CheckOut({
     };
   };
   const totalValues = calculateTotalPrice();
-  // console.log("data", calculateTotalPrice());
-
-  // const calculateTotalPrice = () => {
-  //   let total = 0;
-  //   cart.forEach((item) => {
-  //     if (
-  //       selectedItems.includes(item.id) &&
-  //       selectedOutlets.includes(item.business)
-  //     ) {
-  //       total += item.price * item.quantity;
-  //     }
-  //   });
-  //   return total;
-  // };
-  // const calculateTotalPrice = () => {
-  //   let total = 0;
-
-  //   // Iterasi melalui selectedItems
-  //   for (const outletName in selectedItems) {
-  //     const selectedItemIds = selectedItems[outletName];
-  //     for (const itemId of selectedItemIds) {
-  //       // Temukan item yang sesuai dengan itemId
-  //       const selectedItem = cart.find((item) => item.id === itemId);
-
-  //       if (selectedItem) {
-  //         total += selectedItem.price * selectedItem.quantity;
-  //       }
-  //     }
-  //   }
-
-  //   return total;
-  // };
 
   const handlePayment4 = async (nominal) => {
     try {
@@ -183,12 +205,349 @@ function CheckOut({
       const API_URL = import.meta.env.VITE_API_KEY;
       const cartData = JSON.parse(localStorage.getItem("cart")) || [];
       const businessId = cartData.length > 0 ? cartData[0].business_id : null;
-      // console.log(businessId);
-      const totalAmount = cartData.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
+
+      const totalAmount = calculateTotalPrice().totalResultTotal;
+
+      const result = {
+        tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
+        service: Math.ceil((totalAmount * taxAndService.charge) / 100),
+        paymentTotal: totalAmount,
+      };
+
+      result.resultAmount = Math.ceil(
+        result.paymentTotal + result.tax + result.service
       );
 
+      const response = await axios.get(
+        `${API_URL}/api/v1/business-noverify/${businessId}`
+      );
+      const dataBusiness = response.data.data;
+      const transactionData = {
+        referenceId: TRANSIDMERCHANT,
+        merchantName: dataBusiness.name,
+        paymentTotal: result.paymentTotal,
+        resultAmount: result.resultAmount,
+        transactionUsername: dataBusiness.cz_user,
+      };
+
+      setTransactionData(transactionData);
+
+      const generateSignature = {
+        data: {
+          request: {
+            vendorIdentifier: dataBusiness.cz_vendor_identifier,
+            token: "",
+            referenceId: TRANSIDMERCHANT,
+            entityId: dataBusiness.cz_entity_id,
+            merchantName: dataBusiness.name,
+            merchantDescription: "Cashlez Sunter",
+            currencyCode: "IDR",
+            payment_tax: result.tax,
+            payment_service: result.service,
+            payment_total: result.paymentTotal,
+            amount: result.resultAmount,
+            callbackSuccess: "",
+            callbackFailure: "",
+            message: "",
+            description: "Transaction",
+            transactionUsername: dataBusiness.cz_user,
+          },
+        },
+        signature: "",
+      };
+
+      const resSignature = await axios.post(
+        "https://api.beetpos.com/api/v1/signature/generate",
+        generateSignature
+      );
+      generateSignature.signature = resSignature.data.data[0].result;
+
+      const generateUrlVendor = await axios.post(
+        `${API_URL}/api/v1/signature/generate-url-vendor`,
+        generateSignature
+      );
+
+      if (generateUrlVendor.data && generateUrlVendor.data.data.response) {
+        setLoading1(false);
+        const urlVendor = generateUrlVendor.data.data.response.generatedUrl;
+        setUrlVendor(urlVendor);
+
+        const intervalId = setInterval(async () => {
+          const response1 = await axios.post(
+            "https://api-link.cashlez.com/validate_url",
+            {
+              status: "",
+              message: "",
+              data: {
+                request: {
+                  generatedUrl: urlVendor,
+                },
+              },
+            }
+          );
+
+          if (response1.data.data.response.processStatus === "APPROVED") {
+            setLoading1(false);
+            setUrlVendor(urlVendor);
+            handlePaymentApprovalActions();
+            clearInterval(intervalId);
+          }
+        }, 5000);
+      } else {
+        setLoading1(false);
+        Swal.fire({
+          icon: "error",
+          title: "Kesalahan",
+          text: "Tidak dapat menghasilkan URL vendor. Silakan coba lagi nanti.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handlePayment6 = async (nominal) => {
+    try {
+      setLoading1(true);
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const cartData = JSON.parse(localStorage.getItem("cart")) || [];
+      const businessId = cartData.length > 0 ? cartData[0].business_id : null;
+
+      const totalAmount = calculateTotalPrice().totalResultTotal;
+
+      const result = {
+        tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
+        service: Math.ceil((totalAmount * taxAndService.charge) / 100),
+        paymentTotal: totalAmount,
+      };
+
+      result.resultAmount = Math.ceil(
+        result.paymentTotal + result.tax + result.service
+      );
+
+      const response = await axios.get(
+        `${API_URL}/api/v1/business-noverify/${businessId}`
+      );
+      const dataBusiness = response.data.data;
+      const transactionData = {
+        referenceId: TRANSIDMERCHANT,
+        merchantName: dataBusiness.name,
+        paymentTotal: result.paymentTotal,
+        resultAmount: result.resultAmount,
+        transactionUsername: dataBusiness.cz_user,
+      };
+
+      // Dapatkan URL PDF struk dari server
+
+      setTransactionData(transactionData);
+
+      const generateSignature = {
+        data: {
+          request: {
+            vendorIdentifier: dataBusiness.cz_vendor_identifier,
+            token: "",
+            referenceId: TRANSIDMERCHANT,
+            entityId: dataBusiness.cz_entity_id,
+            merchantName: dataBusiness.name,
+            merchantDescription: "Cashlez Sunter",
+            currencyCode: "IDR",
+            payment_tax: result.tax,
+            payment_service: result.service,
+            payment_total: result.paymentTotal,
+            amount: result.resultAmount,
+            callbackSuccess: "",
+            callbackFailure: "",
+            message: "",
+            description: "Transaction",
+            transactionUsername: dataBusiness.cz_user,
+          },
+        },
+        signature: "",
+      };
+
+      const resSignature = await axios.post(
+        "https://api.beetpos.com/api/v1/signature/generate",
+        generateSignature
+      );
+      generateSignature.signature = resSignature.data.data[0].result;
+
+      const generateUrlVendor = await axios.post(
+        `${API_URL}/api/v1/signature/generate-url-vendor`,
+        generateSignature
+      );
+
+      if (generateUrlVendor.data && generateUrlVendor.data.data.response) {
+        setLoading1(false);
+        const urlVendor = generateUrlVendor.data.data.response.generatedUrl;
+        setUrlVendor(urlVendor);
+
+        // Start checking the status at intervals
+        const intervalId = setInterval(async () => {
+          const response1 = await axios.post(
+            "https://api-link.cashlez.com/validate_url",
+            {
+              status: "",
+              message: "",
+              data: {
+                request: {
+                  generatedUrl: urlVendor,
+                },
+              },
+            }
+          );
+
+          console.log("response1.data.data", response1.data.data);
+          console.log(
+            "response1.data.data.response.processStatus",
+            response1.data.data.response.processStatus
+          );
+
+          // Check if the process status has changed
+          if (response1.data.data.response.processStatus === "APPROVED") {
+            // If the process status is SUCCESS, close the modal and clear the interval
+            setLoading1(false);
+            setUrlVendor(urlVendor);
+            handlePaymentApprovalActions();
+            // Generate and display a receipt or perform other actions
+            // generateReceipt(response1.data.data.response);
+
+            clearInterval(intervalId);
+            // closeModal();
+            // Additional code to close the modal or perform any other actions
+          }
+        }, 5000); // Check every 5 seconds
+      } else {
+        setLoading1(false);
+        // Display an error message if the URL vendor is not found
+        Swal.fire({
+          icon: "error",
+          title: "Kesalahan",
+          text: "Tidak dapat menghasilkan URL vendor. Silakan coba lagi nanti.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const generateReceiptText = (paymentData) => {
+    // Sesuaikan dengan format struk yang diinginkan
+    const referenceId = paymentData?.referenceId || "N/A";
+    const merchantName = paymentData?.merchantName || "N/A";
+    const resultAmount = paymentData?.amount || 0;
+
+    return `
+      ====== Struk Pembayaran ======
+      ID Referensi: ${referenceId}
+      Merchant: ${merchantName}
+      Total Pembayaran: Rp. ${resultAmount}
+      ==============================
+    `;
+  };
+
+  const handlePaymentApprovalActions = async () => {
+    localStorage.removeItem("cart");
+
+    // Panggil fungsi untuk mencetak struk
+    // setShowPrintReceipt(true);
+    printReceipt(transactionData);
+    Swal.fire({
+      title: "Pembayaran sukses!",
+      text: "Text lain sesuai kebutuhan",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 2000,
+    }).then(() => {
+      closeModal();
+      navigate("/dashboard");
+    });
+  };
+
+  // useEffect(() => {
+  //   // Check if showPrintReceipt is true and trigger printing
+  //   if (showPrintReceipt) {
+  //     // const printWindow = window.open();
+  //     window.print(<PrintReceipt />);
+
+  //     // Optionally, reset showPrintReceipt after printing
+  //     setShowPrintReceipt(false);
+  //   }
+  // }, [showPrintReceipt]);
+
+  const generateReceiptContent = () => {
+    // Generate and return the receipt content (HTML structure) here
+    // You can use React's renderToString to convert the component to HTML string
+    const receiptContent = ReactDOMServer.renderToString(
+      <PrintReceipt
+        transactionData={transactionData}
+        totalValues={totalValues}
+        cart={cart}
+      />
+    );
+    return receiptContent;
+  };
+
+  const printReceipt = () => {
+    const printWindow = window.open("");
+
+    // Get the receipt content
+    const receiptContent = generateReceiptContent();
+
+    // Write the content to the print window
+    printWindow.document.write(`
+      <html>
+        <head>
+          <style>
+            /* Add styles here if needed */
+          </style>
+        </head>
+        <body>
+          ${receiptContent}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.close();
+  };
+  const handlePayment5 = async (nominal) => {
+    try {
+      setLoading1(true);
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const cartData = JSON.parse(localStorage.getItem("cart")) || [];
+      const businessId = cartData.length > 0 ? cartData[0].business_id : null;
+
+      const totalAmount = calculateTotalPrice().totalResultTotal;
+
+      const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+      console.log("cart", calculateTotalPrice().totalResultTotal);
+      {
+        calculateTotalPrice;
+      }
+      // const tempItems = [];
+      // cartItems.forEach((value) => {
+      //   const tempAddons = [];
+      //   if (value.fullDataAddons) {
+      //     value.fullDataAddons.forEach((value2) => {
+      //       tempAddons.push({
+      //         id: value2.id,
+      //         price: value2.price,
+      //       });
+      //     });
+      //   }
+      //   // tempItems.push({
+      //   //   sales_type_id: getSalesType,
+      //   //   product_id: value.id,
+      //   //   addons: tempAddons || [],
+      //   //   quantity: value.totalItem,
+      //   //   price_product: value.priceItem,
+      //   //   price_discount: 0,
+      //   //   price_service: 0,
+      //   //   price_addons_total: value.totalPriceAddons || 0,
+      //   //   price_total: value.totalAmount,
+      //   //   notes: value.notes,
+      //   // });
+      // });
       // Inisialisasi objek result
       const result = {
         tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
@@ -247,6 +606,24 @@ function CheckOut({
         setLoading1(false);
         const urlVendor = generateUrlVendor.data.data.response.generatedUrl;
         setUrlVendor(urlVendor);
+        console.log(urlVendor);
+        const response1 = await axios.post(
+          "https://api-link.cashlez.com/validate_url",
+          {
+            status: "",
+            message: "",
+            data: {
+              request: {
+                generatedUrl: urlVendor,
+              },
+            },
+          }
+        );
+        console.log("result.data.data", response1.data.data);
+        console.log(
+          "response1.data.data.response.processStatus",
+          response1.data.data.response.processStatus
+        );
       } else {
         setLoading1(false);
         // Menampilkan pesan kesalahan jika URL vendor tidak ditemukan
@@ -257,126 +634,6 @@ function CheckOut({
         });
       }
     } catch (error) {
-      console.log(error);
-    }
-  };  
-
-  const handlePayment = () => {
-    Swal.fire({
-      imageUrl: Mt,
-      imageWidth: 300,
-      imageHeight: 200,
-      html: '<p class="text-sm text-gray-400 font-semibold">Fitur Belum Tersedia Saat Ini :(</p>',
-      showConfirmButton: false,
-      timer: 2000,
-    });
-  };
-
-  const handlePayment3 = async (event) => {
-    const url = event.target.getAttribute("data-url");
-
-    if (url) {
-      console.log("URL yang akan diolah:", url);
-
-      try {
-        const result = await axios.post(
-          "https://api-link.cashlez.com/validate_url",
-          {
-            status: "",
-            message: "",
-            data: {
-              request: {
-                generatedUrl: url,
-              },
-            },
-          }
-        );
-
-        console.log("Hasil proses URL:", result.data.data);
-        console.log("Status proses:", result.data.data.response.processStatus);
-        return result.data.data;
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    } else {
-      console.error("URL tidak ditemukan");
-    }
-  };
-
-  const handlePayment1 = async (response) => {
-    const API_URL = import.meta.env.VITE_API_KEY;
-
-    try {
-      const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-      const paymentMethods = cartData.map((item) => item.business_id);
-
-      const customer_account_id = localStorage.getItem("user");
-      const receiptId = `Pay_${customer_account_id}:${dayjs(new Date()).format(
-        "YYYY/MM/DD:HH:mm:ss"
-      )}`;
-      let paymentMethod;
-      let paymentMethodId;
-
-      if (response && response.paymentType) {
-        if (response.paymentType.id === 1) {
-          paymentMethod = "ecomm";
-        } else if (response.paymentType.id === 2) {
-          paymentMethod = "virtual";
-        } else if (response.paymentType.id === 3) {
-          paymentMethod = "ovo";
-        } else if (response.paymentType.id === 4) {
-          paymentMethod = "qr";
-        } else if (response.paymentType.id === 7) {
-          paymentMethod = "virtual";
-        }
-      }
-
-      cartData.forEach((value) => {
-        if (value.business_id === paymentMethod) {
-          paymentMethodId = value.id;
-        }
-      });
-
-      const sendData = {
-        receipt_id: receiptId,
-        items: [],
-        outlet_id: 3,
-        business_id: 3, // Sesuaikan dengan nilai yang sesuai
-        customer_account_id,
-        payment_method_id: paymentMethodId,
-        payment_discount: 0,
-        payment_tax: 0,
-        payment_service: 0,
-        payment_total: 50000, // Sesuaikan dengan nilai yang sesuai
-        amount: 50000, // Sesuaikan dengan nilai yang sesuai
-        payment_change: 0,
-        invoice: TRANSIDMERCHANT, // Ganti dengan variable yang sesuai
-        paymentchannel:
-          response && response.paymentType
-            ? response.paymentType.code === "ECOMM"
-              ? 15
-              : response.paymentType.code === "TCASH_QR_PAYMENT"
-              ? 0
-              : null
-            : null,
-      };
-
-      const token = localStorage.getItem("token");
-      const resTransaction = await axios.post(
-        `${API_URL}/api/v1/transaction-customer`,
-        sendData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("response transaction", resTransaction.data.data);
-      console.log("Success topup saldo");
-    } catch (error) {
-      console.log("Failed topup saldo");
       console.log(error);
     }
   };
@@ -430,11 +687,6 @@ function CheckOut({
       console.error("Error:", error);
     }
   };
-  const allSelectedItems = Object.values(selectedItems).flat();
-  const selectedItemsData = cart.filter((item) =>
-    selectedItems.includes(item.id)
-  );
-  // console.log(selectedItemsData);
 
   const navigate = useNavigate();
   const handleCash = async () => {
@@ -502,7 +754,7 @@ function CheckOut({
             <div className="absolute inset-0 bg-black opacity-70" />
           </div>
           <div className="relative z-10 w-full max-w-7xl m-5 bg-white shadow-lg rounded-lg lg:p-4 p-3.5 md:p-8">
-            <h1 className="text-2xl font-semibold mb-4">Checkout</h1>
+            <h1 className="text-2xl font-semibold mb-4">Pesanan</h1>
 
             <button
               onClick={closeModal}
@@ -553,20 +805,45 @@ function CheckOut({
                       <div className="bg-gray-300 p-3 rounded-lg">
                         <ul>
                           {cart.map((item) => (
-                            <li
-                              key={item.id}
-                              className="flex justify-between pl-2"
-                            >
-                              <span>{item.name}</span>
-                              <span className="flex items-center">
-                                <span className="w-16 text-right">
-                                  {item.quantity}x
+                            <div key={item.id}>
+                              <div className="flex justify-between pl-2">
+                                <span>{item.nameItem}</span>
+                                <span className="flex items-center">
+                                  <span className="w-16 text-right">
+                                    {item.totalItem}x
+                                  </span>
+                                  <span className="w-24 text-right flex-grow">
+                                    Rp. {item.priceItem.toLocaleString("id-ID")}
+                                  </span>
                                 </span>
-                                <span className="w-24 text-right flex-grow">
-                                  Rp. {item.price.toLocaleString("id-ID")}
-                                </span>
-                              </span>
-                            </li>
+                              </div>
+
+                              {/* Display addons if they exist */}
+                              {item.fullDataAddons &&
+                                item.fullDataAddons.length > 0 && (
+                                  <ul className="pl-5">
+                                    <div className="text-sm font-bold flex">
+                                      {" "}
+                                      <div className="mt-1.5 mr-1">
+                                        <BsRecordFill size={8} />
+                                      </div>
+                                      Add-On
+                                    </div>
+                                    {item.fullDataAddons.map((addon) => (
+                                      <li
+                                        key={addon.id}
+                                        className="flex justify-between pl-4 font-semibold"
+                                      >
+                                        <span> - {addon.name}</span>
+                                        <span>
+                                          Rp.{" "}
+                                          {addon.price.toLocaleString("id-ID")}
+                                        </span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                            </div>
                           ))}
 
                           <hr className="border-2 ml-2 border-gray-400 mb-2 mt-2 rounded-lg" />
@@ -628,6 +905,13 @@ function CheckOut({
           </div>
         </div>
       )}
+      {/* {showPrintReceipt && (
+        <PrintReceipt
+          transactionData={transactionData}
+          totalValues={totalValues}
+          cart={cart}
+        />
+      )} */}
     </div>
   );
 }

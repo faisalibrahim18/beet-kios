@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { CgLogOut } from "react-icons/cg";
 import Swal from "sweetalert2";
 import axios from "axios";
-import Lg from "../../assets/lg.png";
+import Lg from "../../assets/logo.png";
 import Mt from "../../assets/mt.jpg";
 import Cart from "./Cart";
 import "animate.css/animate.min.css"; // Impor animate.css
@@ -199,7 +199,7 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
                 )}
 
                 <div className="flex">
-                  <div className="lg:text-xl text-xl mr-4 mt-1 lg:mt-1.5 md:mt-2">
+                  <div className="lg:text-xl text-xl mr-4 mt-2 lg:mt-1.5 md:mt-2">
                     <div className="relative text-left bottom-3">
                       <Link
                         to={"/products/keranjang"}
@@ -213,7 +213,7 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
                           </span>
                         )}
                       </Link>
-                      <div
+                      {/* <div
                         className={`${
                           isCartOpen
                             ? "cart-dropdown absolute lg:block md:block hidden right-0 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-auto cart-dropdown-animation"
@@ -224,14 +224,14 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
                         <div className="cart-items p-4">
                           <Cart cart={cart} />
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
 
-                  <div className="lg:mt-3 md:mt-4 mt-5 text-white">
+                  <div className="lg:mt-3 md:mt-4 sm:mt-3 text-white">
                     {" "}
                     <Link to={"/dashboard"}>
-                      <img src={Lg} className="bg-transparent lg:w-40 w-40" />
+                      <img src={Lg} className="bg-transparent lg:w-40 sm:w-[40px]" />
                     </Link>
                   </div>
                 </div>
@@ -335,9 +335,9 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
                       // onMouseLeave={closeCart}
                     >
                       <FaShoppingCart />
-                      {totalItems > 0 && ( // Tampilkan notifikasi angka hanya jika ada item dalam keranjang
+                      {cart.length > 0 && (// Tampilkan notifikasi angka hanya jika ada item dalam keranjang
                         <span className="absolute top-5 right-0 bg-red-500 text-white rounded-full px-1 text-xs">
-                          {totalItems}
+                         {cart.length}
                         </span>
                       )}
                     </Link>

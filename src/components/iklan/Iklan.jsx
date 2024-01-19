@@ -18,7 +18,7 @@ const Iklan = () => {
         autoplay={{ delay: 3000, disableOnInteraction: false }}
       >
         <SwiperSlide>
-          <div className="h-[250px] w-full relative">
+          <div className="h-[240px] w-full relative">
             <img
               src={bnr}
               alt="Slider 1"
@@ -27,7 +27,7 @@ const Iklan = () => {
           </div>
         </SwiperSlide>
         <SwiperSlide>
-          <div className="h-[250px] w-full relative">
+          <div className="h-[240px] w-full relative">
             <img
               src={bnr2}
               alt="Slider 2"

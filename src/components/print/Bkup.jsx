@@ -1,12 +1,13 @@
 // PrintReceipt.js
-import React from 'react';
-import './PrintReceipt.css';
+import React from "react";
+import "./PrintReceipt.css";
 
 const PrintReceipt = ({ receiptData }) => {
-  const { items, subtotal, tax, total, paymentMethod, transactionDate } = receiptData;
+  const { items, subtotal, tax, total, paymentMethod, transactionDate } =
+    receiptData;
 
   return (
-    <div className="receipt p-4 border">
+    <div id="printReceipt" className="receipt p-4 border ">
       <h1 className="text-center text-2xl font-bold mb-4">Struk Pembayaran</h1>
 
       <div className="flex justify-between mb-2">
