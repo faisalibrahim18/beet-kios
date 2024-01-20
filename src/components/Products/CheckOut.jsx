@@ -785,7 +785,7 @@ function CheckOut({
                           title="Konten Pembayaran"
                           allow="geolocation"
                         />
-                        <div className="flex justify-center ">
+                        {/* <div className="flex justify-center ">
                           <div className=" mt-5 mr-3">
                             *Jika sudah melakukan pembayaran. diKlik
                           </div>
@@ -795,7 +795,7 @@ function CheckOut({
                           >
                             Pembayaran selesai{" "}
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     )}
                   </>

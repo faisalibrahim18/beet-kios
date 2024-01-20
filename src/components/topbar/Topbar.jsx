@@ -15,11 +15,18 @@ import Mt from "../../assets/mt.jpg";
 import Cart from "./Cart";
 import "animate.css/animate.min.css"; // Impor animate.css
 
-const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
+const Topbar = ({
+  cart,
+  detail,
+  outlet,
+  products,
+  setSearchTermOutlet,
+  loading,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState([]);
   const [open, setOpen] = useState(false);
-  const [cart, setCart] = useState([]);
+  // const [cart, setCart] = useState([]);
   const [searchValue, setSearchValue] = useState(""); // State untuk nilai pencarian
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -40,11 +47,6 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
     };
   }, []);
 
-  useEffect(() => {
-    // Mengambil data dari localStorage
-    const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(cartData);
-  }, []);
   const toggleOpen = () => {
     setIsOpenUser(!isOpenUser);
   };
@@ -81,7 +83,8 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
   //   }
   // };
   // Menghitung total item dalam keranjang
-  const totalItems = cart.length;
+  // console.log("datacart", cart);
+
   const { id } = useParams();
   // console.log("data", products);
   useEffect(() => {
@@ -163,15 +166,15 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
     <>
       <div>
         {id ? (
-          <nav className="bg-[#091F4B] shadow-md fixed w-full z-50 max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="h-16">
+          <nav className="bg-white  fixed w-full  z-50 max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="h-[90px]">
               <div className="flex">
-                <div className="mt-6">
+                <div className="mt-[35px]">
                   <button
                     onClick={() => window.history.back()}
-                    className="text-xl text-white"
+                    className=" text-[#091F4B]"
                   >
-                    <FaArrowLeft />
+                    <FaArrowLeft size={30} />
                   </button>
                 </div>
                 {loading ? (
@@ -181,35 +184,35 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
                     {products && products.length > 0 ? (
                       <div className="w-full lg:pl-0 pl-10  text-white font-semibold pt-3 mt-2  md:mt-2.5 lg:mt-3 text-center">
                         <div key={products[0].id}>
-                          <div>{products[0].Business.name}</div>
+                          {/* <div>{products[0].Business.name}</div> */}
                         </div>
                       </div>
                     ) : detail ? (
                       <div className="w-full lg:pl-0 pl-10 text-white font-semibold pt-3 mt-2 md:mt-2.5 lg:mt-3 text-center">
                         <div key={detail?.id}>
-                          <div>{detail?.Business?.name}</div>
+                          {/* <div>{detail?.Business?.name}</div> */}
                         </div>
                       </div>
                     ) : (
                       <div className="w-full lg:pl-0 pl-10 text-white font-semibold pt-3 mt-2.5 md:mt-2.5 lg:mt-3 text-center">
-                        Profile
+                        {/* Profile */}
                       </div>
                     )}
                   </>
                 )}
 
                 <div className="flex">
-                  <div className="lg:text-xl text-xl mr-4 mt-2 lg:mt-1.5 md:mt-2">
+                  <div className="lg:text-xl text-xl mr-[60px] mt-4 lg:mt-4 xs:mt-4 sm:mt-4 md:mt-4">
                     <div className="relative text-left bottom-3">
                       <Link
                         to={"/products/keranjang"}
-                        className="text-white px-4 py-2 rounded-md focus:outline-none hover:text-gray-200"
+                        className="text-[#091F4B] px-4 py-2 rounded-md focus:outline-none hover:text-gray-200"
                         onMouseEnter={toggleCart}
                       >
-                        <FaShoppingCart />
-                        {totalItems > 0 && (
+                        <FaShoppingCart size={30} />
+                        {cart.length > 0 && (
                           <span className="absolute top-5 right-0 bg-red-500 text-white rounded-full px-1 text-xs">
-                            {totalItems}
+                            {cart.length}
                           </span>
                         )}
                       </Link>
@@ -228,10 +231,13 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
                     </div>
                   </div>
 
-                  <div className="lg:mt-3 md:mt-4 sm:mt-3 text-white">
+                  <div className="lg:mt-4 mt-4 md:mt-4 sm:mt-4 text-white">
                     {" "}
                     <Link to={"/dashboard"}>
-                      <img src={Lg} className="bg-transparent lg:w-40 sm:w-[40px]" />
+                      <img
+                        src={Lg}
+                        className="bg-transparent  w-[90px] xs:w-[90px] sm:w-[90px] md:w-[90px] lg:w-[70px]"
+                      />
                     </Link>
                   </div>
                 </div>
@@ -335,9 +341,9 @@ const Topbar = ({ detail, outlet, products, setSearchTermOutlet, loading }) => {
                       // onMouseLeave={closeCart}
                     >
                       <FaShoppingCart />
-                      {cart.length > 0 && (// Tampilkan notifikasi angka hanya jika ada item dalam keranjang
+                      {cart.length > 0 && ( // Tampilkan notifikasi angka hanya jika ada item dalam keranjang
                         <span className="absolute top-5 right-0 bg-red-500 text-white rounded-full px-1 text-xs">
-                         {cart.length}
+                          {cart.length}
                         </span>
                       )}
                     </Link>

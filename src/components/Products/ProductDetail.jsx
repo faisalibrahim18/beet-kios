@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import Lg from "../../assets/logo.png";
 import { checkTokenExpiration } from "../../utils/token";
+import { BsCartPlus } from "react-icons/bs";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -255,13 +256,13 @@ const ProductDetail = () => {
 
   return (
     <>
-      <Topbar detail={detail} loading={loading} />
+      <Topbar detail={detail} loading={loading} cart={cart} />
       {loading ? (
         <div className="pt-20 flex text-center justify-center items-center h-screen">
           <Loading />
         </div>
       ) : (
-        <div className="bg-gray-100  pt-14" key={detail.id}>
+        <div className="bg-gray-100  pt-16 pb-10" key={detail.id}>
           <div className="lg:p-12  sm:p-7 flex flex-wrap lg:justify-center md:flex-nowrap bg-white">
             <div className="flex-wrap l">
               <img
@@ -311,7 +312,7 @@ const ProductDetail = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-5 lg:p-12  lg:mt-8 pt-5 lg:pl-12 pr-12 lg:pb-12 pb-6 block">
+          <div className="bg-white p-5 lg:p-12  lg:mt-8 pt-5 lg:pl-[50px] sm:pl-[50px] sm:pr-[50px] pr-12 lg:pb-12 pb-6 block">
             <div className="font-semibold mb-2">Keterangan :</div>
             <div className="">
               {detail.description === "null" ? (
@@ -325,10 +326,10 @@ const ProductDetail = () => {
           </div>
 
           <hr className="" />
-          <div className="pt-2 pl-2 bg-white pb-3 ">
+          <div className="pt-2  bg-white pb-3 ">
             {" "}
             {/* add-On */}
-            <div className="">
+            <div className="sm:pl-[30px] sm:pr-[30px]">
               {allAddons.length > 0 ? (
                 <>
                   <h5 className="font-semibold">Tambahan</h5>
@@ -405,7 +406,7 @@ const ProductDetail = () => {
             </div>
           </div>
           {/* notes */}
-          <div className="pl-2 mr-2 bg-white">
+          <div className="sm:pl-[30px] sm:pr-[40px] bg-white">
             <label className="flex mb-1.5">
               <div className="font-semibold">Catatan</div>
               <div className="font-semibold ml-1 text-gray-400">
@@ -425,8 +426,15 @@ const ProductDetail = () => {
           {/* Modal gambar */}
           <div
             id="imageModal"
-            className="fixed z-50 top-0 left-0 w-full h-full flex hidden items-center justify-center bg-black bg-opacity-60 transition-opacity  rounded-lg"
+            className="fixed z-50 top-0 left-0 w-full h-full flex hidden items-center justify-center bg-black bg-opacity-80 transition-opacity  "
           >
+            <button
+              id="closeModal"
+              className="absolute top-4 right-4 text-white text-5xl hover:text-gray-200"
+              onClick={() => closeModal()} // Tutup modal saat tombol close diklik
+            >
+              &times;
+            </button>
             <div className="relative  max-w-xl mx-auto">
               <img
                 id="modalImage"
@@ -434,13 +442,6 @@ const ProductDetail = () => {
                 className=" rounded-lg"
                 alt="Modal"
               />
-              <button
-                id="closeModal"
-                className="absolute top-4 right-4 text-white text-3xl hover:text-[#a02e89]"
-                onClick={() => closeModal()} // Tutup modal saat tombol close diklik
-              >
-                &times;
-              </button>
             </div>
           </div>
 
@@ -471,10 +472,17 @@ const ProductDetail = () => {
               <div className="">
                 {" "}
                 <button
-                  className="text-white bg-[#091F4B] rounded-xl  font-semibold lg:pl-20 lg:pr-20 md:pl-20 md:pr-20 pl-8 pr-8 py-2"
+                  className="text-white text-center bg-[#091F4B] rounded-xl font-semibold lg:pl-20 lg:pr-20 md:pl-20 md:pr-20 pl-[50px] pr-[50px] py-2"
                   onClick={handleAddCart}
                 >
-                  Masukkan ke keranjang
+                  <span className="sm:hidden md:hidden lg:hidden inline">
+                    {" "}
+                    <BsCartPlus size={25} />
+                  </span>
+                  {/* <!-- Hanya tampilkan ikon cart di ukuran mobile --> */}
+                  <span className="hidden md:inline lg:inline sm:inline">
+                    Tambah ke Keranjang
+                  </span>
                 </button>
               </div>
             </div>

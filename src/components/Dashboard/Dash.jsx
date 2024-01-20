@@ -106,7 +106,7 @@ const Dash = () => {
       )}
       <div className="flex pt-[50px]">
         <div
-          className={`bg-gray-100 flex-grow  pt-5 shadow h-full mt-[50px] md:w-[150px] z-50 fixed ${
+          className={`bg-gray-100 flex-grow  pt-5 shadow h-full mt-[50px] z-50 fixed ${
             category.length > 0
               ? "overflow-auto scroll-m-1.5"
               : "overflow-hidden"
@@ -118,7 +118,7 @@ const Dash = () => {
             setSelectedCategory={setSelectedCategory}
           />
         </div>
-        <div className="flex-grow mt-[40px] pl-[110px] md:pl-[150px]">
+        <div className="flex-grow mt-[40px] pl-[67px] sm:pl-[100px] md:pl-[140px]">
           {/* Gunakan komponen ProductList_ dan teruskan searchTerm dan selectedCategory */}
           <ProductList_
             searchTerm={searchTerm}

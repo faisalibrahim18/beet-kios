@@ -29,7 +29,7 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
         {productDetails ? (
           <div className="relative w-full bg-white p-6 rounded-lg max-w-md mx-auto">
             <button
-              className="absolute top-0 right-0 mt-4 mr-4 text-[#6E205E] hover:text-[#a34791] cursor-pointer"
+              className="absolute top-0 right-0 mt-4 mr-4 text-[#091F4B] hover:text-[#0C376A] cursor-pointer"
               onClick={onClose}
             >
               <span className="sr-only">Close</span>
@@ -108,7 +108,9 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
                       Tambahan
                     </div>
                     {productDetails?.allAddons.length === 0 ? (
-                      <div className="ml-4 text-gray-700">Tidak ada tambahan</div>
+                      <div className="ml-4 text-gray-700">
+                        Tidak ada tambahan
+                      </div>
                     ) : (
                       <ul className="list-disc ml-4">
                         {productDetails.allAddons.map((item) => (
