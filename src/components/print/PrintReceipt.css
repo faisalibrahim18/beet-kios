@@ -1,31 +1,71 @@
 /* PrintReceipt.css */
-/* @page {
-  size: 80mm auto;
-  margin: 5mm;
-} */
-/* .receipt-container {
-  font-family: Arial, sans-serif;
-  text-align: left;
-  padding: 20px;
-  border: 1px solid #ccc;
-  margin-top: 20px;
-} */
-/* Tambahkan gaya desain untuk struk di sini */
+
 /* @media print {
-  body * {
-    visibility: visible;
+  #print-page {
+    font-family: Arial, sans-serif !important;
+    max-width: 300px;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #print-page h2 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  #print-page > div {
+    margin-bottom: 10px;
+  }
+
+  #print-page ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #print-page li {
+    margin-left: 15px;
+  }
+
+  #print-page .add-ons {
+    margin-left: 15px;
   }
 } */
-/* PrintReceipt.css */
-
-/* @page {
-  size: 80mm;
-  margin: 0;
+.my-image {
+  background-image: url("../../assets/lg_r.png");
+  /* Properti lain sesuai kebutuhan */
+  display: block;
+  width: 70px;
+  /* height: 100px; */
 }
 
-body {
-  margin: 0;
-  padding: 0;
-} */
+.receipt-item {
+  margin-bottom: 1px;
+}
 
-/* Add Tailwind styles as needed */
+.item-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-name {
+  margin-right: 5px;
+}
+
+.item-price {
+  text-align: right;
+}
+
+.add-ons {
+  margin-left: 10px;
+  margin-top: 2px;
+}
+.item-detailsA {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 15px;
+}

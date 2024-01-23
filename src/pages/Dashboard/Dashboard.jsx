@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { checkTokenExpiration } from "../../utils/token";
 import Topbar2 from "../../components/topbar/Topbar2";
 import Iklan from "../../components/iklan/Iklan";
+import Swal from "sweetalert2";
 
 const Dashboard = () => {
   const navigate = useNavigate();

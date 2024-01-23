@@ -24,8 +24,14 @@ const Dash = () => {
         const token = localStorage.getItem("token");
 
         // o_id:207
+        // robopark
+        // o_id: 304
+        // b_id: 223
+        // demofnb
+        // o_id: 207
+        // b_id: 152
         const productResponse = await axios.get(
-          `${API_URL}/api/v1/product/emenu?outlet_id=201&business_id=152`,
+          `${API_URL}/api/v1/product/emenu?outlet_id=207&business_id=152`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -33,6 +39,38 @@ const Dash = () => {
             },
           }
         );
+        const response = await axios.get(
+          `${API_URL}/api/v1/business/152`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("cek", response)
+        try {
+          // Mendapatkan respons dari API
+          const BusinessResponse = await axios.get(
+            `${API_URL}/api/v1/business/223`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          console.log("dataB", BusinessResponse.data.data);
+          // Mendapatkan URL gambar dari respons API
+          const imageUrl = BusinessResponse.data.data.image; // Ganti dengan properti yang sesuai dari respons API
+
+          // Menyimpan base64 string ke dalam localStorage
+          localStorage.setItem("logo", imageUrl);
+
+          // console.log("Gambar berhasil disimpan di localStorage");
+        } catch (error) {
+          console.error("Terjadi kesalahan:", error.message);
+        }
 
         const categoryProductResponse = await axios.get(
           `${API_URL}/api/v1/product-category/lite?outlet_id=207&business_id=152`,

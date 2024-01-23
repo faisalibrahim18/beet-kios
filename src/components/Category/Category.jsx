@@ -37,6 +37,8 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
   // }, [id]);
 
   // b 152 o 207
+  // robopark
+  // outlet_id=304&business_id=223
   useEffect(() => {
     const getData = async () => {
       try {

@@ -21,24 +21,62 @@ function CheckOut({
   const [payment, setPayment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loading1, setLoading1] = useState(false);
-  const [checkoutTime, setCheckoutTime] = useState(new Date());
   const [TRANSIDMERCHANT] = useState(nanoid(12));
   const [nominal, setNominal] = useState(0);
   const [urlVendor, setUrlVendor] = useState("");
   const [taxAndService, setTaxAndService] = useState({ tax: 0, charge: 0 });
   const [transactionData, setTransactionData] = useState(null);
-
-  const [showPrintReceipt, setShowPrintReceipt] = useState(false);
-
-  // console.log("show", showPrintReceipt);
-  // Mendefinisikan urlVendor sebagai state dengan nilai awal kosong
-  // ...
-  // console.log("data", selectedOutlets);
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCheckoutTime(new Date());
+    // console.log("Transaction Data Updated:", transactionData);
+  }, [transactionData]);
+
+  const [counter, setCounter] = useState(() => {
+    // Get the counter value from localStorage or default to 1
+    const storedCounter = parseInt(localStorage.getItem("counter")) || "01";
+    return storedCounter;
+  });
+
+  const formatNumber = (number, length) => {
+    let formattedNumber = number.toString();
+    while (formattedNumber.length < length) {
+      formattedNumber = "0" + formattedNumber;
+    }
+    return formattedNumber;
+  };
+
+  const resetCounterAt10PM = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    if (hours === 22 && minutes === 0 && seconds === 0) {
+      setCounter(formatNumber(1, 2)); // Menggunakan formatNumber untuk memastikan dua digit
+    }
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      console.log("counter", counter);
+      resetCounterAt10PM();
     }, 1000);
-  }, []);
+
+    return () => clearInterval(intervalId);
+  }, []); // Menghapus dependensi [counter]
+
+  // Save the counter value to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("counter", counter.toString());
+  }, [counter]);
+  const incrementCounter = () => {
+    // setCounter((prevCounter) => prevCounter + 1);
+    setCounter((prevCounter) => {
+      // Increment the counter as a string and then format to ensure two digits
+      const newCounter = formatNumber(parseInt(prevCounter, 10) + 1, 2);
+      return newCounter;
+    });
+  };
+
   useEffect(() => {
     handleCheckTaxAndService();
   }, []);
@@ -46,13 +84,14 @@ function CheckOut({
     try {
       const API_URL = import.meta.env.VITE_API_KEY;
       const token = localStorage.getItem("token");
+
       const resultOutlet = await axios.get(`${API_URL}/api/v1/outlet/304`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("tatatat", resultOutlet);
+      // console.log("tatatat", resultOutlet);
       let taxPercentage = 0;
       let servicePercentage = 0;
       const resTemp = resultOutlet.data.data;
@@ -68,8 +107,8 @@ function CheckOut({
         });
       }
 
-      console.log("taxPercentage", taxPercentage);
-      console.log("servicePercentage", servicePercentage);
+      // console.log("taxPercentage", taxPercentage);
+      // console.log("servicePercentage", servicePercentage);
 
       setTaxAndService({ tax: taxPercentage, charge: servicePercentage });
     } catch (error) {
@@ -110,15 +149,11 @@ function CheckOut({
 
   useEffect(() => {
     // handlePaymentApprovalActions();
-    // setShowPrintReceipt(true);
-    // Set an interval to check the status every few seconds (adjust the interval as needed)
-    const intervalId = setInterval(() => {
-      // checkStatusPaymentCz();
-    }, 1000); // Check every 5 seconds
 
-    // Cleanup the interval on component unmount
+    const intervalId = setInterval(() => {}, 1000);
+
     return () => clearInterval(intervalId);
-  }, []); // Empty dependency array ensures that this effect runs once after the initial render
+  }, []);
 
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem("cart")) || [];
@@ -202,34 +237,46 @@ function CheckOut({
   const handlePayment4 = async (nominal) => {
     try {
       setLoading1(true);
+      const token = localStorage.getItem("token");
       const API_URL = import.meta.env.VITE_API_KEY;
       const cartData = JSON.parse(localStorage.getItem("cart")) || [];
+      const userId = JSON.parse(localStorage.getItem("user")) || [];
       const businessId = cartData.length > 0 ? cartData[0].business_id : null;
+      const outletId = cartData.length > 0 ? cartData[0].outlet_id : null;
 
       const totalAmount = calculateTotalPrice().totalResultTotal;
-
       const result = {
         tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
         service: Math.ceil((totalAmount * taxAndService.charge) / 100),
         paymentTotal: totalAmount,
       };
 
-      result.resultAmount = Math.ceil(
-        result.paymentTotal + result.tax + result.service
-      );
-
+      result.resultAmount = Math.ceil(result.paymentTotal);
       const response = await axios.get(
         `${API_URL}/api/v1/business-noverify/${businessId}`
       );
+      const response3 = await axios.get(
+        `${API_URL}/api/v1/outlet/${outletId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const dataOutlet = response3.data.data;
+
       const dataBusiness = response.data.data;
+
       const transactionData = {
         referenceId: TRANSIDMERCHANT,
+        address: dataOutlet.address,
         merchantName: dataBusiness.name,
         paymentTotal: result.paymentTotal,
         resultAmount: result.resultAmount,
         transactionUsername: dataBusiness.cz_user,
       };
-
+      incrementCounter();
       setTransactionData(transactionData);
 
       const generateSignature = {
@@ -255,7 +302,55 @@ function CheckOut({
         },
         signature: "",
       };
+      const generateReceiptId = () => {
+        const now = new Date();
+        const year = String(now.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
+        const month = String(now.getMonth() + 1).padStart(2, "0"); // Bulan (indeks dimulai dari 0)
+        const day = String(now.getDate()).padStart(2, "0"); // Hari
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
 
+        // Gabungkan elemen-elemen untuk membentuk receipt ID
+        const receiptId = `1:${year}/${month}/${day}:${hours}:${minutes}:${seconds}`;
+
+        return receiptId;
+      };
+
+      // Contoh penggunaan
+      const receiptId = generateReceiptId();
+      console.log(receiptId);
+
+      const sendData = {
+        receipt_id: receiptId,
+        items: cartData,
+        outlet_id: outletId,
+        business_id: businessId,
+        customer_id: userId,
+        sales_type_id: null || [],
+        payment_method_id: null,
+        payment_discount: null,
+        payment_tax: result.tax,
+        payment_service: result.service,
+        payment_total: result.paymentTotal,
+        amount: result.resultAmount,
+        payment_change: 0,
+        invoice: TRANSIDMERCHANT,
+        status: "Done",
+      };
+      // console.log("datasend", sendData);
+      const response1 = await axios.post(
+        `${API_URL}/api/v1/transaction-customer`,
+        sendData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("datasend", response1);
       const resSignature = await axios.post(
         "https://api.beetpos.com/api/v1/signature/generate",
         generateSignature
@@ -266,7 +361,7 @@ function CheckOut({
         `${API_URL}/api/v1/signature/generate-url-vendor`,
         generateSignature
       );
-
+      // handlePaymentApprovalActions(transactionData);
       if (generateUrlVendor.data && generateUrlVendor.data.data.response) {
         setLoading1(false);
         const urlVendor = generateUrlVendor.data.data.response.generatedUrl;
@@ -289,8 +384,39 @@ function CheckOut({
           if (response1.data.data.response.processStatus === "APPROVED") {
             setLoading1(false);
             setUrlVendor(urlVendor);
-            handlePaymentApprovalActions();
+            handlePaymentApprovalActions(transactionData);
             clearInterval(intervalId);
+            // setCounter((prevCounter) => prevCounter + 1);
+            const sendData = {
+              receipt_id: receiptId,
+              items: cartData,
+              outlet_id: outletId,
+              business_id: businessId,
+              customer_id: userId,
+              sales_type_id: null || [],
+              payment_method_id: null,
+              payment_discount: null,
+              payment_tax: result.tax,
+              payment_service: result.service,
+              payment_total: result.paymentTotal,
+              amount: result.resultAmount,
+              payment_change: 0,
+              invoice: TRANSIDMERCHANT,
+              status: "Done",
+            };
+            // console.log("datasend", sendData);
+            const response1 = await axios.post(
+              `${API_URL}/api/v1/transaction-customer`,
+              sendData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            console.log("datasend", response1);
           }
         }, 5000);
       } else {
@@ -328,17 +454,18 @@ function CheckOut({
         `${API_URL}/api/v1/business-noverify/${businessId}`
       );
       const dataBusiness = response.data.data;
-      const transactionData = {
-        referenceId: TRANSIDMERCHANT,
-        merchantName: dataBusiness.name,
-        paymentTotal: result.paymentTotal,
-        resultAmount: result.resultAmount,
-        transactionUsername: dataBusiness.cz_user,
-      };
+      console.log("dataB", dataBusiness);
+      // const transactionData = {
+      //   referenceId: TRANSIDMERCHANT,
+      //   merchantName: dataBusiness.name,
+      //   paymentTotal: result.paymentTotal,
+      //   resultAmount: result.resultAmount,
+      //   transactionUsername: dataBusiness.cz_user,
+      // };
 
-      // Dapatkan URL PDF struk dari server
+      // // Dapatkan URL PDF struk dari server
 
-      setTransactionData(transactionData);
+      // setTransactionData(transactionData);
 
       const generateSignature = {
         data: {
@@ -429,26 +556,10 @@ function CheckOut({
     }
   };
 
-  const generateReceiptText = (paymentData) => {
-    // Sesuaikan dengan format struk yang diinginkan
-    const referenceId = paymentData?.referenceId || "N/A";
-    const merchantName = paymentData?.merchantName || "N/A";
-    const resultAmount = paymentData?.amount || 0;
-
-    return `
-      ====== Struk Pembayaran ======
-      ID Referensi: ${referenceId}
-      Merchant: ${merchantName}
-      Total Pembayaran: Rp. ${resultAmount}
-      ==============================
-    `;
-  };
-
-  const handlePaymentApprovalActions = async () => {
-    localStorage.removeItem("cart");
-
+  const handlePaymentApprovalActions = async (transactionData) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
+    // generateReceiptContent();
     printReceipt(transactionData);
     Swal.fire({
       title: "Pembayaran sukses!",
@@ -457,40 +568,42 @@ function CheckOut({
       showConfirmButton: false,
       timer: 2000,
     }).then(() => {
+      localStorage.removeItem("cart");
+
       closeModal();
       navigate("/dashboard");
     });
   };
 
-  // useEffect(() => {
-  //   // Check if showPrintReceipt is true and trigger printing
-  //   if (showPrintReceipt) {
-  //     // const printWindow = window.open();
-  //     window.print(<PrintReceipt />);
+  const generateReceiptContent = (transactionData) => {
+    const tax = taxAndService.tax;
+    const service = taxAndService.charge;
+    const totaltax = totalValues.totalTax;
+    const total = totalValues.totalResultTotal;
+    const cartData1 = JSON.parse(localStorage.getItem("cart")) || [];
 
-  //     // Optionally, reset showPrintReceipt after printing
-  //     setShowPrintReceipt(false);
-  //   }
-  // }, [showPrintReceipt]);
+    // console.log("Value of transactionData:", transactionData);
 
-  const generateReceiptContent = () => {
-    // Generate and return the receipt content (HTML structure) here
-    // You can use React's renderToString to convert the component to HTML string
     const receiptContent = ReactDOMServer.renderToString(
       <PrintReceipt
-        transactionData={transactionData}
-        totalValues={totalValues}
-        cart={cart}
+        cart={cartData1}
+        tax={tax}
+        service={service}
+        total={total}
+        totaltax={totaltax}
+        counter={counter}
+        transactionData={transactionData} // transactionData is passed as a prop
       />
     );
+
     return receiptContent;
   };
 
-  const printReceipt = () => {
+  const printReceipt = (transactionData) => {
     const printWindow = window.open("");
 
     // Get the receipt content
-    const receiptContent = generateReceiptContent();
+    const receiptContent = generateReceiptContent(transactionData);
 
     // Write the content to the print window
     printWindow.document.write(`
@@ -520,35 +633,11 @@ function CheckOut({
       const totalAmount = calculateTotalPrice().totalResultTotal;
 
       const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
-      console.log("cart", calculateTotalPrice().totalResultTotal);
+      // console.log("cart", calculateTotalPrice().totalResultTotal);
       {
         calculateTotalPrice;
       }
-      // const tempItems = [];
-      // cartItems.forEach((value) => {
-      //   const tempAddons = [];
-      //   if (value.fullDataAddons) {
-      //     value.fullDataAddons.forEach((value2) => {
-      //       tempAddons.push({
-      //         id: value2.id,
-      //         price: value2.price,
-      //       });
-      //     });
-      //   }
-      //   // tempItems.push({
-      //   //   sales_type_id: getSalesType,
-      //   //   product_id: value.id,
-      //   //   addons: tempAddons || [],
-      //   //   quantity: value.totalItem,
-      //   //   price_product: value.priceItem,
-      //   //   price_discount: 0,
-      //   //   price_service: 0,
-      //   //   price_addons_total: value.totalPriceAddons || 0,
-      //   //   price_total: value.totalAmount,
-      //   //   notes: value.notes,
-      //   // });
-      // });
-      // Inisialisasi objek result
+
       const result = {
         tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
         service: Math.ceil((totalAmount * taxAndService.charge) / 100),
@@ -590,6 +679,7 @@ function CheckOut({
         },
         signature: "",
       };
+
       // console.log(generateSignature);
       const resSignature = await axios.post(
         "https://api.beetpos.com/api/v1/signature/generate",

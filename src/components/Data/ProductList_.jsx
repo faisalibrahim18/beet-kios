@@ -95,6 +95,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
 
   const handleAddToCart = (item) => {
     const token = localStorage.getItem("token");
+    console.log("dataaa", item);
     if (!token) {
       const Toast = Swal.mixin({
         toast: true,
@@ -122,8 +123,18 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
         fullDataAddons: [],
         fullDataProduct: item,
         allAddons: [],
+        addons: [],
+        sales_type_id: 1,
         totalAmount: item.price * totalItem,
         notes: notes,
+        product_id: item.id,
+        // addons: [],
+        quantity: totalItem,
+        price_product: item.price,
+        price_discount: 0,
+        price_service: 0,
+        price_addons_total: 0 || 0,
+        price_total: item.price * totalItem,
       };
 
       const existingItemIndex = cart.findIndex(

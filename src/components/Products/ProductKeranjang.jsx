@@ -397,11 +397,13 @@ const ProductKeranjang = () => {
             <div></div>
           ) : (
             <div className="lg:w-1/3 md:w-1/2 md:pt-4">
-              {/* <div>
-                <h1 className="text-2xl font-bold mb-4">Struk Pembelian</h1>
-                <PrintReceipt receiptData={receiptData} />
+              <div>
+                <h1 className="text-2xl font-bold mb-4 ml-10">
+                  Struk Pembelian
+                </h1>
+                <PrintReceipt cart={cart} />
 
-                <div className="mt-4">
+                <div className="mt-4 ml-32">
                   <button
                     onClick={handlePrint}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -409,7 +411,7 @@ const ProductKeranjang = () => {
                     Cetak Struk
                   </button>
                 </div>
-              </div> */}
+              </div>
               <div className="lg:pl-10 md:pl-5 w-full">
                 <div className="border border-[#091F4B] mt-8 p-3 rounded-2xl">
                   <div className="flex">
