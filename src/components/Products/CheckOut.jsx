@@ -31,6 +31,7 @@ function CheckOut({ isOpen, closeModal }) {
     return storedCounter;
   });
 
+  // counter buat no antrian
   const formatNumber = (number, length) => {
     let formattedNumber = number.toString();
     while (formattedNumber.length < length) {
@@ -63,14 +64,17 @@ function CheckOut({ isOpen, closeModal }) {
     localStorage.setItem("counter", counter.toString());
   }, [counter]);
   const incrementCounter = () => {
-    setCounter((prevCounter) => prevCounter + 1);
+    setCounter((prevCounter) => parseInt(prevCounter, 10) + 1);
+    // setCounter((prevCounter) => prevCounter + 1);
     // setCounter((prevCounter) => {
     //   // Increment the counter as a string and then format to ensure two digits
     //   const newCounter = formatNumber(parseInt(prevCounter, 10) + 1);
     //   return newCounter;
     // });
   };
+  // close counter
 
+  // tax and service
   useEffect(() => {
     handleCheckTaxAndService();
   }, []);
@@ -110,6 +114,8 @@ function CheckOut({ isOpen, closeModal }) {
       console.log("error handleCheckTaxAndService");
     }
   };
+
+  // close tax and serive
 
   useEffect(() => {
     // handlePaymentApprovalActions();
@@ -157,6 +163,7 @@ function CheckOut({ isOpen, closeModal }) {
     fetchData();
   }, []);
 
+  // perhitungan jumlah total
   const calculateTotalPrice = () => {
     let totalTax = 0;
     let totalService = 0;
@@ -197,7 +204,9 @@ function CheckOut({ isOpen, closeModal }) {
     };
   };
   const totalValues = calculateTotalPrice();
+  // close pergitungan jumlah total
 
+  // handle buat pembayaran/checkout
   const handlePayment4 = async () => {
     try {
       setLoading1(true);
@@ -396,6 +405,9 @@ function CheckOut({ isOpen, closeModal }) {
     }
   };
 
+  //  close handle buat pembayaran/checkout
+
+  // action ketika selesai pembayaran
   const handlePaymentApprovalActions = async (transactionData) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
@@ -414,7 +426,9 @@ function CheckOut({ isOpen, closeModal }) {
       navigate("/dashboard");
     });
   };
+  // close  action ketika selesai pembayaran
 
+  // generate data receipt
   const generateReceiptContent = (transactionData) => {
     const tax = taxAndService.tax;
     const service = taxAndService.charge;
@@ -438,7 +452,9 @@ function CheckOut({ isOpen, closeModal }) {
 
     return receiptContent;
   };
+  // close generate data receipt
 
+  //  print receipt
   const printReceipt = (transactionData) => {
     const printWindow = window.open();
     console.log("print ke sini");
@@ -467,7 +483,9 @@ function CheckOut({ isOpen, closeModal }) {
       console.error("Failed to open print window");
     }
   };
+  //  close print receipt
 
+  // handle pembayaran cash
   const handleCash = async () => {
     try {
       const confirmation = await Swal.fire({
@@ -497,7 +515,7 @@ function CheckOut({ isOpen, closeModal }) {
       console.error("Error during navigation:", error);
     }
   };
-
+  // close handle pembayaran cash
   return (
     <div>
       {isOpen && (
@@ -528,6 +546,7 @@ function CheckOut({ isOpen, closeModal }) {
                 ) : urlVendor ? (
                   <>
                     {" "}
+                    {/* untuk menampilkan iframe dan memunculkan jenis pembayaran */}
                     {urlVendor && (
                       <div>
                         <iframe
@@ -550,6 +569,7 @@ function CheckOut({ isOpen, closeModal }) {
                         </div> */}
                       </div>
                     )}
+                    {/*close  untuk menampilkan iframe dan memunculkan jenis pembayaran */}
                   </>
                 ) : (
                   <div className="overflow-auto">
@@ -570,7 +590,7 @@ function CheckOut({ isOpen, closeModal }) {
                                 </span>
                               </div>
 
-                              {/* Display addons if they exist */}
+                              {/* data dari tambahan */}
                               {item.fullDataAddons &&
                                 item.fullDataAddons.length > 0 && (
                                   <ul className="pl-5">
@@ -595,6 +615,7 @@ function CheckOut({ isOpen, closeModal }) {
                                     ))}
                                   </ul>
                                 )}
+                              {/* close data dari tambahan */}
                             </div>
                           ))}
 
@@ -644,7 +665,7 @@ function CheckOut({ isOpen, closeModal }) {
                         Cash
                       </button>
                       <button
-                        className="bg-[#091F4B] text-white px-20 py-2 rounded-2xl hover-bg-[#8f387d]"
+                        className="bg-[#091F4B] text-white px-20 py-2 rounded-2xl hover-bg-[#8f387d] mt-2"
                         onClick={() => handlePayment4(nominal)}
                       >
                         QRIS/CARD
