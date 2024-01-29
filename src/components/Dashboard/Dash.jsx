@@ -31,7 +31,7 @@ const Dash = () => {
         // o_id: 207
         // b_id: 152
         const productResponse = await axios.get(
-          `${API_URL}/api/v1/product/emenu?outlet_id=207&business_id=152`,
+          `${API_URL}/api/v1/product/emenu?outlet_id=304&business_id=223`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -39,16 +39,16 @@ const Dash = () => {
             },
           }
         );
-        const response = await axios.get(
-          `${API_URL}/api/v1/business/152`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("cek", response)
+        // const response = await axios.get(
+        //   `${API_URL}/api/v1/business/223`,
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //   }
+        // );
+        // console.log("cek", response)
         try {
           // Mendapatkan respons dari API
           const BusinessResponse = await axios.get(
@@ -73,7 +73,7 @@ const Dash = () => {
         }
 
         const categoryProductResponse = await axios.get(
-          `${API_URL}/api/v1/product-category/lite?outlet_id=207&business_id=152`,
+          `${API_URL}/api/v1/product-category/lite?outlet_id=304&business_id=223`,
           {
             headers: {
               "Content-Type": "application/json",

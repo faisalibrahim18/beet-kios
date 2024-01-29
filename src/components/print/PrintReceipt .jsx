@@ -1,4 +1,3 @@
-// PrintReceipt.js
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 // import Lg from "../../assets/lg_r.png";
@@ -15,8 +14,9 @@ const PrintReceipt = ({
   if (!cart || cart.length === 0) {
     return <div>Cart is empty</div>;
   }
+
   const API_URL = import.meta.env.VITE_API_KEY;
-  // console.log("trans", transactionData);
+  // console.log("ini data printnya");
   const [taxAndService, setTaxAndService] = useState({ tax: 0, charge: 0 });
 
   useEffect(() => {
@@ -153,13 +153,12 @@ const PrintReceipt = ({
     <div
       style={{
         fontFamily: "Arial, sans-serif",
-        maxWidth: "72mm",
-        margin: "2px",
+        maxWidth: "80mm",
+        margin: "0px",
         fontSize: "10px",
       }}
-      id="print-page"
     >
-      <div style={{ marginBottom: "10px" }}>
+      <div style={{ marginBottom: "5px" }}>
         <div
           style={{
             display: "flex",
@@ -170,7 +169,7 @@ const PrintReceipt = ({
           }}
         >
           <img
-            src={`${API_URL}${logo}`}
+            src={`${API_URL}/${logo}`}
             alt=""
             style={{
               // maxWidth: "100%", // Agar logo tidak melebihi lebar parent
@@ -190,7 +189,7 @@ const PrintReceipt = ({
       {/* data Item */}
       <div>
         {cart.map((item) => (
-          <div key={item.id}>
+          <div>
             <div
               style={{
                 display: "grid",
@@ -214,7 +213,6 @@ const PrintReceipt = ({
                 <b>Tambahan:</b>
                 {item.fullDataAddons.map((addon) => (
                   <div
-                    key={addon.id}
                     style={{
                       display: "grid",
                       gridTemplateColumns: "1fr 1fr",
@@ -243,14 +241,14 @@ const PrintReceipt = ({
       {/* taxAndService */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>tax ({tax}%)</div>
+          <div>Tax ({tax}%)</div>
           <div style={{ textAlign: "right" }}>
-            Rp. {totaltax}
-            {/* Rp. {totaltax.toLocaleString("id-ID")} */}
+            {/* Rp. {totaltax} */}
+            Rp. {totaltax.toLocaleString("id-ID")}
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>service ({taxAndService.charge}%)</div>
+          <div>Service ({taxAndService.charge}%)</div>
           <div style={{ textAlign: "right" }}>
             Rp. {totalValues.totalService.toLocaleString("id-ID")}
           </div>
@@ -260,8 +258,8 @@ const PrintReceipt = ({
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>Total</div>
         <div style={{ textAlign: "right" }}>
-          Rp. {total}
-          {/* Rp. {total.toLocaleString("id-ID")} */}
+          {/* Rp. {total} */}
+          Rp. {total.toLocaleString("id-ID")}
         </div>
       </div>
       <hr />

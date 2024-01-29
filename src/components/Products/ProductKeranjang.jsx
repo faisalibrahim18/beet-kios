@@ -12,6 +12,7 @@ import { BsArrowLeft } from "react-icons/bs";
 import PrintReceipt from "../print/PrintReceipt ";
 import DetailKeranjang from "./DetailKeranjang";
 import { BiDetail } from "react-icons/bi";
+import printJS from "print-js";
 
 const ProductKeranjang = () => {
   const [cart, setCart] = useState([]);
@@ -77,6 +78,7 @@ const ProductKeranjang = () => {
         return {
           ...cartItem,
           totalItem: updatedTotalItem,
+          quantity: updatedTotalItem,
           totalAmount: updatedTotalAmount,
         };
       }
@@ -95,6 +97,7 @@ const ProductKeranjang = () => {
         return {
           ...cartItem,
           totalItem: updatedTotalItem,
+          quantity: updatedTotalItem,
           totalAmount: updatedTotalAmount,
         };
       }
@@ -214,7 +217,7 @@ const ProductKeranjang = () => {
     transactionDate: "2024-01-16 14:30:00",
   };
 
-  const handlePrint = () => {
+  const handlePrinta = () => {
     const printWindow = window.open("", "_blank");
     const styles = Array.from(document.styleSheets)
       .map((styleSheet) => Array.from(styleSheet.cssRules))
@@ -397,7 +400,7 @@ const ProductKeranjang = () => {
             <div></div>
           ) : (
             <div className="lg:w-1/3 md:w-1/2 md:pt-4">
-              <div>
+              {/* <div>
                 <h1 className="text-2xl font-bold mb-4 ml-10">
                   Struk Pembelian
                 </h1>
@@ -405,13 +408,13 @@ const ProductKeranjang = () => {
 
                 <div className="mt-4 ml-32">
                   <button
-                    onClick={handlePrint}
+                    // onClick={handlePrint}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   >
                     Cetak Struk
                   </button>
                 </div>
-              </div>
+              </div> */}
               <div className="lg:pl-10 md:pl-5 w-full">
                 <div className="border border-[#091F4B] mt-8 p-3 rounded-2xl">
                   <div className="flex">

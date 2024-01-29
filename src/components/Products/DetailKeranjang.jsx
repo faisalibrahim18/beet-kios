@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import Lg from "../../assets/logo.png";
 const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
   const [productDetails, setProductDetails] = useState(null);
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -11,7 +11,7 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
         setProductDetails(details);
       } catch (error) {
         console.error("Error fetching item details:", error);
-        // Handle the error appropriately in your application
+        
       }
     };
 

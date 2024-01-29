@@ -1,4 +1,9 @@
 /* PrintReceipt.css */
+@media print {
+  iframe {
+      display: none !important;
+  }
+}
 
 /* @media print {
   #print-page {
@@ -34,12 +39,11 @@
     margin-left: 15px;
   }
 } */
-.my-image {
+/* .my-image {
   background-image: url("../../assets/lg_r.png");
-  /* Properti lain sesuai kebutuhan */
+
   display: block;
   width: 70px;
-  /* height: 100px; */
 }
 
 .receipt-item {
@@ -68,4 +72,4 @@
   display: flex;
   justify-content: space-between;
   margin-left: 15px;
-}
+} */

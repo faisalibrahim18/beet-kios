@@ -4,19 +4,12 @@ import Swal from "sweetalert2";
 import Loading from "../Loading/Loading";
 import Mt from "../../assets/mt.jpg";
 import { nanoid } from "nanoid";
-import dayjs from "dayjs";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { BsRecordFill } from "react-icons/bs";
 import PrintReceipt from "../print/PrintReceipt ";
 import ReactDOMServer from "react-dom/server";
 
-function CheckOut({
-  isOpen,
-  closeModal,
-  setIsModalOpen,
-  selectedItems,
-  selectedOutlets,
-}) {
+function CheckOut({ isOpen, closeModal }) {
   const [cart, setCart] = useState([]);
   const [payment, setPayment] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +19,8 @@ function CheckOut({
   const [urlVendor, setUrlVendor] = useState("");
   const [taxAndService, setTaxAndService] = useState({ tax: 0, charge: 0 });
   const [transactionData, setTransactionData] = useState(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     // console.log("Transaction Data Updated:", transactionData);
   }, [transactionData]);
@@ -64,17 +59,16 @@ function CheckOut({
     return () => clearInterval(intervalId);
   }, []); // Menghapus dependensi [counter]
 
-  // Save the counter value to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("counter", counter.toString());
   }, [counter]);
   const incrementCounter = () => {
-    // setCounter((prevCounter) => prevCounter + 1);
-    setCounter((prevCounter) => {
-      // Increment the counter as a string and then format to ensure two digits
-      const newCounter = formatNumber(parseInt(prevCounter, 10) + 1, 2);
-      return newCounter;
-    });
+    setCounter((prevCounter) => prevCounter + 1);
+    // setCounter((prevCounter) => {
+    //   // Increment the counter as a string and then format to ensure two digits
+    //   const newCounter = formatNumber(parseInt(prevCounter, 10) + 1);
+    //   return newCounter;
+    // });
   };
 
   useEffect(() => {
@@ -116,40 +110,10 @@ function CheckOut({
       console.log("error handleCheckTaxAndService");
     }
   };
-  const checkStatusPaymentCz = async () => {
-    try {
-      const result = await axios.post(
-        "https://api-link.cashlez.com/validate_url",
-        {
-          status: "",
-          message: "",
-          data: {
-            request: {
-              generatedUrl: urlVendor,
-            },
-          },
-        }
-      );
-      console.log("vendor", urlVendor);
-      console.log("result.data.data2222", result.data.data);
-
-      // Check if the process status has changed
-      // if (
-      //   result.data.data &&
-      //   result.data.data.response.processStatus === "SUCCESS"
-      // ) {
-      //   // If the process status is SUCCESS, update the URL vendor and clear the interval
-      //   setUrlVendor(result.data.data.response.generatedUrl);
-      //   clearInterval(intervalId);
-      // }
-    } catch (error) {
-      console.error("Error in checkStatusPaymentCz:", error);
-    }
-  };
 
   useEffect(() => {
     // handlePaymentApprovalActions();
-
+    // incrementCounter();
     const intervalId = setInterval(() => {}, 1000);
 
     return () => clearInterval(intervalId);
@@ -234,7 +198,7 @@ function CheckOut({
   };
   const totalValues = calculateTotalPrice();
 
-  const handlePayment4 = async (nominal) => {
+  const handlePayment4 = async () => {
     try {
       setLoading1(true);
       const token = localStorage.getItem("token");
@@ -276,7 +240,7 @@ function CheckOut({
         resultAmount: result.resultAmount,
         transactionUsername: dataBusiness.cz_user,
       };
-      incrementCounter();
+      // incrementCounter();
       setTransactionData(transactionData);
 
       const generateSignature = {
@@ -302,55 +266,55 @@ function CheckOut({
         },
         signature: "",
       };
-      const generateReceiptId = () => {
-        const now = new Date();
-        const year = String(now.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
-        const month = String(now.getMonth() + 1).padStart(2, "0"); // Bulan (indeks dimulai dari 0)
-        const day = String(now.getDate()).padStart(2, "0"); // Hari
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-        const seconds = String(now.getSeconds()).padStart(2, "0");
+      // const generateReceiptId = () => {
+      //   const now = new Date();
+      //   const year = String(now.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
+      //   const month = String(now.getMonth() + 1).padStart(2, "0"); // Bulan (indeks dimulai dari 0)
+      //   const day = String(now.getDate()).padStart(2, "0"); // Hari
+      //   const hours = String(now.getHours()).padStart(2, "0");
+      //   const minutes = String(now.getMinutes()).padStart(2, "0");
+      //   const seconds = String(now.getSeconds()).padStart(2, "0");
 
-        // Gabungkan elemen-elemen untuk membentuk receipt ID
-        const receiptId = `1:${year}/${month}/${day}:${hours}:${minutes}:${seconds}`;
+      //   // Gabungkan elemen-elemen untuk membentuk receipt ID
+      //   const receiptId = `1:${year}/${month}/${day}:${hours}:${minutes}:${seconds}`;
 
-        return receiptId;
-      };
+      //   return receiptId;
+      // };
 
       // Contoh penggunaan
-      const receiptId = generateReceiptId();
-      console.log(receiptId);
+      // const receiptId = generateReceiptId();
+      // console.log(receiptId);
 
-      const sendData = {
-        receipt_id: receiptId,
-        items: cartData,
-        outlet_id: outletId,
-        business_id: businessId,
-        customer_id: userId,
-        sales_type_id: null || [],
-        payment_method_id: null,
-        payment_discount: null,
-        payment_tax: result.tax,
-        payment_service: result.service,
-        payment_total: result.paymentTotal,
-        amount: result.resultAmount,
-        payment_change: 0,
-        invoice: TRANSIDMERCHANT,
-        status: "Done",
-      };
+      // const sendData = {
+      //   receipt_id: receiptId,
+      //   items: cartData,
+      //   outlet_id: outletId,
+      //   business_id: businessId,
+      //   customer_id: userId,
+      //   sales_type_id: null || [],
+      //   payment_method_id: null,
+      //   payment_discount: null,
+      //   payment_tax: result.tax,
+      //   payment_service: result.service,
+      //   payment_total: result.paymentTotal,
+      //   amount: result.resultAmount,
+      //   payment_change: 0,
+      //   invoice: TRANSIDMERCHANT,
+      //   status: "Done",
+      // };
       // console.log("datasend", sendData);
-      const response1 = await axios.post(
-        `${API_URL}/api/v1/transaction-customer`,
-        sendData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // const response1 = await axios.post(
+      //   `${API_URL}/api/v1/transaction-customer`,
+      //   sendData,
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
+      // );
 
-      console.log("datasend", response1);
+      // console.log("datasend", response1);
       const resSignature = await axios.post(
         "https://api.beetpos.com/api/v1/signature/generate",
         generateSignature
@@ -387,164 +351,40 @@ function CheckOut({
             handlePaymentApprovalActions(transactionData);
             clearInterval(intervalId);
             // setCounter((prevCounter) => prevCounter + 1);
-            const sendData = {
-              receipt_id: receiptId,
-              items: cartData,
-              outlet_id: outletId,
-              business_id: businessId,
-              customer_id: userId,
-              sales_type_id: null || [],
-              payment_method_id: null,
-              payment_discount: null,
-              payment_tax: result.tax,
-              payment_service: result.service,
-              payment_total: result.paymentTotal,
-              amount: result.resultAmount,
-              payment_change: 0,
-              invoice: TRANSIDMERCHANT,
-              status: "Done",
-            };
-            // console.log("datasend", sendData);
-            const response1 = await axios.post(
-              `${API_URL}/api/v1/transaction-customer`,
-              sendData,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+            // const sendData = {
+            //   receipt_id: receiptId,
+            //   items: cartData,
+            //   outlet_id: outletId,
+            //   business_id: businessId,
+            //   customer_id: userId,
+            //   sales_type_id: null || [],
+            //   payment_method_id: null,
+            //   payment_discount: null,
+            //   payment_tax: result.tax,
+            //   payment_service: result.service,
+            //   payment_total: result.paymentTotal,
+            //   amount: result.resultAmount,
+            //   payment_change: 0,
+            //   invoice: TRANSIDMERCHANT,
+            //   status: "Done",
+            // };
+            // // console.log("datasend", sendData);
+            // const response1 = await axios.post(
+            //   `${API_URL}/api/v1/transaction-customer`,
+            //   sendData,
+            //   {
+            //     headers: {
+            //       "Content-Type": "application/json",
+            //       Authorization: `Bearer ${token}`,
+            //     },
+            //   }
+            // );
 
-            console.log("datasend", response1);
+            // console.log("datasend", response1);
           }
         }, 5000);
       } else {
         setLoading1(false);
-        Swal.fire({
-          icon: "error",
-          title: "Kesalahan",
-          text: "Tidak dapat menghasilkan URL vendor. Silakan coba lagi nanti.",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const handlePayment6 = async (nominal) => {
-    try {
-      setLoading1(true);
-      const API_URL = import.meta.env.VITE_API_KEY;
-      const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-      const businessId = cartData.length > 0 ? cartData[0].business_id : null;
-
-      const totalAmount = calculateTotalPrice().totalResultTotal;
-
-      const result = {
-        tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
-        service: Math.ceil((totalAmount * taxAndService.charge) / 100),
-        paymentTotal: totalAmount,
-      };
-
-      result.resultAmount = Math.ceil(
-        result.paymentTotal + result.tax + result.service
-      );
-
-      const response = await axios.get(
-        `${API_URL}/api/v1/business-noverify/${businessId}`
-      );
-      const dataBusiness = response.data.data;
-      console.log("dataB", dataBusiness);
-      // const transactionData = {
-      //   referenceId: TRANSIDMERCHANT,
-      //   merchantName: dataBusiness.name,
-      //   paymentTotal: result.paymentTotal,
-      //   resultAmount: result.resultAmount,
-      //   transactionUsername: dataBusiness.cz_user,
-      // };
-
-      // // Dapatkan URL PDF struk dari server
-
-      // setTransactionData(transactionData);
-
-      const generateSignature = {
-        data: {
-          request: {
-            vendorIdentifier: dataBusiness.cz_vendor_identifier,
-            token: "",
-            referenceId: TRANSIDMERCHANT,
-            entityId: dataBusiness.cz_entity_id,
-            merchantName: dataBusiness.name,
-            merchantDescription: "Cashlez Sunter",
-            currencyCode: "IDR",
-            payment_tax: result.tax,
-            payment_service: result.service,
-            payment_total: result.paymentTotal,
-            amount: result.resultAmount,
-            callbackSuccess: "",
-            callbackFailure: "",
-            message: "",
-            description: "Transaction",
-            transactionUsername: dataBusiness.cz_user,
-          },
-        },
-        signature: "",
-      };
-
-      const resSignature = await axios.post(
-        "https://api.beetpos.com/api/v1/signature/generate",
-        generateSignature
-      );
-      generateSignature.signature = resSignature.data.data[0].result;
-
-      const generateUrlVendor = await axios.post(
-        `${API_URL}/api/v1/signature/generate-url-vendor`,
-        generateSignature
-      );
-
-      if (generateUrlVendor.data && generateUrlVendor.data.data.response) {
-        setLoading1(false);
-        const urlVendor = generateUrlVendor.data.data.response.generatedUrl;
-        setUrlVendor(urlVendor);
-
-        // Start checking the status at intervals
-        const intervalId = setInterval(async () => {
-          const response1 = await axios.post(
-            "https://api-link.cashlez.com/validate_url",
-            {
-              status: "",
-              message: "",
-              data: {
-                request: {
-                  generatedUrl: urlVendor,
-                },
-              },
-            }
-          );
-
-          console.log("response1.data.data", response1.data.data);
-          console.log(
-            "response1.data.data.response.processStatus",
-            response1.data.data.response.processStatus
-          );
-
-          // Check if the process status has changed
-          if (response1.data.data.response.processStatus === "APPROVED") {
-            // If the process status is SUCCESS, close the modal and clear the interval
-            setLoading1(false);
-            setUrlVendor(urlVendor);
-            handlePaymentApprovalActions();
-            // Generate and display a receipt or perform other actions
-            // generateReceipt(response1.data.data.response);
-
-            clearInterval(intervalId);
-            // closeModal();
-            // Additional code to close the modal or perform any other actions
-          }
-        }, 5000); // Check every 5 seconds
-      } else {
-        setLoading1(false);
-        // Display an error message if the URL vendor is not found
         Swal.fire({
           icon: "error",
           title: "Kesalahan",
@@ -600,185 +440,34 @@ function CheckOut({
   };
 
   const printReceipt = (transactionData) => {
-    const printWindow = window.open("");
+    const printWindow = window.open();
+    console.log("print ke sini");
+    if (printWindow) {
+      const receiptContent = generateReceiptContent(transactionData);
 
-    // Get the receipt content
-    const receiptContent = generateReceiptContent(transactionData);
+      printWindow.document.write(`
+          <html>
+            <head>
+              <style>
+                /* Add styles here if needed */
+              </style>
+            </head>
+            <body>
+              ${receiptContent}
+            </body>
+          </html>
+        `);
 
-    // Write the content to the print window
-    printWindow.document.write(`
-      <html>
-        <head>
-          <style>
-            /* Add styles here if needed */
-          </style>
-        </head>
-        <body>
-          ${receiptContent}
-        </body>
-      </html>
-    `);
+      printWindow.document.close();
 
-    printWindow.document.close();
-    printWindow.print();
-    printWindow.close();
-  };
-  const handlePayment5 = async (nominal) => {
-    try {
-      setLoading1(true);
-      const API_URL = import.meta.env.VITE_API_KEY;
-      const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-      const businessId = cartData.length > 0 ? cartData[0].business_id : null;
+      printWindow.print();
 
-      const totalAmount = calculateTotalPrice().totalResultTotal;
-
-      const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
-      // console.log("cart", calculateTotalPrice().totalResultTotal);
-      {
-        calculateTotalPrice;
-      }
-
-      const result = {
-        tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
-        service: Math.ceil((totalAmount * taxAndService.charge) / 100),
-        paymentTotal: totalAmount, // paymentTotal awalnya sama dengan totalAmount
-      };
-
-      // Hitung resultAmount
-      result.resultAmount = Math.ceil(
-        result.paymentTotal + result.tax + result.service
-      );
-
-      // const businessId = selectedItemsArray[0].business_id;
-      const response = await axios.get(
-        `${API_URL}/api/v1/business-noverify/${businessId}`
-      );
-      const dataBusiness = response.data.data;
-
-      // Update generateSignature dengan menggunakan result
-      const generateSignature = {
-        data: {
-          request: {
-            vendorIdentifier: dataBusiness.cz_vendor_identifier,
-            token: "",
-            referenceId: TRANSIDMERCHANT,
-            entityId: dataBusiness.cz_entity_id,
-            merchantName: dataBusiness.name,
-            merchantDescription: "Cashlez Sunter",
-            currencyCode: "IDR",
-            payment_tax: result.tax, // Gunakan result.tax
-            payment_service: result.service, // Gunakan result.service
-            payment_total: result.paymentTotal, // Gunakan result.paymentTotal
-            amount: result.resultAmount,
-            callbackSuccess: "",
-            callbackFailure: "",
-            message: "",
-            description: "Transaction",
-            transactionUsername: dataBusiness.cz_user,
-          },
-        },
-        signature: "",
-      };
-
-      // console.log(generateSignature);
-      const resSignature = await axios.post(
-        "https://api.beetpos.com/api/v1/signature/generate",
-        generateSignature
-      );
-      generateSignature.signature = resSignature.data.data[0].result;
-
-      const generateUrlVendor = await axios.post(
-        `${API_URL}/api/v1/signature/generate-url-vendor`,
-        generateSignature
-      );
-
-      if (generateUrlVendor.data && generateUrlVendor.data.data.response) {
-        setLoading1(false);
-        const urlVendor = generateUrlVendor.data.data.response.generatedUrl;
-        setUrlVendor(urlVendor);
-        console.log(urlVendor);
-        const response1 = await axios.post(
-          "https://api-link.cashlez.com/validate_url",
-          {
-            status: "",
-            message: "",
-            data: {
-              request: {
-                generatedUrl: urlVendor,
-              },
-            },
-          }
-        );
-        console.log("result.data.data", response1.data.data);
-        console.log(
-          "response1.data.data.response.processStatus",
-          response1.data.data.response.processStatus
-        );
-      } else {
-        setLoading1(false);
-        // Menampilkan pesan kesalahan jika URL vendor tidak ditemukan
-        Swal.fire({
-          icon: "error",
-          title: "Kesalahan",
-          text: "Tidak dapat menghasilkan URL vendor. Silakan coba lagi nanti.",
-        });
-      }
-    } catch (error) {
-      console.log(error);
+      printWindow.close();
+    } else {
+      console.error("Failed to open print window");
     }
   };
 
-  const handlePayment2 = async () => {
-    const API_URL = import.meta.env.VITE_API_KEY;
-    const token = localStorage.getItem("token");
-    const sendData = {
-      receipt_id: "1:23/10/15:09:28:52",
-      items: [
-        {
-          product_id: 151,
-          addons: [],
-          quantity: 5,
-          price_product: 5000,
-          price_discount: 0,
-          price_service: 0,
-          price_addons_total: 1000,
-          price_total: 6000,
-          notes: "Semangka",
-        },
-      ],
-      outlet_id: 3,
-      business_id: 3,
-      customer_id: 26,
-      payment_method_id: 10,
-      payment_discount: 4000,
-      payment_tax: 2000,
-      payment_service: 1000,
-      payment_total: 33000,
-      amount: 60900,
-      payment_change: 8000,
-      invoice: TRANSIDMERCHANT,
-    };
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/api/v1/transaction-customer`,
-        sendData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log(sendData);
-      console.log(response);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const navigate = useNavigate();
   const handleCash = async () => {
     try {
       const confirmation = await Swal.fire({
@@ -796,7 +485,8 @@ function CheckOut({
 
       if (confirmation.isConfirmed) {
         closeModal();
-
+        handlePaymentApprovalActions();
+        incrementCounter();
         // Pastikan bahwa localStorage.removeItem("cart") berjalan tanpa kesalahan
         localStorage.removeItem("cart");
 
@@ -808,34 +498,6 @@ function CheckOut({
     }
   };
 
-  const HandleSelesaiPembayaran = async () => {
-    try {
-      const confirmation = await Swal.fire({
-        icon: "success",
-        title: "Pembayaran Selesai",
-        text: "Pembayaran Anda telah berhasil.",
-        showConfirmButton: true,
-        showCancelButton: true,
-        confirmButtonText: "Ya",
-        cancelButtonText: "Tidak",
-        customClass: {
-          title: "text-md",
-        },
-      });
-
-      if (confirmation.isConfirmed) {
-        closeModal();
-
-        // Pastikan bahwa localStorage.removeItem("cart") berjalan tanpa kesalahan
-        localStorage.removeItem("cart");
-
-        // Coba untuk menavigasi
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.error("Error during navigation:", error);
-    }
-  };
   return (
     <div>
       {isOpen && (
@@ -995,13 +657,6 @@ function CheckOut({
           </div>
         </div>
       )}
-      {/* {showPrintReceipt && (
-        <PrintReceipt
-          transactionData={transactionData}
-          totalValues={totalValues}
-          cart={cart}
-        />
-      )} */}
     </div>
   );
 }

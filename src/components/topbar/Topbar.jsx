@@ -231,12 +231,12 @@ const Topbar = ({
                     </div>
                   </div>
 
-                  <div className="lg:mt-4 mt-4 md:mt-4 sm:mt-4 text-white">
+                  <div className="lg:mt-4 mt-[14px] md:mt-4 sm:mt-4 text-white">
                     {" "}
-                    <Link to={"/dashboard"}>
+                    <Link to={"/dashboard"} on>
                       <img
                         src={Lg}
-                        className="bg-transparent  w-[90px] xs:w-[90px] sm:w-[90px] md:w-[90px] lg:w-[70px]"
+                        className="bg-transparent  w-[190px] xs:w-[90px] sm:w-[90px] md:w-[90px] lg:w-[70px]"
                       />
                     </Link>
                   </div>

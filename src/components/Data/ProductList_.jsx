@@ -222,7 +222,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
       <div>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-6 lg:gap-6 sm:gap-6 gap-2">
           {visibleData.map((item) => (
-            <Link
+            <div
               // to={`/products/detail/${item.id}`}
               className="relative bg-white border rounded-lg shadow hover:shadow-2xl group"
               key={item.id}
@@ -255,7 +255,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                     {/* Move the button here */}
                   </div>
                 </div>
-                <div className="flex mt-2 mb-2 pl-1.5 text-sm md:justify-evenly sm:justify-between">
+                <div className="flex mt-2 mb-2  text-sm md:justify-evenly sm:justify-between">
                   <div className=" md:px-2 sm:px-6 px-0.5 py-1 bg-[#091F4B] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none   flex items-center justify-between  md:mr-4  sm:mr-4 mr-3 ">
                     <button
                       className={`sm:mr-2 text-white cursor-pointer hover:opacity-70 duration-500 ${
@@ -284,7 +284,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                   </button>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
 

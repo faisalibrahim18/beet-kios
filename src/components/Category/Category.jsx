@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
-import "./style.css"; // Pastikan file style.css sudah terhubung dengan benar
-import { Navigation } from "swiper/modules";
+import "./style.css";
 import axios from "axios";
 
 const Category = ({ selectedCategory, setSelectedCategory }) => {
@@ -45,7 +43,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
         const API_URL = import.meta.env.VITE_API_KEY;
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${API_URL}/api/v1/product/beetstore?outlet_id=207&business_id=152`,
+          `${API_URL}/api/v1/product/beetstore?outlet_id=304&business_id=223`,
           {
             headers: {
               "Content-Type": "application/json",

@@ -136,7 +136,18 @@ const ProductDetail = () => {
         fullDataProduct: product,
         allAddons: allSelectAddOns,
         totalAmount: amount * totalItem,
+        addons: [],
+        sales_type_id: 1,
+        // totalAmount: product.price * totalItem,
         notes: notes,
+        product_id: product.id,
+        // addons: [],
+        quantity: totalItem,
+        price_product: product.price,
+        price_discount: 0,
+        price_service: 0,
+        price_addons_total: 0 || 0,
+        price_total: amount * totalItem,
       };
       console.log("cartItem", cartItem);
 
@@ -152,6 +163,7 @@ const ProductDetail = () => {
         // If the item already exists, update the totalItem and total amount
         // const existingCartItem = existingCart[existingCartItemIndex];
         existingCartItem.totalItem += totalItem;
+        existingCartItem.quantity += totalItem;
         existingCartItem.totalAmount += cartItem.totalAmount;
         existingCartItem.notes = notes;
       } else {
@@ -329,7 +341,7 @@ const ProductDetail = () => {
           <div className="pt-2  bg-white pb-3 ">
             {" "}
             {/* add-On */}
-            <div className="sm:pl-[30px] sm:pr-[30px]">
+            <div className="sm:pl-[30px] pl-3 sm:pr-[30px]">
               {allAddons.length > 0 ? (
                 <>
                   <h5 className="font-semibold">Tambahan</h5>
@@ -406,7 +418,7 @@ const ProductDetail = () => {
             </div>
           </div>
           {/* notes */}
-          <div className="sm:pl-[30px] sm:pr-[40px] bg-white">
+          <div className="sm:pl-[30px] pl-3 pr-3 sm:pr-[40px] bg-white">
             <label className="flex mb-1.5">
               <div className="font-semibold">Catatan</div>
               <div className="font-semibold ml-1 text-gray-400">
