@@ -249,7 +249,7 @@ function CheckOut({ isOpen, closeModal }) {
         resultAmount: result.resultAmount,
         transactionUsername: dataBusiness.cz_user,
       };
-      // incrementCounter();
+
       setTransactionData(transactionData);
 
       const generateSignature = {
@@ -358,6 +358,7 @@ function CheckOut({ isOpen, closeModal }) {
             setLoading1(false);
             setUrlVendor(urlVendor);
             handlePaymentApprovalActions(transactionData);
+            incrementCounter();
             clearInterval(intervalId);
             // setCounter((prevCounter) => prevCounter + 1);
             // const sendData = {

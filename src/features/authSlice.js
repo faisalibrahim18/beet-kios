@@ -11,215 +11,257 @@ const initialState = {
   isSucces: false,
   isLoading: false,
   // const: localStorage.getItem("isLogged", response.data?.data?.token?.token) || false,
-  isLoggedIn: localStorage.getItem("isLoggedIn", JSON.stringify(false)) || false,
+  isLoggedIn:
+    localStorage.getItem("isLoggedIn", JSON.stringify(false)) || false,
   message: "",
 };
 
-export const LoginUser = createAsyncThunk("user/loginUser", async (user, thunkAPI) => {
-  try {
-    const API_URL = import.meta.env.VITE_API_KEY;
-    const response = await axios.post(`${API_URL}/api/v1/auth/customer/login`, {
-      email: user.email,
-      password: user.password,
-    });
-    // withCredentials = false
+// function login
+export const LoginUser = createAsyncThunk(
+  "user/loginUser",
+  async (user, thunkAPI) => {
+    try {
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const response = await axios.post(
+        `${API_URL}/api/v1/auth/customer/login`,
+        {
+          email: user.email,
+          password: user.password,
+        }
+      );
+      // withCredentials = false
 
-    // console.log(response.data.data.payload.customer_account_id);
-    // console.log(response.data?.data?.token);
-    localStorage.setItem("token", response.data?.data?.token, true);
-    localStorage.setItem("user", response.data.data.payload.customer_account_id, true);
-    // console.log("Bearer", response);
-    // console.log(response.data);
+      // console.log(response.data.data.payload.customer_account_id);
+      // console.log(response.data?.data?.token);
+      localStorage.setItem("token", response.data?.data?.token, true);
+      localStorage.setItem(
+        "user",
+        response.data.data.payload.customer_account_id,
+        true
+      );
+      // console.log("Bearer", response);
+      // console.log(response.data);
 
-    return response.data;
-  } catch (error) {
-    if (error.response) {
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-right",
+          iconColor: "red",
+          customClass: {
+            popup: "colored-toast",
+          },
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        Toast.fire({
+          icon: "error",
+          text: error.response.data.message,
+        });
+        const message = error.response.data.message;
+        return thunkAPI.rejectWithValue(message);
+      }
+    }
+  }
+);
+// close  function login
+
+// function register
+export const RegisterUser = createAsyncThunk(
+  "user/RegisterUser",
+  async (userRegister, thunkAPI) => {
+    try {
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const response = await axios.post(
+        `${API_URL}/api/v1/auth/customer/register`,
+        {
+          email: userRegister.email,
+          password: userRegister.password,
+          phoneNumber: userRegister.phone_number,
+        }
+      );
+
       const Toast = Swal.mixin({
         toast: true,
         position: "top-right",
-        iconColor: 'red',
+        iconColor: "green",
         customClass: {
-          popup: 'colored-toast'
+          popup: "colored-toast",
         },
         showConfirmButton: false,
-        timer: 3000,
+        timer: 2000,
         timerProgressBar: true,
       });
       Toast.fire({
-        icon: "error",
-        text: error.response.data.message,
+        icon: "success",
+        text: "Register Success",
+      }).then(() => {
+        // Setelah SweetAlert ditutup, muat ulang halaman
+        window.location.reload();
       });
-      const message = error.response.data.message;
-      return thunkAPI.rejectWithValue(message);
+      // console.log(response);
+
+      // return response.data;
+    } catch (error) {
+      if (error.response) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-right",
+          iconColor: "red",
+          customClass: {
+            popup: "colored-toast",
+          },
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        Toast.fire({
+          icon: "error",
+          text: error.response.data.message,
+        });
+        const message = error.response.data.message;
+        return thunkAPI.rejectWithValue(message);
+      }
     }
   }
-});
-export const RegisterUser = createAsyncThunk("user/RegisterUser", async (userRegister, thunkAPI) => {
-  try {
-    const API_URL = import.meta.env.VITE_API_KEY;
-    const response = await axios.post(`${API_URL}/api/v1/auth/customer/register`, {
-      email: userRegister.email,
-      password: userRegister.password,
-      phoneNumber: userRegister.phone_number,
-    });
+);
+// close function register
 
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      iconColor: "green",
-      customClass: {
-        popup: "colored-toast",
-      },
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
-    Toast.fire({
-      icon: "success",
-      text: "Register Success",
-    }).then(() => {
-      // Setelah SweetAlert ditutup, muat ulang halaman
-      window.location.reload();
-    });
-    // console.log(response);
-    
-    // return response.data;
-  } catch (error) {
-    if (error.response) {
+// function forgotpassword
+export const ForgotPasswordUser = createAsyncThunk(
+  "user/ForgotPasswordUser",
+  async (userForgotPassword, thunkAPI) => {
+    try {
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const response = await axios.post(
+        `${API_URL}/api/v1/customer-account-noverify/forgot-password`,
+        {
+          email: userForgotPassword.email,
+        }
+      );
+      // withCredentials = false
       const Toast = Swal.mixin({
         toast: true,
         position: "top-right",
-        iconColor: 'red',
+        iconColor: "green",
         customClass: {
-          popup: 'colored-toast'
+          popup: "colored-toast",
         },
         showConfirmButton: false,
-        timer: 3000,
+        timer: 2000,
         timerProgressBar: true,
       });
       Toast.fire({
-        icon: "error",
-        text: error.response.data.message,
+        icon: "success",
+        text: "Success, Silahkan ganti password dengan yang baru",
+      }).then(() => {
+        // Setelah SweetAlert ditutup, muat ulang halaman
+        window.location.replace("/new_Password");
       });
-      const message = error.response.data.message;
-      return thunkAPI.rejectWithValue(message);
+      // console.log(response.data.data.payload.customer_account_id);
+      console.log(response.data?.data);
+      localStorage.setItem("data", response.data?.data, true);
+      // localStorage.setItem("user", response.data.data.payload.customer_account_id, true);
+      // console.log("Bearer", response);
+      // console.log(response.data);
+
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-right",
+          iconColor: "red",
+          customClass: {
+            popup: "colored-toast",
+          },
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        Toast.fire({
+          icon: "error",
+          text: error.response.data.message,
+        });
+        const message = error.response.data.message;
+        return thunkAPI.rejectWithValue(message);
+      }
     }
   }
-});
-export const ForgotPasswordUser = createAsyncThunk("user/ForgotPasswordUser", async (userForgotPassword, thunkAPI) => {
-  try {
-    const API_URL = import.meta.env.VITE_API_KEY;
-    const response = await axios.post(`${API_URL}/api/v1/customer-account-noverify/forgot-password`, {
-      email: userForgotPassword.email,
-    });
-    // withCredentials = false
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      iconColor: "green",
-      customClass: {
-        popup: "colored-toast",
-      },
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
-    Toast.fire({
-      icon: "success",
-      text: "Success, Silahkan ganti password dengan yang baru",
-    }).then(() => {
-      // Setelah SweetAlert ditutup, muat ulang halaman
-      window.location.replace("/new_Password");
-    });
-    // console.log(response.data.data.payload.customer_account_id);
-    console.log(response.data?.data);
-    localStorage.setItem("data", response.data?.data, true);
-    // localStorage.setItem("user", response.data.data.payload.customer_account_id, true);
-    // console.log("Bearer", response);
-    // console.log(response.data);
+);
+// close function forgotpassword
 
-    return response.data;
-  } catch (error) {
-    if (error.response) {
+// function newpassword
+export const NewPasswordUser = createAsyncThunk(
+  "user/NewPasswordUser",
+  async (userNewPassword, thunkAPI) => {
+    try {
+      const token = localStorage.getItem("data");
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const response = await axios.post(
+        `${API_URL}/api/v1/customer-account/new-password`,
+        {
+          new_password: userNewPassword.new_password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // withCredentials = false
       const Toast = Swal.mixin({
         toast: true,
         position: "top-right",
-        iconColor: 'red',
+        iconColor: "green",
         customClass: {
-          popup: 'colored-toast'
+          popup: "colored-toast",
         },
         showConfirmButton: false,
-        timer: 3000,
+        timer: 2000,
         timerProgressBar: true,
       });
       Toast.fire({
-        icon: "error",
-        text: error.response.data.message,
+        icon: "success",
+        text: "Success, Password Berhasil di Ubah",
+      }).then(() => {
+        // Setelah SweetAlert ditutup, muat ulang halaman
+        localStorage.clear();
+        window.location.replace("/");
       });
-      const message = error.response.data.message;
-      return thunkAPI.rejectWithValue(message);
+
+      // console.log(response);
+
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response);
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-right",
+          iconColor: "red",
+          customClass: {
+            popup: "colored-toast",
+          },
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        Toast.fire({
+          icon: "error",
+          text: error.response.data.message,
+        });
+        const message = error.response.data.message;
+        return thunkAPI.rejectWithValue(message);
+      }
     }
   }
-});
-export const NewPasswordUser = createAsyncThunk("user/NewPasswordUser", async (userNewPassword, thunkAPI) => {
-  try {
-    const token = localStorage.getItem("data");
-    const API_URL = import.meta.env.VITE_API_KEY;
-    const response = await axios.post(`${API_URL}/api/v1/customer-account/new-password`, {
-      new_password:userNewPassword.new_password,
-    },  {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    // withCredentials = false
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      iconColor: "green",
-      customClass: {
-        popup: "colored-toast",
-      },
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
-    Toast.fire({
-      icon: "success",
-      text: "Success, Password Berhasil di Ubah",
-    }).then(() => {
-      // Setelah SweetAlert ditutup, muat ulang halaman
-      localStorage.clear();
-      window.location.replace("/");
-    });
+);
+// function newpassword
 
-    // console.log(response);
-
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      console.log(error.response)
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-right",
-        iconColor: 'red',
-        customClass: {
-          popup: 'colored-toast'
-        },
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-      });
-      Toast.fire({
-        icon: "error",
-        text: error.response.data.message,
-      });
-      const message = error.response.data.message;
-      return thunkAPI.rejectWithValue(message);
-    }
-  }
-});
 export const rootReducer = (state = initialState, action) => {
   switch (action.type) {
     case "LOGIN":
@@ -265,15 +307,6 @@ export const getMe = createAsyncThunk("user/getMe", async (_, thunkAPI) => {
   }
 });
 
-// export const LogOut = createAsyncThunk("user/LogOut", async () => {
-//   await axios.delete("http://localhost:9000/api/v1/rfid/logout").then(({ data }) => {
-//     Swal.fire({
-//       icon: "success",
-//       text: data.message,
-//     });
-//   });
-// });
-
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -310,7 +343,7 @@ export const authSlice = createSlice({
       state.isError = true;
       state.message = action.payload;
     });
-   
+
     //ForgotPasswordUser
     builder.addCase(ForgotPasswordUser.pending, (state) => {
       state.isLoading = true;

@@ -1,60 +1,57 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaMinus, FaPlus, FaTrashAlt } from "react-icons/fa";
-import Topbar from "../topbar/Topbar";
 import Swal from "sweetalert2";
 import Cr from "../../assets/cart.jpg";
 import Lg from "../../assets/logo.png";
 import CheckOut from "./CheckOut";
 import { checkTokenExpiration } from "../../utils/token";
 import { Link, useNavigate } from "react-router-dom";
-import ProductNavbar from "../topbar/ProductNavbar";
-import { BsArrowLeft } from "react-icons/bs";
-import PrintReceipt from "../print/PrintReceipt ";
 import DetailKeranjang from "./DetailKeranjang";
 import { BiDetail } from "react-icons/bi";
-import printJS from "print-js";
 
 const ProductKeranjang = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isModalDetail, setIsModalDetail] = useState(false);
-  const [selectedOutlets, setSelectedOutlets] = useState([]);
   const [selectedDetailItemId, setSelectedDetailItemId] = useState(null);
-  const [selectedItems, setSelectedItems] = useState([]);
-
   const API_URL = import.meta.env.VITE_API_KEY;
   const navigate = useNavigate();
 
+  // opsional bagian selectedOutlets dan selectedItems itu
+  // tidak terpakai karna tidak menggunakan checkbox untuk memilih itemnya
+  const [selectedOutlets, setSelectedOutlets] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  // get data cart dari localstorage
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(cartData);
   }, []);
+  // close get data cart dari localstorage
 
+  // get data detail
   const fetchItemDetails = (itemId) => {
     try {
-      // Get the cart data from localStorage
       const cartData = JSON.parse(localStorage.getItem("cart")) || [];
 
-      // Find the item in the cart based on itemId
       const selectedItem = cartData.find((item) => item.id === itemId);
 
-      // Return the details of the selected item
       return selectedItem;
     } catch (error) {
       console.error("Error fetching item details:", error);
-      throw error; // Handle the error appropriately in your application
+      throw error;
     }
   };
+  // close get data detail
 
+  //  hitung total data keranjang
   const calculateTotalPrice = () => {
     let total = 0;
 
     cart.forEach((item) => {
       let productTotal = item.priceItem * item.totalItem;
 
-      // Calculate the total price for addons
       let addonsTotal = 0;
       if (item.fullDataAddons) {
         addonsTotal = item.fullDataAddons.reduce(
@@ -63,13 +60,14 @@ const ProductKeranjang = () => {
         );
       }
 
-      // Add the product total and addons total to the overall total
       total += productTotal + addonsTotal;
     });
 
     return total;
   };
+  // close hitung total data keranjang
 
+  // function menambahkan item
   const incrementQuantity = (item) => {
     const updatedCart = cart.map((cartItem) => {
       if (cartItem.id === item.id) {
@@ -88,7 +86,9 @@ const ProductKeranjang = () => {
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
+  // close function menambahkan item
 
+  // function mengurangi item
   const decrementQuantity = (item) => {
     const updatedCart = cart.map((cartItem) => {
       if (cartItem.id === item.id && cartItem.totalItem > 1) {
@@ -107,13 +107,14 @@ const ProductKeranjang = () => {
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
-
+  // close function mengurangi item
   const calculateTotalAmount = (cart) => {
     return cart.reduce((total, item) => {
       return total + item.price * item.totalItem;
     }, 0);
   };
 
+  // function hapus data cart
   const handleRemoveFromCart = (itemId) => {
     Swal.fire({
       title: "Konfirmasi",
@@ -148,7 +149,9 @@ const ProductKeranjang = () => {
       }
     });
   };
+  // close function hapus data cart
 
+  //  function open modal untuk ke halaman checkout
   const openModal = () => {
     checkTokenExpiration();
     const token = localStorage.getItem("token");
@@ -167,14 +170,16 @@ const ProductKeranjang = () => {
       });
       navigate("/");
     } else {
-      // Izinkan untuk membuka modal jika semua kondisi telah terpenuhi
       setIsModalOpen(true);
     }
   };
+  // close function open modal untuk ke halaman checkout
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  // function open modal detail Keranjang
   const openModalDetail = (itemId) => {
     const token = localStorage.getItem("token");
 
@@ -196,65 +201,29 @@ const ProductKeranjang = () => {
       setSelectedDetailItemId(itemId);
     }
   };
+  // function open modal detail Keranjang
+
+  // function close modal detail Keranjang
   const closeModalDetail = () => {
     setIsModalDetail(false);
   };
+  // closefunction close modal detail Keranjang
+
+  //  get data cart dari localstorage
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(cartData);
     setLoading(false);
   }, []);
-  const receiptData = {
-    items: [
-      { name: "Nasi Goreng", price: "Rp 25,000" },
-      { name: "Ayam Goreng", price: "Rp 30,000" },
-      { name: "Es Teh Manis", price: "Rp 5,000" },
-    ],
-    subtotal: "Rp 60,000",
-    tax: "Rp 6,000",
-    total: "Rp 66,000",
-    paymentMethod: "Tunai",
-    transactionDate: "2024-01-16 14:30:00",
-  };
-
-  const handlePrinta = () => {
-    const printWindow = window.open("", "_blank");
-    const styles = Array.from(document.styleSheets)
-      .map((styleSheet) => Array.from(styleSheet.cssRules))
-      .flat()
-      .map((rule) => rule.cssText)
-      .join("\n");
-
-    const paperWidth = "80mm";
-
-    printWindow.document.write(`
-      <html>
-        <head>
-          <style>
-            ${styles}
-          </style>
-        </head>
-        <body style="width: ${paperWidth}; margin: 0;">
-          ${document.getElementById("printReceipt").outerHTML}
-        </body>
-      </html>
-    `);
-
-    printWindow.document.close();
-    printWindow.print();
-    printWindow.close(); // Menutup jendela cetak setelah selesai mencetak
-  };
+  //  get data cart dari localstorage
 
   return (
     <>
       <div className="pt-5">
-        <div className="mt-6">
-          <button
-            onClick={() => window.history.back()}
-            className="text-xl ml-5"
-          >
+        <div className="mt-6 ml-5 text-xl text-[#091F4B]">
+          <Link to={"/dashboard"}>
             <FaArrowLeft />
-          </button>
+          </Link>
         </div>
         <div className="lg:pl-12 p-5 lg:flex-1 md:flex block">
           <div className="lg:w-2/3 md:w-2/3">

@@ -3,22 +3,22 @@ import Lg from "../../assets/logo.png";
 const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
   const [productDetails, setProductDetails] = useState(null);
   const API_URL = import.meta.env.VITE_API_KEY;
+
+  // get data detail keranjang
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        // Fetch details using the provided fetchItemDetails function
         const details = await fetchItemDetails(itemId);
         setProductDetails(details);
       } catch (error) {
         console.error("Error fetching item details:", error);
-        
       }
     };
 
     fetchDetails();
   }, [itemId, fetchItemDetails]);
+  // get data detail keranjang
 
-  // console.log("datdtautdaut", productDetails);
   return (
     <div className="fixed z-50  inset-0 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20">
@@ -27,7 +27,7 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
         </div>
 
         {productDetails ? (
-          <div className="relative w-full bg-white p-6 rounded-lg max-w-md mx-auto">
+          <div className="relative w-full bg-white p-6 rounded-lg max-w-lg mx-auto">
             <button
               className="absolute top-0 right-0 mt-4 mr-4 text-[#091F4B] hover:text-[#0C376A] cursor-pointer"
               onClick={onClose}
@@ -61,6 +61,8 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
               />
               <div className="w-full">
                 <div className="text-gray-700 ml-2 font-semibold">Detail</div>
+
+                {/* bagian detail product */}
                 <ul className="list-disc ml-4 text-sm">
                   <li className="flex items-center text-gray-700 mb-0.5">
                     <span className="">Total Item</span>
@@ -101,8 +103,11 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
                     </span>
                   </li>
                 </ul>
+                {/* close bagian detail product */}
+
                 <hr className="ml-2 mt-2" />
                 <div>
+                  {/* bagian tambahan /addons */}
                   <div>
                     <div className="text-gray-700 ml-2 font-semibold">
                       Tambahan
@@ -127,6 +132,7 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
                       </ul>
                     )}
                   </div>
+                  {/* close bagian tambahan /addons */}
                 </div>
               </div>
             </div>

@@ -7,6 +7,8 @@ import Swal from "sweetalert2";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
+  // cek expired token
   useEffect(() => {
     checkTokenExpiration();
     const token = localStorage.getItem("token");
@@ -25,10 +27,12 @@ const Dashboard = () => {
       navigate("/");
     }
   });
+  // close cek expired token
+
   return (
     <>
       <Topbar2 />
-      <div className="mb-[250px] ">
+      <div className="sm:mb-[210px] md:mb-[160px] lg:mb-[250px] mb-[70px]">
         <Dash />
       </div>
     </>

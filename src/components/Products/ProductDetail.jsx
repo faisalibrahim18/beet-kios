@@ -276,7 +276,7 @@ const ProductDetail = () => {
       ) : (
         <div className="bg-gray-100  pt-16 pb-10" key={detail.id}>
           <div className="lg:p-12  sm:p-7 flex flex-wrap lg:justify-center md:flex-nowrap bg-white">
-            <div className="flex-wrap l">
+            <div className="flex-wrap ">
               <img
                 src={detail.image == null ? Lg : `${API_URL}/${detail.image}`}
                 className="lg:w-72 lg:h-72 md:w-96 md:h-80 w-screen h-80  lg:rounded-xl md:rounded-xl object-cover cursor-pointer shadow-xl"

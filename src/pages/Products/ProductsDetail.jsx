@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import ProductDetail2 from "../../components/Products/ProductDetail";
-import BottomBar from "../../components/bottombar/BottomBar";
 import { useEffect } from "react";
 import { checkTokenExpiration } from "../../utils/token";
 import Swal from "sweetalert2";
 
 const ProductsDetail = () => {
   const navigate = useNavigate();
+
+  // cek expired token
   useEffect(() => {
     checkTokenExpiration();
     const token = localStorage.getItem("token");
@@ -25,13 +26,15 @@ const ProductsDetail = () => {
       navigate("/");
     }
   });
+  // close cek expired token
+
   return (
     <>
-      {/* <Topbar2/> */}
+    
       <div className="">
         <ProductDetail2 />
       </div>
-      {/* <BottomBar /> */}
+      
     </>
   );
 };

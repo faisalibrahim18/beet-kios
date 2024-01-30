@@ -23,10 +23,11 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
   );
   const [totalItem, setTotalItem] = useState(1);
   const API_URL = import.meta.env.VITE_API_KEY;
-  // console.log("dasyidtuas", selectedCategory);
+  const navigate = useNavigate();
 
   const [detail, setDetail] = useState(null); // Tambahkan 'detail' ke dalam state
 
+  // get category
   useEffect(() => {
     const filterProductsByCategory = async () => {
       // Fungsi filterProductsByCategory tetap sama
@@ -61,9 +62,9 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
       fetchProductDetail();
     }
   }, [searchTerm, selectedCategory, itemsToShow, id]);
+  // close get category
 
-  // Fungsi-fungsi dan bagian lainnya tetap sama
-
+  // filter category
   useEffect(() => {
     const filterProductsByCategory = async () => {
       try {
@@ -90,9 +91,10 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
     filterProductsByCategory();
     setLoading(false);
     setLoadingInitial(false);
-  }, [searchTerm, selectedCategory, itemsToShow]); // Add itemsToShow to the dependency array
-  const navigate = useNavigate();
+  }, [searchTerm, selectedCategory, itemsToShow]);
+  // close filter category
 
+  // function handle add to cart
   const handleAddToCart = (item) => {
     const token = localStorage.getItem("token");
     console.log("dataaa", item);
@@ -177,53 +179,52 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
       }
     }
   };
+  // close function handle add to cart
+
+  // get data cart localStorage
   useEffect(() => {
-    // Update cart state from localStorage
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
   }, []);
+  // get data cart localStorage
+
+  // function button show muat lebih banyak/tampilkan kurang
   const toggleShowMore = () => {
     setLoadingMore(true);
     setShowMore(!showMore);
     setItemsToShow(!showMore ? searchTerm.length : 12); // Update itemsToShow
     setVisibleData(!showMore ? searchTerm : searchTerm.slice(0, itemsToShow));
 
-    // Simulate waiting time for additional loading (replace with actual API request)
-    setTimeout(() => {
-      setLoadingMore(false);
-    }, 1500);
-  };
+    // setTimeout(() => {
+    //   setLoadingMore(false);
+    // }, 1500);
 
-  // if (loadingInitial) {
-  //   return (
-  //     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-  //       <LoadingProduct />
-  //       <LoadingProduct />
-  //       <LoadingProduct />
-  //       <LoadingProduct />
-  //       <LoadingProduct />
-  //       <LoadingProduct />
-  //     </div>
-  //   );
-  // }
+    setLoadingMore(false);
+  };
+  // close function button show muat lebih banyak/tampilkan kurang
+
+  // function tambah data
   const incrementQuantity = () => {
     setTotalItem(totalItem + 1);
   };
+  // close function tambah data
 
+  // function ngurangi data
   const decrementQuantity = () => {
     if (totalItem > 1) {
       setTotalItem(totalItem - 1);
     }
   };
+  //close  function ngurangi data
   return (
-    <div className="px-3 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
-      <div className="font-bold text-gray-900 mb-3 text-xl">Daftar Produk</div>
+    <div className="px-2 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
+      <div className="font-bold text-gray-900 mb-3 text-xl sm:ml-0 md:ml-0 lg:ml-0 ml-1">Daftar Produk</div>
 
       <div>
+        {/* data produk */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-6 lg:gap-6 sm:gap-6 gap-2">
           {visibleData.map((item) => (
             <div
-              // to={`/products/detail/${item.id}`}
               className="relative bg-white border rounded-lg shadow hover:shadow-2xl group"
               key={item.id}
             >
@@ -255,8 +256,9 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                     {/* Move the button here */}
                   </div>
                 </div>
-                <div className="flex mt-2 mb-2  text-sm md:justify-evenly sm:justify-between">
-                  <div className=" md:px-2 sm:px-6 px-0.5 py-1 bg-[#091F4B] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none   flex items-center justify-between  md:mr-4  sm:mr-4 mr-3 ">
+                {/* button tambahkan ke keranjang dan menambah, mengurangi item */}
+                <div className="flex mt-2 mb-2 ml-2 mr-3 text-sm md:justify-evenly sm:justify-between">
+                  <div className=" md:px-2 sm:px-6 px-1.5 py-1 bg-[#091F4B] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none   flex items-center justify-between  md:mr-4 sm:mr-4 mr-3 ">
                     <button
                       className={`sm:mr-2 text-white cursor-pointer hover:opacity-70 duration-500 ${
                         totalItem === 1 ? "opacity-50 cursor-not-allowed" : ""
@@ -270,7 +272,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                       {totalItem}
                     </p>
                     <button
-                      className="sm:ml-2 hover:opacity-70 text-white cursor-pointer duration-500"
+                      className="sm:ml-2  hover:opacity-70 text-white cursor-pointer duration-500"
                       onClick={incrementQuantity}
                     >
                       <FaPlus />
@@ -283,14 +285,17 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
                     <BsCartPlus size={25} />
                   </button>
                 </div>
+                {/* close button tambahkan ke keranjang dan menambah, mengurangi item */}
               </div>
             </div>
           ))}
         </div>
+        {/* close data product */}
 
+        {/* button keranjang */}
         <div>
           {cart.length > 0 && (
-            <div className=" fixed bottom-[255px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-md shadow-xl focus:outline-none">
+            <div className=" fixed sm:bottom-[255px] md:bottom-[190px] lg:bottom-[285px] bottom-[90px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-md shadow-xl focus:outline-none">
               {/* Tambahkan komponen untuk menampilkan item di dalam keranjang */}
               <Link
                 to={"/products/keranjang"}
@@ -307,6 +312,9 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
             </div>
           )}
         </div>
+        {/* close button keranjang */}
+
+        {/* button muat lebih banyak/tampilkan kurang */}
         <div>
           {visibleData.length >= 12 && (
             <div className="flex justify-center mt-6 mb-8">
@@ -332,6 +340,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
             </div>
           )}
         </div>
+        {/* button muat lebih banyak/tampilkan kurang */}
       </div>
     </div>
   );

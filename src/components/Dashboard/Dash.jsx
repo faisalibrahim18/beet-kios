@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from "react";
-import LoadingProduct from "../Loading/LoadingProduct";
-import { Link } from "react-router-dom";
-import Pro from "../../assets/pro.jpg";
-import Lg from "../../assets/logo.png";
 import ProductList_ from "../Data/ProductList_";
 import { debounce } from "lodash";
 import axios from "axios";
@@ -11,11 +7,12 @@ import Iklan from "../iklan/Iklan";
 
 const Dash = () => {
   const [searchTerm, setSearchTerm] = useState([]);
-  const [products, setProducts] = useState([]);
+
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [category, setCategory] = useState([]);
 
+  // get data logo, product dan category
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -23,32 +20,7 @@ const Dash = () => {
         const dataTableParsed = JSON.parse(localStorage.getItem("data_table"));
         const token = localStorage.getItem("token");
 
-        // o_id:207
-        // robopark
-        // o_id: 304
-        // b_id: 223
-        // demofnb
-        // o_id: 207
-        // b_id: 152
-        const productResponse = await axios.get(
-          `${API_URL}/api/v1/product/emenu?outlet_id=304&business_id=223`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        // const response = await axios.get(
-        //   `${API_URL}/api/v1/business/223`,
-        //   {
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   }
-        // );
-        // console.log("cek", response)
+        // get logo untuk di taro di localStorage
         try {
           // Mendapatkan respons dari API
           const BusinessResponse = await axios.get(
@@ -60,7 +32,7 @@ const Dash = () => {
               },
             }
           );
-          console.log("dataB", BusinessResponse.data.data);
+          // console.log("dataB", BusinessResponse.data.data);
           // Mendapatkan URL gambar dari respons API
           const imageUrl = BusinessResponse.data.data.image; // Ganti dengan properti yang sesuai dari respons API
 
@@ -71,7 +43,29 @@ const Dash = () => {
         } catch (error) {
           console.error("Terjadi kesalahan:", error.message);
         }
+        // close get logo untuk di taro di localStorage
 
+        // o_id:207
+        // robopark
+        // o_id: 304
+        // b_id: 223
+        // demofnb
+        // o_id: 207
+        // b_id: 152
+
+        // get data product
+        const productResponse = await axios.get(
+          `${API_URL}/api/v1/product/emenu?outlet_id=304&business_id=223`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        //  close get data product
+
+        // get data category
         const categoryProductResponse = await axios.get(
           `${API_URL}/api/v1/product-category/lite?outlet_id=304&business_id=223`,
           {
@@ -81,6 +75,7 @@ const Dash = () => {
             },
           }
         );
+        // close get data category
 
         const resCategoryProduct = categoryProductResponse.data.data.filter(
           (value) => value.Products.length > 0 && !value.hidden
@@ -101,6 +96,7 @@ const Dash = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  // close get data logo, product dan category
 
   // Fungsi untuk menggulir ke atas halaman
   const scrollToTop = () => {
@@ -121,10 +117,11 @@ const Dash = () => {
 
   return (
     <>
+      {/* button scroll top */}
       {showScrollButton && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-[330px] z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
+          className="fixed sm:bottom-[330px] lg:bottom-[360px]  md:bottom-[265px] bottom-[160px]  z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -142,7 +139,11 @@ const Dash = () => {
           </svg>
         </button>
       )}
+      {/* close  button scroll top */}
+
+      {/* data product dan category */}
       <div className="flex pt-[50px]">
+        {/* data category */}
         <div
           className={`bg-gray-100 flex-grow  pt-5 shadow h-full mt-[50px] z-50 fixed ${
             category.length > 0
@@ -156,14 +157,18 @@ const Dash = () => {
             setSelectedCategory={setSelectedCategory}
           />
         </div>
-        <div className="flex-grow mt-[40px] pl-[67px] sm:pl-[100px] md:pl-[140px]">
-          {/* Gunakan komponen ProductList_ dan teruskan searchTerm dan selectedCategory */}
+        {/* close data category */}
+
+        {/* data product */}
+        <div className="flex-grow mt-[40px] pl-[70px] sm:pl-[100px] md:pl-[140px]">
           <ProductList_
             searchTerm={searchTerm}
             selectedCategory={selectedCategory}
           />
         </div>
+        {/* close data product */}
       </div>
+      {/* close data product dan category */}
 
       <div className="">
         <Iklan />
