@@ -218,7 +218,9 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
   //close  function ngurangi data
   return (
     <div className="px-2 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
-      <div className="font-bold text-gray-900 mb-3 text-xl sm:ml-0 md:ml-0 lg:ml-0 ml-1">Daftar Produk</div>
+      <div className="font-bold text-gray-900 mb-3 text-xl sm:ml-0 md:ml-0 lg:ml-0 ml-1">
+        Daftar Produk
+      </div>
 
       <div>
         {/* data produk */}
@@ -295,7 +297,7 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
         {/* button keranjang */}
         <div>
           {cart.length > 0 && (
-            <div className=" fixed sm:bottom-[255px] md:bottom-[190px] lg:bottom-[285px] bottom-[90px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-md shadow-xl focus:outline-none">
+            <div className=" fixed sm:bottom-[255px] md:bottom-[190px] lg:bottom-[285px] bottom-[90px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white lg:p-2 md:p-2 sm:p-2 p-1 rounded-md shadow-xl focus:outline-none">
               {/* Tambahkan komponen untuk menampilkan item di dalam keranjang */}
               <Link
                 to={"/products/keranjang"}
@@ -303,8 +305,10 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
               >
                 <div>
                   {" "}
-                  <FaShoppingCart size={30} />
-                  <span className="absolute bottom-[35px] right-3 bg-red-500 text-white rounded-full px-1.5 text-sm">
+                  <div className="lg:text-3xl md:text-3xl sm:text-3xl text-2xl">
+                    <FaShoppingCart />
+                  </div>
+                  <span className="absolute lg:bottom-[35px] md:bottom-[35px] sm:bottom-[35px] bottom-[28px] right-2 lg:right-3 md:right-3 sm:right-3 bg-red-500 text-white rounded-full px-1.5  sm:px-1.5 text-xs lg:text-sm md:text-sm sm:text-sm">
                     {cart.length}
                   </span>{" "}
                 </div>

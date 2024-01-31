@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 const FogotPassword = () => {
   const [email, setEmail] = useState("");
-  const [isMdScreen, setIsMdScreen] = useState(false);
+  const [isMdScreen, setIsMdScreen  ] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {

@@ -20,7 +20,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
         const API_URL = import.meta.env.VITE_API_KEY;
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${API_URL}/api/v1/product/beetstore?outlet_id=304&business_id=223`,
+          `${API_URL}/api/v1/product/beetstore?outlet_id=207&business_id=152`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -51,7 +51,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
   // close filter data category
   return (
     <>
-      <div className=" md:w-full xs:w-[60px] sm:w-[120px] w-[75px] mb-[320px]">
+      <div className=" md:w-full xs:w-[60px] sm:w-[120px] w-[75px] lg:mb-[350px] sm:mb-[270px] md:mb-[250px] mb-[160px]">
         <div className="text-gray-800 text-center mt-2 font-semibold pb-2 p-2">
           Pilihan Kategori
         </div>
@@ -90,6 +90,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
                 </div>
               </div>
             ))}
+
             {/* close data dari category */}
           </div>
         </div>

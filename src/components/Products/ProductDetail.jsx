@@ -146,7 +146,7 @@ const ProductDetail = () => {
         price_product: product.price,
         price_discount: 0,
         price_service: 0,
-        price_addons_total: 0 || 0,
+        price_addons_total: addonsTotalPrice || 0,
         price_total: amount * totalItem,
       };
       console.log("cartItem", cartItem);

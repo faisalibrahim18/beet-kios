@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { BsRecordFill } from "react-icons/bs";
 import PrintReceipt from "../print/PrintReceipt ";
 import ReactDOMServer from "react-dom/server";
+import dayjs from "dayjs";
 
 function CheckOut({ isOpen, closeModal }) {
   const [cart, setCart] = useState([]);
@@ -114,7 +115,6 @@ function CheckOut({ isOpen, closeModal }) {
       console.log("error handleCheckTaxAndService");
     }
   };
-
   // close tax and serive
 
   useEffect(() => {
@@ -228,7 +228,7 @@ function CheckOut({ isOpen, closeModal }) {
       const response = await axios.get(
         `${API_URL}/api/v1/business-noverify/${businessId}`
       );
-      const response3 = await axios.get(
+      const responseOutlet = await axios.get(
         `${API_URL}/api/v1/outlet/${outletId}`,
         {
           headers: {
@@ -237,7 +237,7 @@ function CheckOut({ isOpen, closeModal }) {
           },
         }
       );
-      const dataOutlet = response3.data.data;
+      const dataOutlet = responseOutlet.data.data;
 
       const dataBusiness = response.data.data;
 
@@ -275,55 +275,7 @@ function CheckOut({ isOpen, closeModal }) {
         },
         signature: "",
       };
-      // const generateReceiptId = () => {
-      //   const now = new Date();
-      //   const year = String(now.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
-      //   const month = String(now.getMonth() + 1).padStart(2, "0"); // Bulan (indeks dimulai dari 0)
-      //   const day = String(now.getDate()).padStart(2, "0"); // Hari
-      //   const hours = String(now.getHours()).padStart(2, "0");
-      //   const minutes = String(now.getMinutes()).padStart(2, "0");
-      //   const seconds = String(now.getSeconds()).padStart(2, "0");
 
-      //   // Gabungkan elemen-elemen untuk membentuk receipt ID
-      //   const receiptId = `1:${year}/${month}/${day}:${hours}:${minutes}:${seconds}`;
-
-      //   return receiptId;
-      // };
-
-      // Contoh penggunaan
-      // const receiptId = generateReceiptId();
-      // console.log(receiptId);
-
-      // const sendData = {
-      //   receipt_id: receiptId,
-      //   items: cartData,
-      //   outlet_id: outletId,
-      //   business_id: businessId,
-      //   customer_id: userId,
-      //   sales_type_id: null || [],
-      //   payment_method_id: null,
-      //   payment_discount: null,
-      //   payment_tax: result.tax,
-      //   payment_service: result.service,
-      //   payment_total: result.paymentTotal,
-      //   amount: result.resultAmount,
-      //   payment_change: 0,
-      //   invoice: TRANSIDMERCHANT,
-      //   status: "Done",
-      // };
-      // console.log("datasend", sendData);
-      // const response1 = await axios.post(
-      //   `${API_URL}/api/v1/transaction-customer`,
-      //   sendData,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   }
-      // );
-
-      // console.log("datasend", response1);
       const resSignature = await axios.post(
         "https://api.beetpos.com/api/v1/signature/generate",
         generateSignature
@@ -353,35 +305,82 @@ function CheckOut({ isOpen, closeModal }) {
               },
             }
           );
-
+          console.log("status", response1.data.data.response.processStatus);
           if (response1.data.data.response.processStatus === "APPROVED") {
-            setLoading1(false);
-            setUrlVendor(urlVendor);
-            handlePaymentApprovalActions(transactionData);
-            incrementCounter();
-            clearInterval(intervalId);
-            // setCounter((prevCounter) => prevCounter + 1);
-            // const sendData = {
+            const receiptId =
+              "ORDER_" +
+              dayjs(new Date()).format("YY/MM/DD-HH/mm/ss") +
+              outletId;
+            // kirim data ke beetOffice
+            const sendData = {
+              receipt_id: receiptId,
+              items: cartData,
+              outlet_id: outletId,
+              business_id: businessId,
+              customer_id: userId,
+              sales_type_id: null || [],
+              payment_method_id: null,
+              payment_discount: null,
+              payment_tax: result.tax,
+              payment_service: result.service,
+              payment_total: result.paymentTotal,
+              amount: result.resultAmount,
+              payment_change: 0,
+              invoice: TRANSIDMERCHANT,
+              status: "Done",
+            };
+            console.log("datasend", sendData);
+            const response1 = await axios.post(
+              `${API_URL}/api/v1/transaction-customer`,
+              sendData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            console.log("datasend", response1);
+            //close  kirim data ke beetOffice
+
+            // kirim data ke kitchen
+            // const tempItems = [];
+
+            // cartData.forEach((value) => {
+            //   const tempAddons = [];
+            //   if (value.fullDataAddons) {
+            //     value.fullDataAddons.forEach((value2) => {
+            //       tempAddons.push({
+            //         id: value2.id,
+            //         price: value2.price,
+            //       });
+            //     });
+            //   }
+            //   tempItems.push({
+            //     sales_type_id: value.sales_type_id,
+            //     product_id: value.id,
+            //     addons: tempAddons || [],
+            //     quantity: value.totalItem,
+            //     price_product: value.priceItem,
+            //     price_discount: 0,
+            //     price_service: 0,
+            //     price_addons_total: value.price_addons_total || 0,
+            //     price_total: value.totalAmount,
+            //     notes: value.notes,
+            //   });
+            // });
+            // // console.log("cart", cartData);
+            // const sendDataKitchen = {
             //   receipt_id: receiptId,
-            //   items: cartData,
-            //   outlet_id: outletId,
-            //   business_id: businessId,
-            //   customer_id: userId,
-            //   sales_type_id: null || [],
-            //   payment_method_id: null,
-            //   payment_discount: null,
-            //   payment_tax: result.tax,
-            //   payment_service: result.service,
-            //   payment_total: result.paymentTotal,
-            //   amount: result.resultAmount,
-            //   payment_change: 0,
-            //   invoice: TRANSIDMERCHANT,
+            //   items: tempItems,
+            //   outlet_id: parseInt(outletId),
+            //   business_id: parseInt(businessId),
             //   status: "Done",
             // };
-            // // console.log("datasend", sendData);
-            // const response1 = await axios.post(
-            //   `${API_URL}/api/v1/transaction-customer`,
-            //   sendData,
+            // console.log("sendData", sendDataKitchen);
+            // const resTransaction = await axios.post(
+            //   `${API_URL}/api/v1/transaction/save/qr  `,
+            //   sendDataKitchen,
             //   {
             //     headers: {
             //       "Content-Type": "application/json",
@@ -390,7 +389,79 @@ function CheckOut({ isOpen, closeModal }) {
             //   }
             // );
 
-            // console.log("datasend", response1);
+            // console.log("transaksi", resTransaction);
+            // const getUserBusiness = await axios.get(
+            //   `${API_URL}/api/v1/auth/get-user?business_id=${parseInt(
+            //     businessId
+            //   )}&outlet_id=${parseInt(outletId)}`,
+            //   {
+            //     headers: {
+            //       "Content-Type": "application/json",
+            //       Authorization: `Bearer ${token}`,
+            //     },
+            //   }
+            // );
+            // console.log("getUserBusiness", getUserBusiness.data.data);
+
+            // if (resTransaction.data.statusCode === 201) {
+            //   if (getUserBusiness) {
+            //     const deviceUser = [];
+            //     getUserBusiness.data.data.forEach((value) => {
+            //       console.log("looping device ", value.device);
+            //       if (value.device) {
+            //         const splitDevice = value.device.split("-");
+            //         if (splitDevice.length === 5) {
+            //           deviceUser.push(value);
+            //         }
+            //       }
+            //     });
+            //     // console.log("deviceUser", deviceUser);
+            //     const resultDevice = deviceUser.map((value) => value.device);
+
+            //     // console.log("include_player_ids yang akan dikirim", resultDevice);
+            //     const bodyOneSignal = {
+            //       app_id: "545db6bf-4448-4444-b9c8-70fb9fae225b",
+            //       include_player_ids: resultDevice,
+            //       contents: {
+            //         en: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+            //         id: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+            //       },
+            //       headings: {
+            //         en: "Request Self Order baru ",
+            //         id: "Request Self Order baru ",
+            //       },
+            //       subtitle: {
+            //         en: "Request Self Order baru ",
+            //         id: "Request Self Order baru",
+            //       },
+            //     };
+            //     fetch("https://onesignal.com/api/v1/notifications", {
+            //       method: "POST",
+            //       headers: {
+            //         Accept: "application/json",
+            //         "Content-Type": "application/json",
+            //         Authorization:
+            //           "Basic ZGJiNjZmYWEtNTQ2Ny00MmExLTgwZjMtZDRhN2U2YWUwMjk0",
+            //       },
+            //       body: JSON.stringify(bodyOneSignal),
+            //     })
+            //       .then((response) => response.json())
+            //       .then((responseJson) => {
+            //         const result = responseJson;
+            //         console.log("responseJSON send notif ==> ", result);
+            //       })
+            //       .catch((_err) => {
+            //         console.log("ERR ==> ", _err);
+            //       });
+            //   }
+            // }
+            // close kirim data ke kitchen
+            setLoading1(false);
+            setUrlVendor(urlVendor);
+            handlePaymentApprovalActions(transactionData);
+            incrementCounter();
+            clearInterval(intervalId);
+            // setCounter((prevCounter) => prevCounter + 1);
           }
         }, 5000);
       } else {
