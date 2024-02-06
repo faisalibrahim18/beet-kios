@@ -9,6 +9,7 @@ import Telp from "../assets/telp.png";
 import { LoginUser, RegisterUser, reset } from "../features/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Login = () => {
   const [openTab, setOpenTab] = useState(1);
@@ -16,6 +17,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [phoneNumber, setNumberPhone] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [captcha, setCaptchaToken] = useState("");
   const [isMdScreen, setIsMdScreen] = useState(false);
 
   useEffect(() => {
@@ -53,6 +55,10 @@ const Login = () => {
     (state) => state.auth
   );
 
+  const handleCaptcha = (value) => {
+    setCaptchaToken(value);
+  };
+  // console.log(captchaToken);
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -88,7 +94,7 @@ const Login = () => {
 
   const Auth = (e) => {
     e.preventDefault();
-    dispatch(LoginUser({ email, password }));
+    dispatch(LoginUser({ email, password, captcha }));
   };
   const Register = (e) => {
     e.preventDefault();
@@ -222,7 +228,14 @@ const Login = () => {
                     />
                     <span className="text-sm text-gray-600">Show password</span>
                   </label>
+                  <div>
+                    <ReCAPTCHA
+                      sitekey={import.meta.env.VITE_APP_SITE_KEY}
+                      onChange={handleCaptcha}
+                    />
+                  </div>
                 </div>
+
                 <div className="lg:flex md:flex ">
                   <div className="mt-6 w-3/4">
                     <Link

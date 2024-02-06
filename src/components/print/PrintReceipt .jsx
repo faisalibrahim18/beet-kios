@@ -10,11 +10,21 @@ const PrintReceipt = ({
   totaltax,
   counter,
   transactionData,
+  StatusPayment,
 }) => {
   if (!cart || cart.length === 0) {
     return <div>Cart is empty</div>;
   }
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000); // Update every 1000 milliseconds (1 second)
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
   const API_URL = import.meta.env.VITE_API_KEY;
   // console.log("ini data printnya");
   const [taxAndService, setTaxAndService] = useState({ tax: 0, charge: 0 });
@@ -70,13 +80,7 @@ const PrintReceipt = ({
       const service = Math.ceil((resultTotal * taxAndService.charge) / 100);
 
       // Calculate addons total
-      let addonsTotal = 0;
-      if (item.fullDataAddons) {
-        addonsTotal = item.fullDataAddons.reduce(
-          (accumulator, addon) => accumulator + addon.price,
-          0
-        );
-      }
+      let addonsTotal = item.price_addons_total || 0;
 
       const paymentTotal = resultTotal + addonsTotal;
 
@@ -98,31 +102,8 @@ const PrintReceipt = ({
     };
   };
   const totalValues = calculateTotalPrice();
-  const { totalTax, totalService, totalPaymentTotal, totalResultTotal } =
-    calculateTotalPrice();
+  const { totalPaymentTotal, totalResultTotal } = calculateTotalPrice();
 
-  const calculateSubTotalPrice = () => {
-    let total = 0;
-
-    cart.forEach((item) => {
-      let productTotal = item.priceItem * item.totalItem;
-
-      // Calculate the total price for addons
-      let addonsTotal = 0;
-      if (item.fullDataAddons) {
-        addonsTotal = item.fullDataAddons.reduce(
-          (accumulator, addon) => accumulator + addon.price,
-          0
-        );
-      }
-
-      // Add the product total and addons total to the overall total
-      total += productTotal + addonsTotal;
-    });
-
-    return total;
-  };
-  const subtotalValues = calculateSubTotalPrice();
   useEffect(() => {
     const setPrintStyles = () => {
       const printPage = document.getElementById("print-page");
@@ -158,24 +139,20 @@ const PrintReceipt = ({
         fontSize: "10px",
       }}
     >
+      {/* Header */}
       <div style={{ marginBottom: "5px" }}>
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            // alignItems: "center",
-            // width: "100%", // Sesuaikan dengan lebar maksimal yang diinginkan
-            // height: "100vh", // Sesuaikan dengan tinggi maksimal yang diinginkan
           }}
         >
           <img
             src={`${API_URL}/${logo}`}
             alt=""
             style={{
-              // maxWidth: "100%", // Agar logo tidak melebihi lebar parent
-              // maxHeight: "100%", // Agar logo tidak melebihi tinggi parent
-              width: "40px", // Atur lebar gambar menjadi 40px
-              height: "40px", // Atur tinggi gambar menjadi 40px
+              width: "40px",
+              height: "40px",
             }}
           />
         </div>
@@ -184,7 +161,17 @@ const PrintReceipt = ({
           <span>{transactionData?.address}</span>
         </div>
       </div>
-
+      <div style={{ fontSize: "10px", marginTop: "3px" }}>
+        <div>
+          <span>Tanggal dan Waktu:</span>
+          <div style={{ fontSize: "9px" }}>
+            <b>{currentDateTime.toLocaleString()}</b>
+          </div>
+        </div>
+        <div>
+          <span></span>
+        </div>
+      </div>
       <hr />
       {/* data Item */}
       <div>
@@ -235,7 +222,7 @@ const PrintReceipt = ({
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>Sub Total</div>
         <div style={{ textAlign: "right" }}>
-          Rp. {subtotalValues.toLocaleString("id-ID")}
+          Rp. {totalPaymentTotal.toLocaleString("id-ID")}
         </div>
       </div>
       {/* taxAndService */}
@@ -259,7 +246,7 @@ const PrintReceipt = ({
         <div>Total</div>
         <div style={{ textAlign: "right" }}>
           {/* Rp. {total} */}
-          Rp. {total.toLocaleString("id-ID")}
+          Rp. {totalResultTotal.toLocaleString("id-ID")}
         </div>
       </div>
       <hr />

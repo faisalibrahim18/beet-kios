@@ -3,21 +3,19 @@ import LoadingProduct from "../Loading/LoadingProduct";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Pro from "../../assets/pro.jpg";
 import Lg from "../../assets/logo.png";
-import { BsCartPlus } from "react-icons/bs";
+import { BsCartPlus, BsFillStarFill } from "react-icons/bs";
 import { FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Iklan from "../iklan/Iklan";
 
-const ProductList_ = ({ searchTerm, selectedCategory }) => {
-  const [loadingInitial, setLoadingInitial] = useState(true);
-  const [loading, setLoading] = useState(true);
+const ProductList_ = ({ searchTerm, selectedCategory, favorite }) => {
   const [showMore, setShowMore] = useState(false);
   const [visibleData, setVisibleData] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const { id } = useParams();
   const [cart, setCart] = useState([]);
   const [notes, setNotes] = useState("");
-
+  const [isFavoriteAvailable, setIsFavoriteAvailable] = useState(true);
   const [itemsToShow, setItemsToShow] = useState(
     showMore ? searchTerm.length : 12
   );
@@ -25,73 +23,63 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
   const API_URL = import.meta.env.VITE_API_KEY;
   const navigate = useNavigate();
 
-  const [detail, setDetail] = useState(null); // Tambahkan 'detail' ke dalam state
-
-  // get category
-  useEffect(() => {
-    const filterProductsByCategory = async () => {
-      // Fungsi filterProductsByCategory tetap sama
-    };
-
-    // Panggil fungsi filterProductsByCategory
-    filterProductsByCategory();
-    setLoading(false);
-    setLoadingInitial(false);
-
-    // Ambil 'detail' berdasarkan 'id'
-    const fetchProductDetail = async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/api/v1/item/find-item/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        setDetail(data.detail);
-      } catch (error) {
-        console.error("Error fetching item details:", error);
-      }
-    };
-
-    // Panggil fetchProductDetail ketika 'id' berubah
-    if (id) {
-      fetchProductDetail();
-    }
-  }, [searchTerm, selectedCategory, itemsToShow, id]);
-  // close get category
-
-  // filter category
+  // Di dalam useEffect pada komponen ProductList_
   useEffect(() => {
     const filterProductsByCategory = async () => {
       try {
         let filteredData;
 
-        if (!selectedCategory || selectedCategory === "all") {
-          filteredData = searchTerm.slice(0, itemsToShow);
+        if (selectedCategory === "favorite") {
+          // Filter berdasarkan produk favorit
+          filteredData = searchTerm.filter((item) => item.is_favorite);
+          setIsFavoriteAvailable(filteredData.length > 0);
+        } else if (selectedCategory === "all") {
+          // Tampilkan semua produk jika kategori "all" dipilih
+          filteredData = searchTerm;
         } else {
-          const filtered = searchTerm.filter(
+          // Filter berdasarkan kategori yang dipilih
+          filteredData = searchTerm.filter(
             (item) => item.Product_Category?.name === selectedCategory
           );
-          filteredData = filtered.slice(0, itemsToShow);
         }
 
-        setVisibleData(filteredData);
+        setVisibleData(filteredData.slice(0, itemsToShow));
       } catch (error) {
         console.error("Error filtering products:", error);
-      } finally {
-        setLoadingInitial(false);
       }
     };
 
-    // Call filterProductsByCategory function
+    // Panggil fungsi filterProductsByCategory
     filterProductsByCategory();
-    setLoading(false);
-    setLoadingInitial(false);
   }, [searchTerm, selectedCategory, itemsToShow]);
+
+  // useEffect(() => {
+  //   const filterProductsByCategory = async () => {
+  //     try {
+  //       let filteredData;
+
+  //       if (!selectedCategory || selectedCategory === "all") {
+  //         filteredData = searchTerm.slice(0, itemsToShow);
+  //       } else {
+  //         const filtered = searchTerm.filter(
+  //           (item) => item.Product_Category?.name === selectedCategory
+  //         );
+  //         filteredData = filtered.slice(0, itemsToShow);
+  //       }
+
+  //       setVisibleData(filteredData);
+  //     } catch (error) {
+  //       console.error("Error filtering products:", error);
+  //     } finally {
+  //       setLoadingInitial(false);
+  //     }
+  //   };
+
+  //   // Call filterProductsByCategory function
+  //   filterProductsByCategory();
+  //   setLoading(false);
+  //   setLoadingInitial(false);
+  // }, [searchTerm, selectedCategory, itemsToShow]);
   // close filter category
 
   // function handle add to cart
@@ -224,39 +212,46 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
 
       <div>
         {/* data produk */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-6 lg:gap-6 sm:gap-6 gap-2">
+
+        <div className="mb-5 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-6 lg:gap-6 sm:gap-6 gap-2">
           {visibleData.map((item) => (
             <div
               className="relative bg-white border rounded-lg shadow hover:shadow-2xl group"
               key={item.id}
             >
               <div className="flex justify-center items-center">
-                <img
-                  src={item.image == null ? Lg : `${API_URL}/${item.image}`}
-                  className="w-auto object-cover sm:h-40 md:h-52 h-32 rounded-t-lg"
-                  alt={item.name}
-                />
+                <Link to={`/products/detail/${item.id}`}>
+                  <img
+                    src={item.image == null ? Lg : `${API_URL}/${item.image}`}
+                    className="w-auto object-cover sm:h-40 md:h-52 h-32 rounded-t-lg"
+                  />
+                </Link>
               </div>
               <div className=" relative">
-                <div className="sm:pl-3 pl-2 pr-1 sm:pr-3 pb-1.5">
+                <div className="sm:pl-3 pl-2 pr-1 sm:pr-3 pb-1.5 flex justify-between">
                   <div>
-                    <Link to={`/products/detail/${item.id}`}>
+                    <div>
                       <div className=" text-sm tracking-tight font-semibold text-gray-900">
                         {item.name}
                       </div>
-                    </Link>
+                    </div>
+                    <div className="flex">
+                      {item && item.Product_Category && (
+                        <p className="text-sm lowercase rounded-lg font-normal text-gray-400 flex">
+                          {item.Product_Category.name}
+                        </p>
+                      )}
+                    </div>
+                    <div className="inline-flex items-center text-sm font-medium text-center text-black">
+                      Rp {item.price.toLocaleString("id-ID")}
+                      {/* Move the button here */}
+                    </div>
                   </div>
-                  <div className="flex">
-                    {item && item.Product_Category && (
-                      <p className="text-sm lowercase rounded-lg font-normal text-gray-400 flex">
-                        {item.Product_Category.name}
-                      </p>
-                    )}
-                  </div>
-                  <div className="inline-flex items-center text-sm font-medium text-center text-black">
-                    Rp {item.price.toLocaleString("id-ID")}
-                    {/* Move the button here */}
-                  </div>
+                  {item.is_favorite && (
+                    <div className="mt-1 text-yellow-500">
+                      <BsFillStarFill />
+                    </div>
+                  )}
                 </div>
                 {/* button tambahkan ke keranjang dan menambah, mengurangi item */}
                 <div className="flex mt-2 mb-2 ml-2 mr-3 text-sm md:justify-evenly sm:justify-between">
@@ -292,6 +287,15 @@ const ProductList_ = ({ searchTerm, selectedCategory }) => {
             </div>
           ))}
         </div>
+        {!isFavoriteAvailable && selectedCategory === "favorite" && (
+          <div className="text-gray-500 font-semibold text-center flex items-center justify-center">
+            <div>
+              <img src={Pro} alt="" className="w-96" />
+              <span> Data favorit tidak tersedia.</span>
+            </div>
+          </div>
+        )}
+
         {/* close data product */}
 
         {/* button keranjang */}

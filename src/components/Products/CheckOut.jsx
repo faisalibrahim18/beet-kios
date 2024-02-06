@@ -26,53 +26,53 @@ function CheckOut({ isOpen, closeModal }) {
     // console.log("Transaction Data Updated:", transactionData);
   }, [transactionData]);
 
-  const [counter, setCounter] = useState(() => {
-    // Get the counter value from localStorage or default to 1
-    const storedCounter = parseInt(localStorage.getItem("counter")) || "01";
-    return storedCounter;
-  });
-
-  // counter buat no antrian
-  const formatNumber = (number, length) => {
-    let formattedNumber = number.toString();
-    while (formattedNumber.length < length) {
-      formattedNumber = "0" + formattedNumber;
+  const [counter, setCounter] = useState(1);
+  useEffect(() => {
+    // Ambil nomor antrian dari local storage saat komponen dipasang
+    const storedQueueNumber = localStorage.getItem("queueNumber");
+    if (storedQueueNumber) {
+      setCounter(parseInt(storedQueueNumber));
     }
-    return formattedNumber;
+  }, []);
+
+  const handleTransaction = () => {
+    // Tambahkan 1 ke nomor antrian dan simpan ke local storage
+    const newQueueNumber = counter + 1;
+    setCounter(newQueueNumber);
+    localStorage.setItem("queueNumber", newQueueNumber.toString());
   };
 
-  const resetCounterAt10PM = () => {
+  useEffect(() => {
+    const resetDataAt10PM = () => {
+      // Hapus data nomor antrian dari local storage setiap jam 10 malam
+      const now = new Date();
+      if (
+        now.getHours() === 22 &&
+        now.getMinutes() === 0 &&
+        now.getSeconds() === 0
+      ) {
+        localStorage.removeItem("queueNumber");
+        setCounter(1);
+      }
+    };
+
+    // Set timeout untuk menjalankan resetDataAt10PM pada pukul 10 malam
     const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
+    const resetTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      22,
+      0,
+      0,
+      0
+    );
+    const timeUntilReset = resetTime.getTime() - now.getTime();
+    const timeoutId = setTimeout(resetDataAt10PM, timeUntilReset);
 
-    if (hours === 22 && minutes === 0 && seconds === 0) {
-      setCounter(formatNumber(1, 2)); // Menggunakan formatNumber untuk memastikan dua digit
-    }
-  };
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      console.log("counter", counter);
-      resetCounterAt10PM();
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, []); // Menghapus dependensi [counter]
-
-  useEffect(() => {
-    localStorage.setItem("counter", counter.toString());
+    // Hapus timeout saat komponen dibongkar
+    return () => clearTimeout(timeoutId);
   }, [counter]);
-  const incrementCounter = () => {
-    setCounter((prevCounter) => parseInt(prevCounter, 10) + 1);
-    // setCounter((prevCounter) => prevCounter + 1);
-    // setCounter((prevCounter) => {
-    //   // Increment the counter as a string and then format to ensure two digits
-    //   const newCounter = formatNumber(parseInt(prevCounter, 10) + 1);
-    //   return newCounter;
-    // });
-  };
   // close counter
 
   // tax and service
@@ -115,7 +115,7 @@ function CheckOut({ isOpen, closeModal }) {
       console.log("error handleCheckTaxAndService");
     }
   };
-  // close tax and serive
+  // close tax and service
 
   useEffect(() => {
     // handlePaymentApprovalActions();
@@ -176,13 +176,14 @@ function CheckOut({ isOpen, closeModal }) {
       const service = Math.ceil((resultTotal * taxAndService.charge) / 100);
 
       // Calculate addons total
-      let addonsTotal = 0;
-      if (item.fullDataAddons) {
-        addonsTotal = item.fullDataAddons.reduce(
-          (accumulator, addon) => accumulator + addon.price,
-          0
-        );
-      }
+      let addonsTotal = item.price_addons_total || 0; // Ambil nilai dari price_addons_total
+      // let addonsTotal = 0;
+      // if (item.fullDataAddons) {
+      //   addonsTotal = item.fullDataAddons.reduce(
+      //     (accumulator, addon) => accumulator + addon.price,
+      //     0
+      //   );
+      // }
 
       const paymentTotal = resultTotal + addonsTotal;
 
@@ -305,8 +306,10 @@ function CheckOut({ isOpen, closeModal }) {
               },
             }
           );
-          console.log("status", response1.data.data.response.processStatus);
+          console.log("status", response1.data.data.response);
+          const StatusPayment = response1.data.data.response.processStatus;
           if (response1.data.data.response.processStatus === "APPROVED") {
+            handleTransaction();
             const receiptId =
               "ORDER_" +
               dayjs(new Date()).format("YY/MM/DD-HH/mm/ss") +
@@ -329,7 +332,7 @@ function CheckOut({ isOpen, closeModal }) {
               invoice: TRANSIDMERCHANT,
               status: "Done",
             };
-            console.log("datasend", sendData);
+            // console.log("datasend", sendData);
             const response1 = await axios.post(
               `${API_URL}/api/v1/transaction-customer`,
               sendData,
@@ -340,7 +343,7 @@ function CheckOut({ isOpen, closeModal }) {
                 },
               }
             );
-            console.log("datasend", response1);
+            // console.log("datasend", response1);
             //close  kirim data ke beetOffice
 
             // kirim data ke kitchen
@@ -458,8 +461,8 @@ function CheckOut({ isOpen, closeModal }) {
             // close kirim data ke kitchen
             setLoading1(false);
             setUrlVendor(urlVendor);
-            handlePaymentApprovalActions(transactionData);
-            incrementCounter();
+            handlePaymentApprovalActions(transactionData, StatusPayment);
+
             clearInterval(intervalId);
             // setCounter((prevCounter) => prevCounter + 1);
           }
@@ -476,15 +479,17 @@ function CheckOut({ isOpen, closeModal }) {
       console.log(error);
     }
   };
-
   //  close handle buat pembayaran/checkout
 
   // action ketika selesai pembayaran
-  const handlePaymentApprovalActions = async (transactionData) => {
+  const handlePaymentApprovalActions = async (
+    transactionData,
+    StatusPayment
+  ) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
     // generateReceiptContent();
-    printReceipt(transactionData);
+    printReceipt(transactionData, StatusPayment);
     Swal.fire({
       title: "Pembayaran sukses!",
       text: "Text lain sesuai kebutuhan",
@@ -501,7 +506,7 @@ function CheckOut({ isOpen, closeModal }) {
   // close  action ketika selesai pembayaran
 
   // generate data receipt
-  const generateReceiptContent = (transactionData) => {
+  const generateReceiptContent = (transactionData, StatusPayment) => {
     const tax = taxAndService.tax;
     const service = taxAndService.charge;
     const totaltax = totalValues.totalTax;
@@ -519,6 +524,7 @@ function CheckOut({ isOpen, closeModal }) {
         totaltax={totaltax}
         counter={counter}
         transactionData={transactionData} // transactionData is passed as a prop
+        StatusPayment={StatusPayment}
       />
     );
 
@@ -527,11 +533,14 @@ function CheckOut({ isOpen, closeModal }) {
   // close generate data receipt
 
   //  print receipt
-  const printReceipt = (transactionData) => {
+  const printReceipt = (transactionData, StatusPayment) => {
     const printWindow = window.open();
     console.log("print ke sini");
     if (printWindow) {
-      const receiptContent = generateReceiptContent(transactionData);
+      const receiptContent = generateReceiptContent(
+        transactionData,
+        StatusPayment
+      );
 
       printWindow.document.write(`
           <html>
@@ -574,9 +583,98 @@ function CheckOut({ isOpen, closeModal }) {
       });
 
       if (confirmation.isConfirmed) {
+        handleTransaction();
+        const API_URL = import.meta.env.VITE_API_KEY;
+        const token = localStorage.getItem("token");
+        const cartData = JSON.parse(localStorage.getItem("cart")) || [];
+        const user = JSON.parse(localStorage.getItem("user")) || [];
+        const businessId = cartData.length > 0 ? cartData[0].business_id : null;
+        const outletId = cartData.length > 0 ? cartData[0].outlet_id : null;
+        const userId = user.owner_id;
+        // console.log(userId);
+        const totalAmount = calculateTotalPrice().totalResultTotal;
+        const result = {
+          tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
+          service: Math.ceil((totalAmount * taxAndService.charge) / 100),
+          paymentTotal: totalAmount,
+        };
+
+        result.resultAmount = Math.ceil(result.paymentTotal);
+        const response = await axios.get(
+          `${API_URL}/api/v1/business-noverify/${businessId}`
+        );
+        const responseOutlet = await axios.get(
+          `${API_URL}/api/v1/outlet/${outletId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const dataOutlet = responseOutlet.data.data;
+
+        const dataBusiness = response.data.data;
+
+        const transactionData = {
+          referenceId: TRANSIDMERCHANT,
+          address: dataOutlet.address,
+          merchantName: dataBusiness.name,
+          paymentTotal: result.paymentTotal,
+          resultAmount: result.resultAmount,
+          transactionUsername: dataBusiness.cz_user,
+        };
+        // setTransactionData(transactionData);
+        const receiptId =
+          "ORDER_" + dayjs(new Date()).format("YY/MM/DD-HH/mm/ss") + outletId;
+        // kirim data ke beetOffice
+        const sendData = {
+          receipt_id: receiptId,
+          items: cartData,
+          outlet_id: outletId,
+          business_id: businessId,
+          customer_id: userId,
+          sales_type_id: 311 || [],
+          payment_method_id: 2,
+          payment_discount: 0,
+          payment_tax: result.tax,
+          payment_service: result.service,
+          payment_total: result.paymentTotal,
+          amount: result.resultAmount,
+          payment_change: 0,
+          kitchen: true,
+          queue_number: counter,
+          status: "Done",
+        };
+        //  parameter_send.queue_number = this.state.queue_number;
+        //   kitchen = true;
+
+        // console.log("datasend", sendData);
+        // const response1 = await axios.post(
+        //   `${API_URL}/api/v1/transaction-customer`,
+        //   sendData,
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //   }
+        // );
+
+        const response1 = await axios.post(
+          `${API_URL}/api/v1/transaction`,
+          sendData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("datasend", response1);
         closeModal();
-        handlePaymentApprovalActions();
-        incrementCounter();
+        handlePaymentApprovalActions(transactionData);
+
         // Pastikan bahwa localStorage.removeItem("cart") berjalan tanpa kesalahan
         localStorage.removeItem("cart");
 
@@ -671,7 +769,7 @@ function CheckOut({ isOpen, closeModal }) {
                                       <div className="mt-1.5 mr-1">
                                         <BsRecordFill size={8} />
                                       </div>
-                                      Add-On
+                                      Tambahan :
                                     </div>
                                     {item.fullDataAddons.map((addon) => (
                                       <li
@@ -679,9 +777,16 @@ function CheckOut({ isOpen, closeModal }) {
                                         className="flex justify-between pl-4 font-semibold"
                                       >
                                         <span> - {addon.name}</span>
-                                        <span>
-                                          Rp.{" "}
-                                          {addon.price.toLocaleString("id-ID")}
+                                        <span className="flex items-center">
+                                          <span className="w-16 text-right">
+                                            {item.totalItem}x
+                                          </span>
+                                          <span className="w-24 text-right flex-grow">
+                                            Rp.{" "}
+                                            {addon.price.toLocaleString(
+                                              "id-ID"
+                                            )}
+                                          </span>
                                         </span>
                                       </li>
                                     ))}

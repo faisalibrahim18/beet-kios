@@ -22,27 +22,21 @@ export const LoginUser = createAsyncThunk(
   async (user, thunkAPI) => {
     try {
       const API_URL = import.meta.env.VITE_API_KEY;
-      const response = await axios.post(
-        `${API_URL}/api/v1/auth/customer/login`,
-        {
-          email: user.email,
-          password: user.password,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/v1/auth/login`, {
+        email: user.email,
+        password: user.password,
+        "g-recaptcha-response": user.captcha,
+      });
       // withCredentials = false
 
       // console.log(response.data.data.payload.customer_account_id);
       // console.log(response.data?.data?.token);
       localStorage.setItem("token", response.data?.data?.token, true);
-      localStorage.setItem(
-        "user",
-        response.data.data.payload.customer_account_id,
-        true
-      );
+      localStorage.setItem("user", JSON.stringify(response.data.data.user));
       // console.log("Bearer", response);
-      // console.log(response.data);
+      console.log(response.data);
 
-      return response.data;
+      // return response.data;
     } catch (error) {
       if (error.response) {
         const Toast = Swal.mixin({

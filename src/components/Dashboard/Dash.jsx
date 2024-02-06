@@ -10,6 +10,7 @@ const Dash = () => {
 
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [favorite, setFavorite] = useState(false);
   const [category, setCategory] = useState([]);
 
   // get data logo, product dan category
@@ -74,7 +75,11 @@ const Dash = () => {
           }
         );
         //  close get data product
-
+        const isAnyFavorite = productResponse.data.data.some(
+          (item) => item.is_favorite
+        );
+        setFavorite(isAnyFavorite);
+        // console.log("product", productResponse);
         // get data category
         const categoryProductResponse = await axios.get(
           `${API_URL}/api/v1/product-category/lite?outlet_id=207&business_id=152`,
@@ -155,7 +160,7 @@ const Dash = () => {
       <div className="flex pt-[50px]">
         {/* data category */}
         <div
-          className={`bg-gray-100 flex-grow  pt-5 shadow h-full mt-[50px] z-50 fixed ${
+          className={`bg-gray-100 flex-grow  pt-5 shadow h-full lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[10px] z-50 fixed ${
             category.length > 0
               ? "overflow-auto scroll-m-1.5"
               : "overflow-hidden"
@@ -170,10 +175,11 @@ const Dash = () => {
         {/* close data category */}
 
         {/* data product */}
-        <div className="flex-grow mt-[40px] pl-[70px] sm:pl-[100px] md:pl-[140px]">
+        <div className="flex-grow lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[10px] pl-[70px] sm:pl-[100px] md:pl-[140px]">
           <ProductList_
             searchTerm={searchTerm}
             selectedCategory={selectedCategory}
+            favorite={favorite}
           />
         </div>
         {/* close data product */}

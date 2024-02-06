@@ -8,6 +8,7 @@ import { FaMinus, FaPlus } from "react-icons/fa";
 import Lg from "../../assets/logo.png";
 import { checkTokenExpiration } from "../../utils/token";
 import { BsCartPlus } from "react-icons/bs";
+import Iklan from "../iklan/Iklan";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -64,6 +65,7 @@ const ProductDetail = () => {
     const modal = document.getElementById("imageModal");
     modal.classList.add("hidden");
   };
+
   useEffect(() => {
     const getData1 = async () => {
       try {
@@ -114,16 +116,17 @@ const ProductDetail = () => {
 
   const handleAddCart = () => {
     try {
-      // Calculate the total price including addons
       const addonsTotalPrice = allSelectAddOns.reduce(
         (total, addon) => total + addon.price,
         0
       );
 
       const amount = product.price + addonsTotalPrice;
-
+      const cartItemId = `${product.id}-${allSelectAddOns
+        .map((addon) => addon.id)
+        .join("-")}`;
       const cartItem = {
-        id: product.id,
+        id: cartItemId,
         business_id: product.business_id,
         outlet_id: product.outlet_id,
         nameItem: product.name,
@@ -137,44 +140,70 @@ const ProductDetail = () => {
         allAddons: allSelectAddOns,
         totalAmount: amount * totalItem,
         addons: [],
-        sales_type_id: 1,
-        // totalAmount: product.price * totalItem,
+        sales_type_id: 613,
         notes: notes,
         product_id: product.id,
-        // addons: [],
         quantity: totalItem,
         price_product: product.price,
         price_discount: 0,
         price_service: 0,
-        price_addons_total: addonsTotalPrice || 0,
+        price_addons_total: addonsTotalPrice * totalItem || 0,
         price_total: amount * totalItem,
       };
-      console.log("cartItem", cartItem);
 
-      // Get existing cart data from localStorage
       const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+      let itemExists = false;
+      for (let i = 0; i < existingCart.length; i++) {
+        const existingCartItem = existingCart[i];
 
-      // Check if the item already exists in the cart
-      const existingCartItem = existingCart.find((item) =>
-        isSameCartItem(item, cartItem)
-      );
+        if (existingCartItem.id === cartItemId) {
+          // Jika item sudah ada, lakukan update seperti sebelumnya
+          existingCartItem.totalItem += totalItem;
+          existingCartItem.quantity += totalItem;
+          existingCartItem.totalAmount += cartItem.totalAmount;
+          existingCartItem.notes = notes;
 
-      if (existingCartItem) {
-        // If the item already exists, update the totalItem and total amount
-        // const existingCartItem = existingCart[existingCartItemIndex];
-        existingCartItem.totalItem += totalItem;
-        existingCartItem.quantity += totalItem;
-        existingCartItem.totalAmount += cartItem.totalAmount;
-        existingCartItem.notes = notes;
-      } else {
-        // If it's a new item, add it to the cart
+          // Periksa apakah addons sudah ada dalam existingCartItem
+          for (const newAddon of allSelectAddOns) {
+            const existingAddonIndex =
+              existingCartItem.fullDataAddons.findIndex(
+                (existingAddon) => existingAddon.id === newAddon.id
+              );
+
+            if (existingAddonIndex !== -1) {
+              // Jika addon sudah ada, update quantity
+              existingCartItem.fullDataAddons[existingAddonIndex].quantity +=
+                newAddon.quantity;
+            } else {
+              // Jika addon baru, tambahkan ke existingCartItem dengan jumlah minimal 1
+              const addonWithMinQuantity = {
+                ...newAddon,
+                quantity: Math.max(newAddon.quantity, 1),
+              };
+
+              existingCartItem.fullDataAddons.push(addonWithMinQuantity);
+            }
+          }
+
+          // Perbarui total harga untuk addons
+          existingCartItem.price_addons_total +=
+            existingCartItem.fullDataAddons.reduce(
+              (total, addon) => total + addon.price * totalItem,
+              0
+            );
+
+          itemExists = true;
+          break;
+        }
+      }
+
+      if (!itemExists) {
+        // Jika item belum ada, tambahkan ke dalam existingCart
         existingCart.push(cartItem);
       }
 
-      // Save the updated cart data to localStorage
       localStorage.setItem("cart", JSON.stringify(existingCart));
 
-      // Show success message or perform other actions
       Swal.fire({
         icon: "success",
         title: "Item Ditambahkan ke Keranjang",
@@ -184,12 +213,10 @@ const ProductDetail = () => {
           title: "text-lg",
         },
       }).then(() => {
-        // You might want to navigate back or perform other actions
         navigate("/dashboard");
       });
     } catch (error) {
       console.error("Error adding item to cart:", error);
-      // Handle errors as needed
     }
   };
 
@@ -199,6 +226,7 @@ const ProductDetail = () => {
     setCart(storedCart);
     handleGetProduct();
   }, []);
+
   const handleSelectAllAddons = (data2, index, data) => {
     const data2_temp = { ...data2, group_id: data.id };
 
@@ -231,6 +259,7 @@ const ProductDetail = () => {
       ]);
     }
   };
+
   const handleGetProduct = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -390,7 +419,7 @@ const ProductDetail = () => {
                               }
                             >
                               <div
-                                className={`border cursor-pointer   md:w-[400px] border-[#6E205E] flex mb-2 mr-2 rounded-lg p-1 pl-3 text-sm text-gray-700 hover:bg-[#6E205E] hover:text-white ${
+                                className={`border cursor-pointer   md:w-[400px] border-[#091F4B] flex mb-2 mr-2 rounded-lg p-1 pl-3 text-sm text-gray-700 hover:bg-[#091F4B] hover:text-white ${
                                   allSelectAddOns.some(
                                     (element) => element.id === data2.id
                                   )
@@ -498,6 +527,9 @@ const ProductDetail = () => {
                 </button>
               </div>
             </div>
+          </div>
+          <div className="">
+            <Iklan />
           </div>
         </div>
       )}

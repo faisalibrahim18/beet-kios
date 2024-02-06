@@ -8,6 +8,8 @@ import { checkTokenExpiration } from "../../utils/token";
 import { Link, useNavigate } from "react-router-dom";
 import DetailKeranjang from "./DetailKeranjang";
 import { BiDetail } from "react-icons/bi";
+import axios from "axios";
+import Iklan from "../iklan/Iklan";
 
 const ProductKeranjang = () => {
   const [cart, setCart] = useState([]);
@@ -27,6 +29,54 @@ const ProductKeranjang = () => {
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(cartData);
+    const getProduct = async () => {
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const token = localStorage.getItem("token");
+      const response1 = await axios.get(
+        `${API_URL}/api/v1/payment-method/development?businessId=152&outlet_id=207`,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("payment", response1);
+    };
+    const getsales = async () => {
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const token = localStorage.getItem("token");
+      const response1 = await axios.get(
+        `${API_URL}/api/v1/sales-type/guest?business_id=152`,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("sales", response1);
+    };
+    const getkitchen = async () => {
+      const API_URL = import.meta.env.VITE_API_KEY;
+      const token = localStorage.getItem("token");
+      const response1 = await axios.get(
+        `${API_URL}/api/v1/kitchen-management/201`,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("kitchen", response1);
+    };
+    getkitchen();
+    getsales();
+    getProduct();
   }, []);
   // close get data cart dari localstorage
 
@@ -52,19 +102,33 @@ const ProductKeranjang = () => {
     cart.forEach((item) => {
       let productTotal = item.priceItem * item.totalItem;
 
-      let addonsTotal = 0;
-      if (item.fullDataAddons) {
-        addonsTotal = item.fullDataAddons.reduce(
-          (accumulator, addon) => accumulator + addon.price,
-          0
-        );
-      }
+      let addonsTotal = item.price_addons_total || 0; // Ambil nilai dari price_addons_total
 
       total += productTotal + addonsTotal;
     });
 
     return total;
   };
+
+  // const calculateTotalPrice = () => {
+  //   let total = 0;
+
+  //   cart.forEach((item) => {
+  //     let productTotal = item.priceItem * item.totalItem;
+
+  //     let addonsTotal = 0;
+  //     if (item.fullDataAddons) {
+  //       addonsTotal = item.fullDataAddons.reduce(
+  //         (accumulator, addon) => accumulator + addon.price,
+  //         0
+  //       );
+  //     }
+
+  //     total += productTotal + addonsTotal;
+  //   });
+
+  //   return total;
+  // };
   // close hitung total data keranjang
 
   // function menambahkan item
@@ -73,11 +137,13 @@ const ProductKeranjang = () => {
       if (cartItem.id === item.id) {
         const updatedTotalItem = cartItem.totalItem + 1;
         const updatedTotalAmount = item.priceItem * updatedTotalItem;
+        const updateTotalAddons = item.price_addons_total * updatedTotalItem;
         return {
           ...cartItem,
           totalItem: updatedTotalItem,
           quantity: updatedTotalItem,
           totalAmount: updatedTotalAmount,
+          price_addons_total: updateTotalAddons,
         };
       }
       return cartItem;
@@ -93,20 +159,30 @@ const ProductKeranjang = () => {
     const updatedCart = cart.map((cartItem) => {
       if (cartItem.id === item.id && cartItem.totalItem > 1) {
         const updatedTotalItem = cartItem.totalItem - 1;
-        const updatedTotalAmount = item.priceItem * updatedTotalItem;
+        const updatedTotalAmount = cartItem.priceItem * updatedTotalItem;
+
+        // Perhitungan total addons
+        const updatedTotalAddons = cartItem.fullDataAddons.reduce(
+          (total, addon) => total + addon.price * updatedTotalItem,
+          0
+        );
+
         return {
           ...cartItem,
           totalItem: updatedTotalItem,
           quantity: updatedTotalItem,
           totalAmount: updatedTotalAmount,
+          price_addons_total: updatedTotalAddons,
         };
       }
+
       return cartItem;
     });
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
+
   // close function mengurangi item
   const calculateTotalAmount = (cart) => {
     return cart.reduce((total, item) => {
@@ -139,12 +215,12 @@ const ProductKeranjang = () => {
             title: "text-sm",
           },
         }).then(() => {
-          setClickCounts((prevClickCounts) => {
-            const updatedClickCounts = { ...prevClickCounts };
-            delete updatedClickCounts[itemId];
-            return updatedClickCounts;
-          });
-          window.location.reload();
+          // setClickCounts((prevClickCounts) => {
+          //   const updatedClickCounts = { ...prevClickCounts };
+          //   delete updatedClickCounts[itemId];
+          //   return updatedClickCounts;
+          // });
+          // window.location.reload();
         });
       }
     });
@@ -220,7 +296,7 @@ const ProductKeranjang = () => {
   return (
     <>
       <div className="pt-5">
-        <div className="mt-6 ml-5 text-xl text-[#091F4B]">
+        <div className="mt-6 ml-5 text-2xl text-[#091F4B]">
           <Link to={"/dashboard"}>
             <FaArrowLeft />
           </Link>
@@ -429,6 +505,9 @@ const ProductKeranjang = () => {
           selectedOutlets={selectedOutlets} // Pass selected item IDs to the Checkout component
         />
       )}
+      <div className="">
+        <Iklan />
+      </div>
     </>
   );
 };

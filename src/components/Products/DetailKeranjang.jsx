@@ -3,7 +3,7 @@ import Lg from "../../assets/logo.png";
 const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
   const [productDetails, setProductDetails] = useState(null);
   const API_URL = import.meta.env.VITE_API_KEY;
-
+  // console.log(productDetails);
   // get data detail keranjang
   useEffect(() => {
     const fetchDetails = async () => {
@@ -95,13 +95,13 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
                       )}
                     </span>
                   </li>
-                  <li className="flex items-center text-gray-700 mb-0.5">
+                  {/* <li className="flex items-center text-gray-700 mb-0.5">
                     <span className="">Total Harga</span>
                     <span className="mr-1 ml-[11px]">:</span>
                     <span>
                       Rp. {productDetails?.totalAmount.toLocaleString("id-ID")}
                     </span>
-                  </li>
+                  </li> */}
                 </ul>
                 {/* close bagian detail product */}
 
@@ -112,13 +112,13 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
                     <div className="text-gray-700 ml-2 font-semibold">
                       Tambahan
                     </div>
-                    {productDetails?.allAddons.length === 0 ? (
-                      <div className="ml-4 text-gray-700">
+                    {productDetails?.fullDataAddons.length === 0 ? (
+                      <div className="ml-4 text-gray-700 text-sm">
                         Tidak ada tambahan
                       </div>
                     ) : (
                       <ul className="list-disc ml-4">
-                        {productDetails.allAddons.map((item) => (
+                        {productDetails.fullDataAddons.map((item) => (
                           <li className="flex items-center text-gray-700 text-sm mb-0.5">
                             <span className="flex-shrink-0 mr-[10px] ">
                               {item.name}
@@ -127,8 +127,19 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
                             <span>
                               Rp. {item.price.toLocaleString("id-ID")}
                             </span>
+                            <span className="ml-3">
+                              x {productDetails?.totalItem}
+                            </span>
                           </li>
                         ))}
+                        <div className="text-gray-700 text-sm font-semibold">
+                          <span>
+                            Total Tambahan : Rp.{" "}
+                            {productDetails?.price_addons_total.toLocaleString(
+                              "id-ID"
+                            )}
+                          </span>
+                        </div>
                       </ul>
                     )}
                   </div>
@@ -136,7 +147,13 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
                 </div>
               </div>
             </div>
-
+            <div className="text-gray-700 text-md font-semibold mt-3">
+              <span>Total Harga</span>
+              <span className="ml-2  mr-2">:</span>
+              <span>
+                Rp. {productDetails?.price_total.toLocaleString("id-ID")}
+              </span>
+            </div>
             {/* Add other product details as needed */}
           </div>
         ) : (
