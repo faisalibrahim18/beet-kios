@@ -5,7 +5,7 @@ import Bg from "../assets/bg.png";
 import Pass from "../assets/pass.png";
 import User1 from "../assets/user.png";
 import Telp from "../assets/telp.png";
-
+import { AiFillIdcard } from "react-icons/ai";
 import { LoginUser, RegisterUser, reset } from "../features/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
@@ -156,15 +156,16 @@ const Login = () => {
                     Staff Id
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <img
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#6E205E] ">
+                      {/* <img
                         src={User1}
                         className="lg:h-auto lg:w-auto bounce-top-icons bg-opacity-100 "
                         style={{
                           width: "20px",
                           height: "20px",
                         }}
-                      />
+                      /> */}
+                      <AiFillIdcard size={21} />
                     </div>
                     <input
                       type="text"
