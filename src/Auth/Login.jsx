@@ -13,6 +13,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 
 const Login = () => {
   const [openTab, setOpenTab] = useState(1);
+  const [staff_id, setStaff_Id] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setNumberPhone] = useState("");
@@ -45,9 +46,8 @@ const Login = () => {
   }, []);
 
   // Tentukan URL gambar latar belakang
-  const bgImage = `${Bg}`; // Ganti dengan URL gambar latar belakang Anda
+  const bgImage = `${Bg}`; // Ganti dengan URL gambar latar belakang
 
-  // Define the background image URL
   // const bgImage = `url(${Bg})`;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -68,38 +68,23 @@ const Login = () => {
     } else if (user || isSuccess) {
       // If the user is logged in, redirect to the dashboard
       navigate("/dashboard");
-    } else if (userRegister || isSuccess) {
-      navigate("/");
-      window.location("/");
     }
+    // else if (userRegister || isSuccess) {
+    //   navigate("/");
+    //   window.location("/");
+    // }
 
     dispatch(reset());
   }, [user, isSuccess, userRegister, dispatch, navigate]);
-  // useEffect(() => {
-  //   if (userRegister || isSuccess) {
-  //     //
-
-  //     // window.location.reload();
-  //   }
-  //   // Authorization = "Bearer" + localStorage.getItem("token");
-  //   dispatch(reset());
-  // }, [userRegister, isSuccess, dispatch, navigate]);
-
-  // useEffect(() => {
-  //   if (user || isSuccess) {
-  //     navigate("/dashboard");
-  //   }
-  //   dispatch(reset());
-  // }, [user, dispatch, navigate, isSuccess]);
 
   const Auth = (e) => {
     e.preventDefault();
-    dispatch(LoginUser({ email, password, captcha }));
+    dispatch(LoginUser({ staff_id, email, password }));
   };
-  const Register = (e) => {
-    e.preventDefault();
-    dispatch(RegisterUser({ email, password, phoneNumber }));
-  };
+  // const Register = (e) => {
+  //   e.preventDefault();
+  //   dispatch(RegisterUser({ email, password, phoneNumber }));
+  // };
 
   function togglePasswordVisibility() {
     setIsPasswordVisible((prevState) => !prevState);
@@ -149,7 +134,7 @@ const Login = () => {
                   Login
                 </a>
               </li>
-              <li className="">
+              {/* <li className="">
                 <a
                   href="#"
                   onClick={() => setOpenTab(2)}
@@ -159,10 +144,38 @@ const Login = () => {
                 >
                   Sign Up
                 </a>
-              </li>
+              </li> */}
             </ul>
             <div className={openTab === 1 ? "block" : "hidden"}>
               <form className="lg:w-2/6 fade-in pl-5" onSubmit={Auth}>
+                <div className="mb-5">
+                  <label
+                    htmlFor="website-admin"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Staff Id
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <img
+                        src={User1}
+                        className="lg:h-auto lg:w-auto bounce-top-icons bg-opacity-100 "
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                        }}
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={staff_id}
+                      onChange={(e) => setStaff_Id(e.target.value)}
+                      className="block shadow-xl rounded-xl border w-full p-2.5 pl-10 text-sm text-gray-900 flex-1 min-w-0  focus:border-[#6E205E] focus:ring-[#6E205E] focus:outline-none focus:ring focus:ring-opacity-5"
+                      placeholder="example123"
+                      required
+                    />
+                  </div>
+                </div>
                 <div className="mb-5">
                   <label
                     htmlFor="website-admin"
@@ -228,38 +241,36 @@ const Login = () => {
                     />
                     <span className="text-sm text-gray-600">Show password</span>
                   </label>
-                  <div>
+                  {/* <div className="mt-2">
                     <ReCAPTCHA
                       sitekey={import.meta.env.VITE_APP_SITE_KEY}
                       onChange={handleCaptcha}
                     />
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className="lg:flex md:flex ">
-                  <div className="mt-6 w-3/4">
+                <div className="">
+                  {/* <div className="mt-6 w-3/4">
                     <Link
                       to={"/forgotPassword"}
                       className="w-full text-sm font-medium  text-black hover:text-[#6E205E]"
                     >
                       Forgot your password?
                     </Link>
-                  </div>
+                  </div> */}
                   <div className="mt-6 flex justify-center items-center">
                     <button
                       type="submit"
                       className="shadow-lg w-full text-center px-5 lg:py-1 md:py-1 py-1.5 pr-10 pl-10  text-white  bg-[#6E205E] rounded-lg hover:bg-[#8f397c] focus:outline-none focus:bg-[#8f397c]"
                     >
                       {isLoading ? (
-                        <div className="flex sm:pl-48 lg:pl-0 md:pl-0 pl-20">
+                        <div className="flex justify-center">
                           <div className="h-4 w-4 mt-1 mr-2  animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]">
                             {/* <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
                               Loading...
                             </span> */}
                           </div>
-                          <div className="text-center  flex justify-center items-center">
-                            Loading...
-                          </div>
+                          <div className="text-center">Loading...</div>
                         </div>
                       ) : (
                         <div>Login</div>
@@ -269,7 +280,9 @@ const Login = () => {
                 </div>
               </form>
             </div>
-            <div className={openTab === 2 ? "block" : "hidden"}>
+
+            {/* form register */}
+            {/* <div className={openTab === 2 ? "block" : "hidden"}>
               <form className="lg:w-2/6 fade-in pl-5" onSubmit={Register}>
                 <div className="mb-5">
                   <label
@@ -374,11 +387,7 @@ const Login = () => {
                       {" "}
                       {isLoading ? (
                         <div className="flex justify-center">
-                          <div className="h-4 w-4 mt-1 mr-2 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]">
-                            {/* <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                            Loading...
-                          </span> */}
-                          </div>
+                          <div className="h-4 w-4 mt-1 mr-2 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
                           <div>Loading...</div>
                         </div>
                       ) : (
@@ -388,7 +397,8 @@ const Login = () => {
                   </div>
                 </div>
               </form>
-            </div>
+            </div> */}
+            {/* close form register */}
           </div>
 
           {/* <!--Right Col--> */}
@@ -406,20 +416,20 @@ const Login = () => {
               className="text-gray-500 pt-10 no-underline hover:no-underline fade-in w-full pb-6 text-sm text-center md:text-left"
               to={"#"}
             >
-              © BeetStore 2023
+              © BeetPos 2024
             </Link>
           </div>
         </div>
-        <div className={openTab === 2 ? "block" : "hidden"}>
+        {/* <div className={openTab === 2 ? "block" : "hidden"}>
           <div className=" px-11 text-sm text-center lg:text-center">
             <Link
               className="text-gray-500 no-underline hover:no-underline w-full pb-5 text-sm text-center md:text-left"
               to={"#"}
             >
-              © BeetStore 2023
+              © BeetPos 2024
             </Link>
           </div>
-        </div>
+        </div> */}
         <ToastContainer />
       </div>
     </>

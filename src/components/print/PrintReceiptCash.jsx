@@ -1,133 +1,38 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 // import Lg from "../../assets/lg_r.png";
 import "./PrintReceipt.css";
 
-const PrintReceipt = ({
+const PrintReceiptCash = ({
   cart,
   tax,
+  service,
   total,
+  Subtotal,
   totaltax,
   counter,
-  transactionData,
-  StatusPayment,
+  totalservice,
 }) => {
   if (!cart || cart.length === 0) {
     return <div>Cart is empty</div>;
   }
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
+  const API_URL = import.meta.env.VITE_API_KEY;
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const data_Business = JSON.parse(localStorage.getItem("user"));
+  // console.log()
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDateTime(new Date());
-    }, 1000); // Update every 1000 milliseconds (1 second)
-
-    // Cleanup the interval on component unmount
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
-  const API_URL = import.meta.env.VITE_API_KEY;
-  // console.log("ini data printnya");
-  const [taxAndService, setTaxAndService] = useState({ tax: 0, charge: 0 });
 
-  useEffect(() => {
-    handleCheckTaxAndService();
-  }, []);
-  const handleCheckTaxAndService = async () => {
-    try {
-      const API_URL = import.meta.env.VITE_API_KEY;
-      const token = localStorage.getItem("token");
-
-      const resultOutlet = await axios.get(`${API_URL}/api/v1/outlet/207`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // console.log("tatatat", resultOutlet);
-      let taxPercentage = 0;
-      let servicePercentage = 0;
-      const resTemp = resultOutlet.data.data;
-
-      if (resTemp.Outlet_Taxes && resTemp.Outlet_Taxes.length > 0) {
-        resTemp.Outlet_Taxes.forEach((item) => {
-          if (item.Tax.Tax_Type.name === "Tax") {
-            taxPercentage = parseInt(item.Tax.value);
-          }
-          if (item.Tax.Tax_Type.name === "Charge") {
-            servicePercentage = parseInt(item.Tax.value);
-          }
-        });
-      }
-
-      // console.log("taxPercentage", taxPercentage);
-      // console.log("servicePercentage", servicePercentage);
-
-      setTaxAndService({ tax: taxPercentage, charge: servicePercentage });
-    } catch (error) {
-      console.error(error);
-      console.log("error handleCheckTaxAndService");
-    }
-  };
-  const calculateTotalPrice = () => {
-    let totalTax = 0;
-    let totalService = 0;
-    let totalPaymentTotal = 0;
-    let totalResultTotal = 0;
-
-    cart.forEach((item) => {
-      const resultTotal = item.priceItem * item.totalItem;
-      const tax = Math.ceil((resultTotal * taxAndService.tax) / 100);
-      const service = Math.ceil((resultTotal * taxAndService.charge) / 100);
-
-      // Calculate addons total
-      let addonsTotal = item.price_addons_total || 0;
-
-      const paymentTotal = resultTotal + addonsTotal;
-
-      // Hitung resultAmount
-      const resultTotalValue = Math.ceil(paymentTotal + tax + service);
-
-      // Accumulate totals
-      totalTax += tax;
-      totalService += service;
-      totalPaymentTotal += paymentTotal;
-      totalResultTotal += resultTotalValue;
-    });
-
-    return {
-      totalTax,
-      totalService,
-      totalPaymentTotal,
-      totalResultTotal,
-    };
-  };
-  const totalValues = calculateTotalPrice();
-  const { totalPaymentTotal, totalResultTotal } = calculateTotalPrice();
-
-  useEffect(() => {
-    const setPrintStyles = () => {
-      const printPage = document.getElementById("print-page");
-      if (printPage) {
-        printPage.style.fontFamily = "Arial, sans-serif";
-        printPage.style.maxWidth = "300px";
-        // Tambahkan properti gaya lainnya
-      }
-    };
-
-    window.onbeforeprint = setPrintStyles;
-
-    window.onafterprint = () => {
-      const printPage = document.getElementById("print-page");
-      if (printPage) {
-        printPage.removeAttribute("style");
-      }
-    };
-
-    return () => {
-      window.onbeforeprint = null;
-      window.onafterprint = null;
-    };
-  }, []);
+  // console.log("total", total);
+  // console.log("subtotal", Subtotal);
+  // console.log("tax", tax);
+  // console.log("service", service);
+  // console.log("totaltax ", totaltax);
+  // console.log("totalservice ", totalservice);
   const logo = localStorage.getItem("logo");
   // console.log(logo);
   return (
@@ -158,10 +63,17 @@ const PrintReceipt = ({
         </div>
 
         <div style={{ textAlign: "center" }}>
-          <span>{transactionData?.address}</span>
+          <span>{data_Business.outlet_address}</span>
         </div>
       </div>
-      <div style={{ fontSize: "10px", marginTop: "3px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: "10px",
+          marginTop: "3px",
+        }}
+      >
         <div>
           <span>Tanggal dan Waktu:</span>
           <div style={{ fontSize: "9px" }}>
@@ -169,7 +81,8 @@ const PrintReceipt = ({
           </div>
         </div>
         <div>
-          <span></span>
+          {" "}
+          <span>CASH</span>{" "}
         </div>
       </div>
       <hr />
@@ -222,7 +135,7 @@ const PrintReceipt = ({
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>Sub Total</div>
         <div style={{ textAlign: "right" }}>
-          Rp. {totalPaymentTotal.toLocaleString("id-ID")}
+          Rp. {Subtotal.toLocaleString("id-ID")}
         </div>
       </div>
       {/* taxAndService */}
@@ -235,9 +148,9 @@ const PrintReceipt = ({
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>Service ({taxAndService.charge}%)</div>
+          <div>Service ({service}%)</div>
           <div style={{ textAlign: "right" }}>
-            Rp. {totalValues.totalService.toLocaleString("id-ID")}
+            Rp. {totalservice.toLocaleString("id-ID")}
           </div>
         </div>
       </div>
@@ -246,7 +159,7 @@ const PrintReceipt = ({
         <div>Total</div>
         <div style={{ textAlign: "right" }}>
           {/* Rp. {total} */}
-          Rp. {totalResultTotal.toLocaleString("id-ID")}
+          Rp. {total.toLocaleString("id-ID")}
         </div>
       </div>
       <hr />
@@ -265,4 +178,4 @@ const PrintReceipt = ({
   );
 };
 
-export default PrintReceipt;
+export default PrintReceiptCash;

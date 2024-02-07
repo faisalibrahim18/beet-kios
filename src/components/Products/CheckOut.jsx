@@ -6,13 +6,17 @@ import Mt from "../../assets/mt.jpg";
 import { nanoid } from "nanoid";
 import { useNavigate } from "react-router-dom";
 import { BsRecordFill } from "react-icons/bs";
-import PrintReceipt from "../print/PrintReceipt ";
+import PrintReceiptCash from "../print/PrintReceiptCash";
 import ReactDOMServer from "react-dom/server";
 import dayjs from "dayjs";
+import PrintReceiptQR from "../print/PrintReceiptQR";
 
 function CheckOut({ isOpen, closeModal }) {
   const [cart, setCart] = useState([]);
   const [payment, setPayment] = useState([]);
+  const [paymentCash, setPaymentCash] = useState([]);
+  const [paymentQr, setPaymentQr] = useState([]);
+  const [salesTypeId, setSalesTypeId] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loading1, setLoading1] = useState(false);
   const [TRANSIDMERCHANT] = useState(nanoid(12));
@@ -21,10 +25,46 @@ function CheckOut({ isOpen, closeModal }) {
   const [taxAndService, setTaxAndService] = useState({ tax: 0, charge: 0 });
   const [transactionData, setTransactionData] = useState(null);
   const navigate = useNavigate();
+  const data_Business = JSON.parse(localStorage.getItem("user"));
 
+  // console.log("payyyyyyy", payment);
   useEffect(() => {
-    // console.log("Transaction Data Updated:", transactionData);
-  }, [transactionData]);
+    const fetchData = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_KEY;
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `${API_URL}/api/v1/payment-method/development?businessId=${data_Business.business_id}&outlet_id=${data_Business.outlet_id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Filter data untuk pembayaran tunai (Cash)
+        const cashPayments = response.data.data.rows.filter(
+          (payment) => payment.name === "Cash"
+        );
+
+        // Filter data untuk pembayaran QR
+        const qrPayments = response.data.data.rows.filter(
+          (payment) => payment.name === "Cashlez QR"
+        );
+
+        // console.log("cash", cashPayments[0].id);
+        // console.log("Qr", qrPayments[0].id);
+        setPaymentCash(cashPayments[0]);
+        setPaymentQr(qrPayments[0]);
+        setPayment(response.data.data.rows);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const [counter, setCounter] = useState(1);
   useEffect(() => {
@@ -75,6 +115,43 @@ function CheckOut({ isOpen, closeModal }) {
   }, [counter]);
   // close counter
 
+  // get data Type sales Take away
+  useEffect(() => {
+    const getsales = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_KEY;
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `${API_URL}/api/v1/sales-type/guest?business_id=${data_Business.business_id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Cari objek dengan properti 'name' yang sama dengan 'Take away'
+        const takeAwayData = response.data.data.find(
+          (item) => item.name === "Take away"
+        );
+
+        if (takeAwayData) {
+          // Jika ditemukan, simpan data 'Take away' ke dalam state
+          // console.log("typesales", takeAwayData.id);
+          setSalesTypeId(takeAwayData);
+        } else {
+          console.error("Take away data not found");
+        }
+      } catch (error) {
+        console.error("Error fetching sales data:", error);
+      }
+    };
+
+    getsales();
+  }, []);
+  // close get data Type sales Take away
+
   // tax and service
   useEffect(() => {
     handleCheckTaxAndService();
@@ -84,12 +161,15 @@ function CheckOut({ isOpen, closeModal }) {
       const API_URL = import.meta.env.VITE_API_KEY;
       const token = localStorage.getItem("token");
 
-      const resultOutlet = await axios.get(`${API_URL}/api/v1/outlet/304`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const resultOutlet = await axios.get(
+        `${API_URL}/api/v1/outlet/${data_Business.outlet_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       // console.log("tatatat", resultOutlet);
       let taxPercentage = 0;
       let servicePercentage = 0;
@@ -147,7 +227,7 @@ function CheckOut({ isOpen, closeModal }) {
           },
         });
 
-        setPayment(response.data.data.rows);
+        // setPayment(response.data.data.rows);
       } catch (error) {
         console.error(error);
       } finally {
@@ -206,17 +286,15 @@ function CheckOut({ isOpen, closeModal }) {
   };
   const totalValues = calculateTotalPrice();
   // close pergitungan jumlah total
-
-  // handle buat pembayaran/checkout
-  const handlePayment4 = async () => {
+  // console.log("toaa", totalValues);
+  //  Payment Qr
+  // handle buat pembayaran/checkout QR
+  const handlePayment = async () => {
     try {
       setLoading1(true);
       const token = localStorage.getItem("token");
       const API_URL = import.meta.env.VITE_API_KEY;
       const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-      const userId = JSON.parse(localStorage.getItem("user")) || [];
-      const businessId = cartData.length > 0 ? cartData[0].business_id : null;
-      const outletId = cartData.length > 0 ? cartData[0].outlet_id : null;
 
       const totalAmount = calculateTotalPrice().totalResultTotal;
       const result = {
@@ -227,24 +305,13 @@ function CheckOut({ isOpen, closeModal }) {
 
       result.resultAmount = Math.ceil(result.paymentTotal);
       const response = await axios.get(
-        `${API_URL}/api/v1/business-noverify/${businessId}`
+        `${API_URL}/api/v1/business-noverify/${data_Business.business_id}`
       );
-      const responseOutlet = await axios.get(
-        `${API_URL}/api/v1/outlet/${outletId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const dataOutlet = responseOutlet.data.data;
 
       const dataBusiness = response.data.data;
 
       const transactionData = {
         referenceId: TRANSIDMERCHANT,
-        address: dataOutlet.address,
         merchantName: dataBusiness.name,
         paymentTotal: result.paymentTotal,
         resultAmount: result.resultAmount,
@@ -306,35 +373,36 @@ function CheckOut({ isOpen, closeModal }) {
               },
             }
           );
-          console.log("status", response1.data.data.response);
+          // console.log("status", response1.data.data.response);
           const StatusPayment = response1.data.data.response.processStatus;
           if (response1.data.data.response.processStatus === "APPROVED") {
             handleTransaction();
             const receiptId =
               "ORDER_" +
               dayjs(new Date()).format("YY/MM/DD-HH/mm/ss") +
-              outletId;
+              data_Business.outlet_id;
             // kirim data ke beetOffice
             const sendData = {
               receipt_id: receiptId,
               items: cartData,
-              outlet_id: outletId,
-              business_id: businessId,
-              customer_id: userId,
-              sales_type_id: null || [],
-              payment_method_id: null,
-              payment_discount: null,
+              outlet_id: data_Business.outlet_id,
+              business_id: data_Business.business_id,
+              customer_id: data_Business.user_id,
+              sales_type_id: salesTypeId.id,
+              payment_method_id: paymentQr.id,
+              payment_discount: 0,
               payment_tax: result.tax,
               payment_service: result.service,
               payment_total: result.paymentTotal,
               amount: result.resultAmount,
               payment_change: 0,
-              invoice: TRANSIDMERCHANT,
+              kitchen: true,
+              queue_number: counter,
               status: "Done",
             };
             // console.log("datasend", sendData);
             const response1 = await axios.post(
-              `${API_URL}/api/v1/transaction-customer`,
+              `${API_URL}/api/v1/transaction`,
               sendData,
               {
                 headers: {
@@ -344,124 +412,100 @@ function CheckOut({ isOpen, closeModal }) {
               }
             );
             // console.log("datasend", response1);
-            //close  kirim data ke beetOffice
+            // close  kirim data ke beetOffice
 
             // kirim data ke kitchen
-            // const tempItems = [];
 
-            // cartData.forEach((value) => {
-            //   const tempAddons = [];
-            //   if (value.fullDataAddons) {
-            //     value.fullDataAddons.forEach((value2) => {
-            //       tempAddons.push({
-            //         id: value2.id,
-            //         price: value2.price,
-            //       });
-            //     });
-            //   }
-            //   tempItems.push({
-            //     sales_type_id: value.sales_type_id,
-            //     product_id: value.id,
-            //     addons: tempAddons || [],
-            //     quantity: value.totalItem,
-            //     price_product: value.priceItem,
-            //     price_discount: 0,
-            //     price_service: 0,
-            //     price_addons_total: value.price_addons_total || 0,
-            //     price_total: value.totalAmount,
-            //     notes: value.notes,
-            //   });
-            // });
-            // // console.log("cart", cartData);
-            // const sendDataKitchen = {
-            //   receipt_id: receiptId,
-            //   items: tempItems,
-            //   outlet_id: parseInt(outletId),
-            //   business_id: parseInt(businessId),
-            //   status: "Done",
-            // };
-            // console.log("sendData", sendDataKitchen);
-            // const resTransaction = await axios.post(
-            //   `${API_URL}/api/v1/transaction/save/qr  `,
-            //   sendDataKitchen,
-            //   {
-            //     headers: {
-            //       "Content-Type": "application/json",
-            //       Authorization: `Bearer ${token}`,
-            //     },
-            //   }
-            // );
+            // console.log("cart", cartData);
+            const sendDataKitchen = {
+              receipt_id: receiptId,
+              items: cartData,
+              outlet_id: parseInt(data_Business.outlet_id),
+              business_id: parseInt(data_Business.business_id),
+              status: "Done",
+            };
+            console.log("sendData", sendDataKitchen);
+            const resTransaction = await axios.post(
+              `${API_URL}/api/v1/transaction/save/qr  `,
+              sendDataKitchen,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
 
-            // console.log("transaksi", resTransaction);
-            // const getUserBusiness = await axios.get(
-            //   `${API_URL}/api/v1/auth/get-user?business_id=${parseInt(
-            //     businessId
-            //   )}&outlet_id=${parseInt(outletId)}`,
-            //   {
-            //     headers: {
-            //       "Content-Type": "application/json",
-            //       Authorization: `Bearer ${token}`,
-            //     },
-            //   }
-            // );
-            // console.log("getUserBusiness", getUserBusiness.data.data);
+            console.log("transaksi", resTransaction);
+            const getUserBusiness = await axios.get(
+              `${API_URL}/api/v1/auth/get-user?business_id=${parseInt(
+                data_Business.business_id
+              )}&outlet_id=${parseInt(data_Business.outlet_id)}`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            console.log("getUserBusiness", getUserBusiness.data.data);
 
-            // if (resTransaction.data.statusCode === 201) {
-            //   if (getUserBusiness) {
-            //     const deviceUser = [];
-            //     getUserBusiness.data.data.forEach((value) => {
-            //       console.log("looping device ", value.device);
-            //       if (value.device) {
-            //         const splitDevice = value.device.split("-");
-            //         if (splitDevice.length === 5) {
-            //           deviceUser.push(value);
-            //         }
-            //       }
-            //     });
-            //     // console.log("deviceUser", deviceUser);
-            //     const resultDevice = deviceUser.map((value) => value.device);
+            if (resTransaction.data.statusCode === 201) {
+              if (getUserBusiness) {
+                const deviceUser = [];
+                getUserBusiness.data.data.forEach((value) => {
+                  console.log("looping device ", value.device);
+                  if (value.device) {
+                    const splitDevice = value.device.split("-");
+                    if (splitDevice.length === 5) {
+                      deviceUser.push(value);
+                    }
+                  }
+                });
+                // console.log("deviceUser", deviceUser);
+                const resultDevice = deviceUser.map((value) => value.device);
 
-            //     // console.log("include_player_ids yang akan dikirim", resultDevice);
-            //     const bodyOneSignal = {
-            //       app_id: "545db6bf-4448-4444-b9c8-70fb9fae225b",
-            //       include_player_ids: resultDevice,
-            //       contents: {
-            //         en: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
-            //         id: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
-            //       },
-            //       headings: {
-            //         en: "Request Self Order baru ",
-            //         id: "Request Self Order baru ",
-            //       },
-            //       subtitle: {
-            //         en: "Request Self Order baru ",
-            //         id: "Request Self Order baru",
-            //       },
-            //     };
-            //     fetch("https://onesignal.com/api/v1/notifications", {
-            //       method: "POST",
-            //       headers: {
-            //         Accept: "application/json",
-            //         "Content-Type": "application/json",
-            //         Authorization:
-            //           "Basic ZGJiNjZmYWEtNTQ2Ny00MmExLTgwZjMtZDRhN2U2YWUwMjk0",
-            //       },
-            //       body: JSON.stringify(bodyOneSignal),
-            //     })
-            //       .then((response) => response.json())
-            //       .then((responseJson) => {
-            //         const result = responseJson;
-            //         console.log("responseJSON send notif ==> ", result);
-            //       })
-            //       .catch((_err) => {
-            //         console.log("ERR ==> ", _err);
-            //       });
-            //   }
-            // }
+                // console.log("include_player_ids yang akan dikirim", resultDevice);
+                const bodyOneSignal = {
+                  app_id: "545db6bf-4448-4444-b9c8-70fb9fae225b",
+                  include_player_ids: resultDevice,
+                  contents: {
+                    en: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+                    id: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+                  },
+                  headings: {
+                    en: "Request Self Order baru ",
+                    id: "Request Self Order baru ",
+                  },
+                  subtitle: {
+                    en: "Request Self Order baru ",
+                    id: "Request Self Order baru",
+                  },
+                };
+                fetch("https://onesignal.com/api/v1/notifications", {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization:
+                      "Basic ZGJiNjZmYWEtNTQ2Ny00MmExLTgwZjMtZDRhN2U2YWUwMjk0",
+                  },
+                  body: JSON.stringify(bodyOneSignal),
+                })
+                  .then((response) => response.json())
+                  .then((responseJson) => {
+                    const result = responseJson;
+                    console.log("responseJSON send notif ==> ", result);
+                  })
+                  .catch((_err) => {
+                    console.log("ERR ==> ", _err);
+                  });
+              }
+            }
             // close kirim data ke kitchen
             setLoading1(false);
             setUrlVendor(urlVendor);
-            handlePaymentApprovalActions(transactionData, StatusPayment);
+            handlePaymentQrApprovalActions(transactionData, StatusPayment);
 
             clearInterval(intervalId);
             // setCounter((prevCounter) => prevCounter + 1);
@@ -479,20 +523,20 @@ function CheckOut({ isOpen, closeModal }) {
       console.log(error);
     }
   };
-  //  close handle buat pembayaran/checkout
+  //  close handle buat pembayaran/checkout Qr
 
-  // action ketika selesai pembayaran
-  const handlePaymentApprovalActions = async (
+  // action ketika selesai pembayaran qr
+  const handlePaymentQrApprovalActions = async (
     transactionData,
     StatusPayment
   ) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
     // generateReceiptContent();
-    printReceipt(transactionData, StatusPayment);
+    printReceiptQr(transactionData, StatusPayment);
     Swal.fire({
       title: "Pembayaran sukses!",
-      text: "Text lain sesuai kebutuhan",
+      // text: "Text lain sesuai kebutuhan",
       icon: "success",
       showConfirmButton: false,
       timer: 2000,
@@ -503,25 +547,122 @@ function CheckOut({ isOpen, closeModal }) {
       navigate("/dashboard");
     });
   };
-  // close  action ketika selesai pembayaran
+  // close  action ketika selesai pembayaran qr
 
-  // generate data receipt
-  const generateReceiptContent = (transactionData, StatusPayment) => {
+  // generate data receipt qr
+  const generateReceiptQrContent = (transactionData, StatusPayment) => {
     const tax = taxAndService.tax;
     const service = taxAndService.charge;
     const totaltax = totalValues.totalTax;
+    const totalservice = totalValues.totalService;
+    const Subtotal = totalValues.totalPaymentTotal;
     const total = totalValues.totalResultTotal;
     const cartData1 = JSON.parse(localStorage.getItem("cart")) || [];
 
     // console.log("Value of transactionData:", transactionData);
 
     const receiptContent = ReactDOMServer.renderToString(
-      <PrintReceipt
+      <PrintReceiptQR
+        payment={payment}
         cart={cartData1}
         tax={tax}
         service={service}
+        Subtotal={Subtotal}
         total={total}
         totaltax={totaltax}
+        totalservice={totalservice}
+        counter={counter}
+        transactionData={transactionData} // transactionData is passed as a prop
+        StatusPayment={StatusPayment}
+      />
+    );
+
+    return receiptContent;
+  };
+  // close generate data receipt qr
+
+  //  print receipt Qr
+  const printReceiptQr = (transactionData, StatusPayment) => {
+    const printWindow = window.open();
+    // console.log("print ke sini");
+    if (printWindow) {
+      const receiptContent = generateReceiptQrContent(
+        transactionData,
+        StatusPayment
+      );
+
+      printWindow.document.write(`
+          <html>
+            <head>
+              <style>
+                /* Add styles here if needed */
+              </style>
+            </head>
+            <body>
+              ${receiptContent}
+            </body>
+          </html>
+        `);
+
+      printWindow.document.close();
+
+      printWindow.print();
+
+      printWindow.close();
+    } else {
+      console.error("Failed to open print window");
+    }
+  };
+  //  close print receipt
+  // close PaymentQr
+
+  // Paymnet Cash
+  // action ketika selesai pembayaran cash
+  const handlePaymentCashApprovalActions = async (
+    transactionData,
+    StatusPayment
+  ) => {
+    // Panggil fungsi untuk mencetak struk
+    // setShowPrintReceipt(true);
+    // generateReceiptContent();
+    printReceiptCash(transactionData, StatusPayment);
+    Swal.fire({
+      title: "Pembayaran sukses!",
+      // text: "Text lain sesuai kebutuhan",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 2000,
+    }).then(() => {
+      localStorage.removeItem("cart");
+
+      closeModal();
+      navigate("/dashboard");
+    });
+  };
+  // close  action ketika selesai pembayaran cash
+
+  // generate data receipt cash
+  const generateReceiptCashContent = (transactionData, StatusPayment) => {
+    const tax = taxAndService.tax;
+    const service = taxAndService.charge;
+    const totaltax = totalValues.totalTax;
+    const totalservice = totalValues.totalService;
+    const Subtotal = totalValues.totalPaymentTotal;
+    const total = totalValues.totalResultTotal;
+    const cartData1 = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // console.log("Value of transactionData:", transactionData);
+
+    const receiptContent = ReactDOMServer.renderToString(
+      <PrintReceiptCash
+        payment={payment}
+        cart={cartData1}
+        tax={tax}
+        service={service}
+        Subtotal={Subtotal}
+        total={total}
+        totaltax={totaltax}
+        totalservice={totalservice}
         counter={counter}
         transactionData={transactionData} // transactionData is passed as a prop
         StatusPayment={StatusPayment}
@@ -533,11 +674,11 @@ function CheckOut({ isOpen, closeModal }) {
   // close generate data receipt
 
   //  print receipt
-  const printReceipt = (transactionData, StatusPayment) => {
+  const printReceiptCash = (transactionData, StatusPayment) => {
     const printWindow = window.open();
-    console.log("print ke sini");
+    // console.log("print ke sini");
     if (printWindow) {
-      const receiptContent = generateReceiptContent(
+      const receiptContent = generateReceiptCashContent(
         transactionData,
         StatusPayment
       );
@@ -587,11 +728,7 @@ function CheckOut({ isOpen, closeModal }) {
         const API_URL = import.meta.env.VITE_API_KEY;
         const token = localStorage.getItem("token");
         const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-        const user = JSON.parse(localStorage.getItem("user")) || [];
-        const businessId = cartData.length > 0 ? cartData[0].business_id : null;
-        const outletId = cartData.length > 0 ? cartData[0].outlet_id : null;
-        const userId = user.owner_id;
-        // console.log(userId);
+
         const totalAmount = calculateTotalPrice().totalResultTotal;
         const result = {
           tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
@@ -601,24 +738,13 @@ function CheckOut({ isOpen, closeModal }) {
 
         result.resultAmount = Math.ceil(result.paymentTotal);
         const response = await axios.get(
-          `${API_URL}/api/v1/business-noverify/${businessId}`
+          `${API_URL}/api/v1/business-noverify/${data_Business.business_id}`
         );
-        const responseOutlet = await axios.get(
-          `${API_URL}/api/v1/outlet/${outletId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const dataOutlet = responseOutlet.data.data;
 
         const dataBusiness = response.data.data;
 
         const transactionData = {
           referenceId: TRANSIDMERCHANT,
-          address: dataOutlet.address,
           merchantName: dataBusiness.name,
           paymentTotal: result.paymentTotal,
           resultAmount: result.resultAmount,
@@ -626,16 +752,18 @@ function CheckOut({ isOpen, closeModal }) {
         };
         // setTransactionData(transactionData);
         const receiptId =
-          "ORDER_" + dayjs(new Date()).format("YY/MM/DD-HH/mm/ss") + outletId;
+          "ORDER_" +
+          dayjs(new Date()).format("YY/MM/DD-HH/mm/ss") +
+          data_Business.outlet_id;
         // kirim data ke beetOffice
         const sendData = {
           receipt_id: receiptId,
           items: cartData,
-          outlet_id: outletId,
-          business_id: businessId,
-          customer_id: userId,
-          sales_type_id: 311 || [],
-          payment_method_id: 2,
+          outlet_id: data_Business.outlet_id,
+          business_id: data_Business.business_id,
+          customer_id: data_Business.user_id,
+          sales_type_id: salesTypeId.id,
+          payment_method_id: paymentCash.id,
           payment_discount: 0,
           payment_tax: result.tax,
           payment_service: result.service,
@@ -673,7 +801,7 @@ function CheckOut({ isOpen, closeModal }) {
         );
         console.log("datasend", response1);
         closeModal();
-        handlePaymentApprovalActions(transactionData);
+        handlePaymentCashApprovalActions(transactionData);
 
         // Pastikan bahwa localStorage.removeItem("cart") berjalan tanpa kesalahan
         localStorage.removeItem("cart");
@@ -686,10 +814,11 @@ function CheckOut({ isOpen, closeModal }) {
     }
   };
   // close handle pembayaran cash
+  // close payment cash
   return (
     <div>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 overflow-auto">
+        <div className="fixed inset-0 z-50 mt-20 flex place-items-start  justify-center transition-opacity duration-300 overflow-auto">
           <div className="fixed inset-0">
             <div className="absolute inset-0 bg-black opacity-70" />
           </div>
@@ -698,7 +827,7 @@ function CheckOut({ isOpen, closeModal }) {
 
             <button
               onClick={closeModal}
-              className="absolute top-0 right-0 m-2 px-4 text-5xl py-2  text-[#091F4B] hover:text-[#0C376A] "
+              className="absolute -top-3 right-0 m-2 px-4 text-5xl py-2  text-[#091F4B] hover:text-[#0C376A] "
             >
               &times;
             </button>
@@ -843,7 +972,7 @@ function CheckOut({ isOpen, closeModal }) {
                       </button>
                       <button
                         className="bg-[#091F4B] text-white px-20 py-2 rounded-2xl hover-bg-[#8f387d] mt-2"
-                        onClick={() => handlePayment4(nominal)}
+                        onClick={() => handlePayment(nominal)}
                       >
                         QRIS/CARD
                       </button>

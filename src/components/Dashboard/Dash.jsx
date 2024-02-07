@@ -18,20 +18,9 @@ const Dash = () => {
     const getProduct = async () => {
       try {
         const API_URL = import.meta.env.VITE_API_KEY;
-        const dataTableParsed = JSON.parse(localStorage.getItem("data_table"));
-        const token = localStorage.getItem("token");
+        const dataBusiness = JSON.parse(localStorage.getItem("user"));
 
-        // const product1 = await axios.get(
-        //   `${API_URL}/api/v1/kitchen-management?business_id=152&outlet_id=207`,
-        //   {
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   }
-        // );
-        // console.log("kitchen", product1);
-        // get logo untuk di taro di localStorage
+        const token = localStorage.getItem("token");
         try {
           // Mendapatkan respons dari API
           const BusinessResponse = await axios.get(
@@ -66,7 +55,7 @@ const Dash = () => {
 
         // get data product
         const productResponse = await axios.get(
-          `${API_URL}/api/v1/product/emenu?outlet_id=207&business_id=152`,
+          `${API_URL}/api/v1/product/emenu?outlet_id=${dataBusiness.outlet_id}&business_id=${dataBusiness.business_id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -82,7 +71,7 @@ const Dash = () => {
         // console.log("product", productResponse);
         // get data category
         const categoryProductResponse = await axios.get(
-          `${API_URL}/api/v1/product-category/lite?outlet_id=207&business_id=152`,
+          `${API_URL}/api/v1/product-category/lite?outlet_id=${dataBusiness.outlet_id}&business_id=${dataBusiness.business_id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -136,7 +125,7 @@ const Dash = () => {
       {showScrollButton && (
         <button
           onClick={scrollToTop}
-          className="fixed sm:bottom-[330px] lg:bottom-[360px]  md:bottom-[265px] bottom-[150px]  z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
+          className="fixed sm:bottom-[330px]  lg:bottom-[360px]  md:bottom-[265px] bottom-[150px] z-50 right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white p-2 rounded-full shadow-xl focus:outline-none"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

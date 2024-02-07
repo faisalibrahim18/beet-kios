@@ -29,54 +29,6 @@ const ProductKeranjang = () => {
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(cartData);
-    const getProduct = async () => {
-      const API_URL = import.meta.env.VITE_API_KEY;
-      const token = localStorage.getItem("token");
-      const response1 = await axios.get(
-        `${API_URL}/api/v1/payment-method/development?businessId=152&outlet_id=207`,
-
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("payment", response1);
-    };
-    const getsales = async () => {
-      const API_URL = import.meta.env.VITE_API_KEY;
-      const token = localStorage.getItem("token");
-      const response1 = await axios.get(
-        `${API_URL}/api/v1/sales-type/guest?business_id=152`,
-
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("sales", response1);
-    };
-    const getkitchen = async () => {
-      const API_URL = import.meta.env.VITE_API_KEY;
-      const token = localStorage.getItem("token");
-      const response1 = await axios.get(
-        `${API_URL}/api/v1/kitchen-management/201`,
-
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("kitchen", response1);
-    };
-    getkitchen();
-    getsales();
-    getProduct();
   }, []);
   // close get data cart dari localstorage
 
@@ -505,9 +457,7 @@ const ProductKeranjang = () => {
           selectedOutlets={selectedOutlets} // Pass selected item IDs to the Checkout component
         />
       )}
-      <div className="">
-        <Iklan />
-      </div>
+     
     </>
   );
 };

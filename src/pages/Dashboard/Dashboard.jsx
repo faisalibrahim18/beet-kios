@@ -32,7 +32,7 @@ const Dashboard = () => {
   return (
     <>
       <Topbar2 />
-      <div className="sm:mb-[210px] md:mb-[210px] lg:mb-[250px] mb-[70px]">
+      <div className="sm:mb-[210px] md:mb-[220px] lg:mb-[280px] mb-[70px]">
         <Dash />
       </div>
     </>

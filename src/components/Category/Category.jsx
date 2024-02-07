@@ -10,6 +10,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
   const [initialCategoryData, setInitialCategoryData] = useState([]);
   const { id } = useParams();
   const [isFavoriteAvailable, setIsFavoriteAvailable] = useState(false);
+  const dataBusiness = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const getData = async () => {
@@ -24,7 +25,7 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
         // o_id: 207
         // b_id: 152 by
         const response = await axios.get(
-          `${API_URL}/api/v1/product/beetstore?outlet_id=207&business_id=152`,
+          `${API_URL}/api/v1/product/beetstore?outlet_id=${dataBusiness.outlet_id}&business_id=${dataBusiness.business_id}`,
           {
             headers: {
               "Content-Type": "application/json",

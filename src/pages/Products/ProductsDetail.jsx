@@ -3,6 +3,7 @@ import ProductDetail2 from "../../components/Products/ProductDetail";
 import { useEffect } from "react";
 import { checkTokenExpiration } from "../../utils/token";
 import Swal from "sweetalert2";
+import Iklan from "../../components/iklan/Iklan";
 
 const ProductsDetail = () => {
   const navigate = useNavigate();
@@ -30,11 +31,12 @@ const ProductsDetail = () => {
 
   return (
     <>
-    
-      <div className="">
+      <div className="sm:mb-[200px] md:mb-[200px] lg:mb-[230px] mb-[50px]">
         <ProductDetail2 />
       </div>
-      
+      <div className="">
+        <Iklan />
+      </div>
     </>
   );
 };

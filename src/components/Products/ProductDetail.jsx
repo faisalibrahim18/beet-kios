@@ -274,11 +274,11 @@ const ProductDetail = () => {
       );
       setProduct(response.data.data);
 
-      console.log("data.data", response);
+      // console.log("data.data", response);
       const groupAddons = JSON.parse(
         JSON.stringify(response.data.data.Group_Addons)
       );
-      console.log("groupAddons", groupAddons);
+      // console.log("groupAddons", groupAddons);
       // groupAddons.forEach((value) => {
       //   setAllAddons((prevAllAddons) => [...prevAllAddons, value]);
       // });
@@ -527,9 +527,6 @@ const ProductDetail = () => {
                 </button>
               </div>
             </div>
-          </div>
-          <div className="">
-            <Iklan />
           </div>
         </div>
       )}

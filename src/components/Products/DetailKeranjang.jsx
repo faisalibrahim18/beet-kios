@@ -21,7 +21,7 @@ const DetailKeranjang = ({ itemId, onClose, fetchItemDetails }) => {
 
   return (
     <div className="fixed z-50  inset-0 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20">
+      <div className="flex mt-32 place-items-start justify-center min-h-screen pt-4 px-4 pb-20">
         <div className="fixed inset-0 transition-opacity" onClick={onClose}>
           <div className="absolute inset-0  bg-black opacity-50"></div>
         </div>
