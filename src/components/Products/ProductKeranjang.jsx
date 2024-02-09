@@ -298,22 +298,22 @@ const ProductKeranjang = () => {
                     return (
                       <div
                         key={outletName}
-                        className="border p-2 mb-4  border-[#091F4B] rounded-lg mt-2"
+                        className="border p-2  border-[#091F4B] rounded-lg mt-2"
                       >
-                        <div className="flex items-center">
+                        {/* <div className="flex items-center">
                           <div>
                             <div
                               // Gunakan outletName dalam URL
-                              className="text-lg font-semibold text-gray-900 mt-4"
+                              className="text-lg font-semibold text-gray-900 mt-"
                             >
                               {outletName}
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                         <div>
                           {cart.map((item) => (
                             <div
-                              className="flex mt-3 flex-wrap justify-between items-center shadow-[#091F4B] shadow-sm border rounded-lg mb-4 p-2 lg:mx-4"
+                              className="flex flex-wrap justify-between items-center shadow-[#091F4B] shadow-sm border rounded-lg mb-1 mt-4 p-2 lg:mx-4"
                               key={item.id}
                             >
                               <div className="flex items-center pl-3">

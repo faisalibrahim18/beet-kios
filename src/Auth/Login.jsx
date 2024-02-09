@@ -92,16 +92,16 @@ const Login = () => {
   return (
     <>
       <div
-        className={`lg:bg-right w-screen lg:h-screen bg-cover bg-no-repeat ${
+        className={`lg:bg-right w-screen h-screen bg-cover bg-no-repeat ${
           isMdScreen ? "bg-none" : ""
         }`}
         style={{
           backgroundImage: isMdScreen ? "none" : `url(${bgImage})`,
         }}
       >
-        <div className="w-full mx-auto p-11 lg:pl-20 pl-7 lg:pt-20">
+        <div className="w-full mx-auto p-11 lg:pl-20 pl-7 lg:pt-16">
           <div className="w-full flex items-center justify-between">
-            <Link
+            <div
               className="flex items-center text-indigo-400 no-underline hover:no-underline font-bold text-2xl lg:text-4xl"
               href="#"
             >
@@ -115,24 +115,23 @@ const Login = () => {
                   top: "75px",
                 }}
               />
-            </Link>
+            </div>
           </div>
         </div>
         {/* <!--Main--> */}
-        <div className=" px-11 flex flex-col pl-4 md:flex-row items-center lg:pl-28 pt-3">
+        <div className=" px-11 flex flex-col pl-4 md:flex-row items-center lg:pl-28 -mt-8">
           {/* <!--Left Col--> */}
           <div className="w-full  text-justify  lg:items-start overflow-y-hidden">
             <ul className="flex mb-3 ">
               <li className="lg:w-3/12 sm:w-32 w-2/3 pl-5">
-                <a
-                  href="#"
+                <div
                   onClick={() => setOpenTab(1)}
                   className={`lg:text-xl text-xl pb-1  text-black font-semibold  ${
                     openTab === 1 ? "border-b-4 border-[#6E205E]" : ""
                   } inline-block px-1 py-2  hover:border-b-4 border-[#6E205E] `}
                 >
                   Login
-                </a>
+                </div>
               </li>
               {/* <li className="">
                 <a

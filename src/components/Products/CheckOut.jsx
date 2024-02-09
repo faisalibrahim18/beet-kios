@@ -963,9 +963,9 @@ function CheckOut({ isOpen, closeModal }) {
                     </div>
 
                     {/* Tombol Bayar */}
-                    <div className="text-center">
+                    <div className="text-center ">
                       <button
-                        className="bg-[#091F4B] text-white px-20 py-2 rounded-2xl mr-4 hover-bg-[#8f387d]"
+                        className="bg-[#091F4B] ml-4 text-white px-20 py-2 rounded-2xl mr-4 hover-bg-[#8f387d]"
                         onClick={handleCash}
                       >
                         Cash
