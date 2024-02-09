@@ -157,7 +157,7 @@ const Dash = () => {
       <div className="flex pt-[50px]">
         {/* data category */}
         <div
-          className={`bg-gray-100 flex-grow  pt-5 shadow h-full lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[10px] z-50 fixed ${
+          className={`bg-gray-100 flex-grow  pt-5 shadow h-full lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[9px] z-50 fixed ${
             category.length > 0
               ? "overflow-auto scroll-m-1.5"
               : "overflow-hidden"

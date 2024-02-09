@@ -6,7 +6,7 @@ const ProductKeranjang = () => {
   return (
     <>
       {" "}
-      <div className="sm:mb-[210px] md:mb-[210px] lg:mb-[260px] mb-[70px]">
+      <div className="sm:mb-[210px] md:mb-[210px] lg:mb-[260px] mb-[90px]">
         <ProductKeranjang2 />
       </div>
       <div className="">

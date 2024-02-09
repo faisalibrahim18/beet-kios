@@ -4,6 +4,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "./style.css";
 import axios from "axios";
+import { FaXmark } from "react-icons/fa6";
 
 const Category = ({
   isCategoryOpen,
@@ -82,8 +83,9 @@ const Category = ({
 
   return (
     <>
-      <div className="md:block hidden md:w-full xs:w-[60px] sm:w-[120px] w-[75px] lg:mb-[350px] sm:mb-[270px] md:mb-[250px] mb-[160px]">
-        <div className="text-gray-800 text-sm text-center mt-2 font-semibold pb-2 p-2">
+      {/* tampilan utama */}
+      <div className="md:block sm:block lg:block hidden md:w-full xs:w-[60px] sm:w-[120px] w-[75px] lg:mb-[370px] sm:mb-[270px] md:mb-[250px] mb-[160px]">
+        <div className="text-gray-800 text-sm text-center font-semibold p-2">
           Pilihan Kategori
         </div>
 
@@ -91,9 +93,9 @@ const Category = ({
           <div className="py-3">
             <div>
               <div
-                className={`bg-gray-100 md:text-sm text-xs font-semibold hover:bg-gray-300 w-full p-4 text-center ${
+                className={`bg-gray-100  text-sm  hover:bg-gray-300 w-full p-4 text-center ${
                   selectedCategory === "all"
-                    ? "text-[#091F4B] bg-gray-300 "
+                    ? "text-[#091F4B] font-medium bg-gray-300 "
                     : ""
                 }`}
                 onClick={() => {
@@ -106,9 +108,9 @@ const Category = ({
             {isFavoriteAvailable && (
               <div>
                 <div
-                  className={`bg-gray-100 md:text-sm text-xs font-semibold hover:bg-gray-300 w-full p-4 text-center ${
+                  className={`bg-gray-100 text-sm  hover:bg-gray-300 w-full p-4 text-center ${
                     selectedCategory === "favorite"
-                      ? "text-[#091F4B] bg-gray-300 "
+                      ? "text-[#091F4B] font-medium bg-gray-300 "
                       : ""
                   }`}
                   onClick={() => {
@@ -122,9 +124,9 @@ const Category = ({
             {displayCategories.map((category) => (
               <div key={category.Product_Category?.name}>
                 <div
-                  className={`bg-gray-100 md:text-sm text-xs font-semibold hover:bg-gray-300 w-full p-4 cursor-pointer text-center ${
+                  className={`bg-gray-100 text-sm  hover:bg-gray-300 w-full p-4 cursor-pointer text-center ${
                     selectedCategory === category.Product_Category?.name
-                      ? " bg-gray-300 text-[#091F4B]"
+                      ? " bg-gray-300 font-medium text-[#091F4B]"
                       : ""
                   }`}
                   onClick={() => {
@@ -138,18 +140,21 @@ const Category = ({
           </div>
         </div>
       </div>
+      {/* close tampilan utama */}
+
+      {/* tampilan mobile */}
       {isCategoryOpen && (
-        <div className="block md:hidden md:w-full xs:w-[60px] sm:w-[120px]  lg:mb-[350px] w-[200px] sm:mb-[270px] md:mb-[250px] mb-[160px]">
+        <div className="block md:hidden lg:hidden sm:hidden md:w-full xs:w-[60px] sm:w-[120px] lg:mb-[350px] w-[200px] sm:mb-[270px] md:mb-[250px] mb-[160px]">
           <div className="flex justify-between">
             {" "}
             <div className="text-gray-800 text-md ml-4 font-semibold pb-2 p-2">
               Pilihan Kategori
             </div>
             <button
-              className="text-4xl -mt-4 pr-2 font-semibold"
+              className="text-2xl  pr-3 font-semibold"
               onClick={closeModal}
             >
-              &times;
+              <FaXmark />
             </button>
           </div>
 
@@ -157,9 +162,9 @@ const Category = ({
             <div className="py-3">
               <div>
                 <div
-                  className={`bg-gray-100 md:text-sm text-sm font-semibold hover:bg-gray-300 w-full p-3.5 text-center ${
+                  className={`bg-gray-100 text-sm  hover:bg-gray-300 w-full p-3.5 text-center ${
                     selectedCategory === "all"
-                      ? "text-[#091F4B] bg-gray-300 "
+                      ? "text-[#091F4B] font-medium bg-gray-300 "
                       : ""
                   }`}
                   onClick={() => {
@@ -172,9 +177,9 @@ const Category = ({
               {isFavoriteAvailable && (
                 <div>
                   <div
-                    className={`bg-gray-100 md:text-sm text-sm font-semibold hover:bg-gray-300 w-full p-3.5 text-center ${
+                    className={`bg-gray-100 text-sm  hover:bg-gray-300 w-full p-3.5 text-center ${
                       selectedCategory === "favorite"
-                        ? "text-[#091F4B] bg-gray-300 "
+                        ? "text-[#091F4B] font-medium bg-gray-300 "
                         : ""
                     }`}
                     onClick={() => {
@@ -188,9 +193,9 @@ const Category = ({
               {displayCategories.map((category) => (
                 <div key={category.Product_Category?.name}>
                   <div
-                    className={`bg-gray-100 md:text-sm text-sm font-semibold hover:bg-gray-300 w-full p-3.5 cursor-pointer text-center ${
+                    className={`bg-gray-100 text-sm  hover:bg-gray-300 w-full p-3.5 cursor-pointer text-center ${
                       selectedCategory === category.Product_Category?.name
-                        ? " bg-gray-300 text-[#091F4B]"
+                        ? " bg-gray-300 font-medium text-[#091F4B]"
                         : ""
                     }`}
                     onClick={() => {
@@ -205,6 +210,7 @@ const Category = ({
           </div>
         </div>
       )}
+      {/* tampilan mobile */}
     </>
   );
 };

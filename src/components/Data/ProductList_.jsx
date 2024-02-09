@@ -7,8 +7,14 @@ import { BsCartPlus, BsFillStarFill } from "react-icons/bs";
 import { FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Iklan from "../iklan/Iklan";
+import { BiDetail } from "react-icons/bi";
 
-const ProductList_ = ({ openModal, searchTerm, selectedCategory, favorite }) => {
+const ProductList_ = ({
+  openModal,
+  searchTerm,
+  selectedCategory,
+  favorite,
+}) => {
   const [showMore, setShowMore] = useState(false);
   const [visibleData, setVisibleData] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -205,19 +211,22 @@ const ProductList_ = ({ openModal, searchTerm, selectedCategory, favorite }) => 
   };
   //close  function ngurangi data
   return (
-    <div className="px-2 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
+    <div className="px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
       <div className="flex justify-between font-bold text-gray-900 mb-3 md:text-xl text-lg sm:ml-0 md:ml-0 lg:ml-0 ml-1">
         <div>Daftar Produk</div>
-        <div className="flex">
+        <div className="flex md:hidden sm:hidden lg:hidden">
           <div>Category</div>
-          <div onClick={openModal}>...</div>
+          <div onClick={openModal} className="mt-2 ml-1">
+            {" "}
+            <BiDetail />
+          </div>
         </div>
       </div>
 
       <div>
         {/* data produk */}
 
-        <div className="mb-5 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-6 lg:gap-6 sm:gap-6 gap-2">
+        <div className="mb-5 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-6 lg:gap-6 sm:gap-6 gap-2 ">
           {visibleData.map((item) => (
             <div
               className="relative bg-white border rounded-lg shadow hover:shadow-2xl group"
@@ -252,14 +261,14 @@ const ProductList_ = ({ openModal, searchTerm, selectedCategory, favorite }) => 
                     </div>
                   </div>
                   {item.is_favorite && (
-                    <div className="mt-1 text-yellow-500">
-                      <BsFillStarFill />
+                    <div className="mt-1 text-yellow-500 mr-2">
+                      <BsFillStarFill size={18}/>
                     </div>
                   )}
                 </div>
                 {/* button tambahkan ke keranjang dan menambah, mengurangi item */}
-                <div className="flex mt-2 mb-2 ml-2 mr-3 text-sm md:justify-evenly sm:justify-between">
-                  <div className=" md:px-2 sm:px-6 px-1.5 py-1 bg-[#091F4B] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none   flex items-center justify-between  md:mr-4 sm:mr-4 mr-3 ">
+                <div className="flex mt-2 mb-2 sm:ml-2 ml-2 mr-3 text-sm md:justify-evenly sm:justify-between">
+                  <div className=" md:px-2 sm:px-6 px-4 py-1 bg-[#091F4B] text-white rounded-md opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus:outline-none   flex items-center justify-between  md:mr-4 sm:mr-4 mr-3 ">
                     <button
                       className={`sm:mr-2 text-white cursor-pointer hover:opacity-70 duration-500 ${
                         totalItem === 1 ? "opacity-50 cursor-not-allowed" : ""
@@ -269,7 +278,7 @@ const ProductList_ = ({ openModal, searchTerm, selectedCategory, favorite }) => 
                     >
                       <FaMinus />
                     </button>
-                    <p className="font-bold text-sm text-white md:pl-4 md:pr-4 pr-2 pl-2">
+                    <p className="font-bold text-sm text-white md:pl-4 md:pr-4 pr-4 pl-4">
                       {totalItem}
                     </p>
                     <button
@@ -305,7 +314,7 @@ const ProductList_ = ({ openModal, searchTerm, selectedCategory, favorite }) => 
         {/* button keranjang */}
         <div>
           {cart.length > 0 && (
-            <div className=" fixed sm:bottom-[255px] md:bottom-[190px] lg:bottom-[285px] bottom-[90px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white lg:p-2 md:p-2 sm:p-2 p-1 rounded-md shadow-xl focus:outline-none">
+            <div className=" fixed sm:bottom-[255px] md:bottom-[190px] lg:bottom-[285px] bottom-[95px] right-6 bg-[#091F4B] hover:bg-[#0C376A] text-white lg:p-2 md:p-2 sm:p-2 p-1 rounded-md shadow-xl focus:outline-none">
               {/* Tambahkan komponen untuk menampilkan item di dalam keranjang */}
               <Link
                 to={"/products/keranjang"}

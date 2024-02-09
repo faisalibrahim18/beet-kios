@@ -24,46 +24,29 @@ const Topbar = ({ cart, detail, products, loading }) => {
   return (
     <>
       <div>
-        <nav className="bg-white  fixed w-full  z-50 max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-[90px]">
-            <div className="flex">
-              <div className="mt-[35px]">
-                <Link to={"/dashboard"} className=" text-[#091F4B]">
-                  <FaArrowLeft size={30} />
+        <nav className="bg-white fixed w-full  z-50 max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="md:h-[80px] lg:h-[80px] sm:h-[80px]  h-[55px]">
+            <div className="flex justify-between">
+              <div className="md:mt-[30px] lg:mt-[30px] sm:mt-[30] mt-[17px]">
+                <Link
+                  to={"/dashboard"}
+                  className=" text-[#091F4B] md:text-3xl text-2xl"
+                >
+                  <FaArrowLeft />
                 </Link>
               </div>
-              {loading ? (
-                <div className="w-full lg:pl-0 pl-10 text-white font-semibold pt-3 mt-3 text-center"></div>
-              ) : (
-                <>
-                  {products && products.length > 0 ? (
-                    <div className="w-full lg:pl-0 pl-10  text-white font-semibold pt-3 mt-2  md:mt-2.5 lg:mt-3 text-center">
-                      <div key={products[0].id}>
-                        {/* <div>{products[0].Business.name}</div> */}
-                      </div>
-                    </div>
-                  ) : detail ? (
-                    <div className="w-full lg:pl-0 pl-10 text-white font-semibold pt-3 mt-2 md:mt-2.5 lg:mt-3 text-center">
-                      <div key={detail?.id}>
-                        {/* <div>{detail?.Business?.name}</div> */}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full lg:pl-0 pl-10 text-white font-semibold pt-3 mt-2.5 md:mt-2.5 lg:mt-3 text-center">
-                      {/* Profile */}
-                    </div>
-                  )}
-                </>
-              )}
 
-              <div className="flex">
-                <div className="lg:text-xl text-xl mr-[60px] mt-4 lg:mt-4 xs:mt-4 sm:mt-4 md:mt-4">
-                  <div className="relative text-left bottom-3">
+              <div className="flex ">
+                <div className="lg:text-xl text-xl mr-[20px] mt-0.5 lg:mt-4 xs:mt-4 sm:mt-4 md:mt-4">
+                  <div className="relative bottom-3">
                     <Link
                       to={"/products/keranjang"}
                       className="text-[#091F4B] px-4 py-2 rounded-md focus:outline-none hover:text-gray-200"
                     >
-                      <FaShoppingCart size={30} />
+                      <div className="md:text-3xl lg:text-3xl sm:text-3xl text-2xl">
+                        <FaShoppingCart />
+                      </div>
+
                       {cart.length > 0 && (
                         <span className="absolute top-5 right-0 bg-red-500 text-white rounded-full px-1 text-xs">
                           {cart.length}
@@ -73,12 +56,12 @@ const Topbar = ({ cart, detail, products, loading }) => {
                   </div>
                 </div>
 
-                <div className="lg:mt-4 mt-[14px] md:mt-4 sm:mt-4 text-white">
+                <div className="lg:mt-2 mt-[5px] md:mt-2 sm:mt-2 text-white">
                   {" "}
                   <Link to={"/dashboard"} on>
                     <img
                       src={Lg}
-                      className="bg-transparent  w-[190px] xs:w-[90px] sm:w-[90px] md:w-[90px] lg:w-[70px]"
+                      className="bg-transparent  w-[35px] xs:w-[90px] sm:w-[90px] md:w-[50px] lg:w-[50px]"
                     />
                   </Link>
                 </div>

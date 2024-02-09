@@ -39,7 +39,7 @@ const ProductDetail = () => {
             },
           }
         );
-        // console.log(response);
+        console.log(response);
         setDetail(response.data.data);
         setLoading(false);
       } catch (error) {
@@ -226,39 +226,133 @@ const ProductDetail = () => {
     setCart(storedCart);
     handleGetProduct();
   }, []);
-
   const handleSelectAllAddons = (data2, index, data) => {
     const data2_temp = { ...data2, group_id: data.id };
 
-    // Check if the add-on is already selected
+    // Check if any addon from this group is already selected
+    const isGroupSelected = allSelectAddOns.some(
+      (element) => element.group_id === data.id
+    );
+
+    // Check if the current addon is already selected
     const isSelected = allSelectAddOns.some(
       (element) => element.id === data2_temp.id
     );
 
-    if (isSelected) {
-      // If already selected, remove it from the selection
-      setHandleSelect((prevHandleSelect) =>
-        prevHandleSelect.filter(
-          (element) => element !== `${index},${data2_temp.id}`
-        )
+    if (isGroupSelected && isSelected) {
+      // If any addon from this group is already selected and current addon is already selected, remove all addons from this group
+      const updatedSelectAddOns = allSelectAddOns.filter(
+        (addon) => addon.group_id !== data.id
       );
 
-      setAllSelectAddOns((prevAllSelectAddOns) =>
-        prevAllSelectAddOns.filter((element) => element.id !== data2_temp.id)
+      const updatedHandleSelect = handleSelect.filter(
+        (element) => element.split(",")[0] !== `${index}`
       );
+
+      // Update state allSelectAddOns with the updated selection
+      setAllSelectAddOns(updatedSelectAddOns);
+
+      // Update state handleSelect with the updated selection
+      setHandleSelect(updatedHandleSelect);
     } else {
-      // If not selected, add it to the selection
-      setHandleSelect((prevHandleSelect) => [
-        ...prevHandleSelect,
-        `${index},${data2_temp.id}`,
-      ]);
+      // If no addon from this group is selected or current addon is not selected, add or toggle the selected addon to the selection
+      const updatedHandleSelect = handleSelect.filter(
+        (element) => element.split(",")[0] !== `${index}`
+      );
 
-      setAllSelectAddOns((prevAllSelectAddOns) => [
-        ...prevAllSelectAddOns,
-        data2_temp,
-      ]);
+      if (isSelected) {
+        // If current addon is already selected, remove it from selection
+        setHandleSelect(
+          updatedHandleSelect.filter(
+            (element) => element !== `${index},${data2_temp.id}`
+          )
+        );
+        setAllSelectAddOns((prevAllSelectAddOns) =>
+          prevAllSelectAddOns.filter((element) => element.id !== data2_temp.id)
+        );
+      } else {
+        // If current addon is not selected, add it to selection
+        setHandleSelect([...updatedHandleSelect, `${index},${data2_temp.id}`]);
+        setAllSelectAddOns((prevAllSelectAddOns) => [
+          ...prevAllSelectAddOns,
+          data2_temp,
+        ]);
+      }
     }
   };
+
+  // const handleSelectAllAddons = (data2, index, data) => {
+  //   const data2_temp = { ...data2, group_id: data.id };
+
+  //   // Filter addons yang telah dipilih sebelumnya dari grup yang sama
+  //   const selectedGroupAddons = allSelectAddOns.filter(
+  //     (addon) => addon.group_id === data.id
+  //   );
+
+  //   // Jika sudah ada add-on yang dipilih dari grup yang sama, hapus add-on tersebut
+  //   if (selectedGroupAddons.length > 0) {
+  //     // Hapus add-on yang dipilih sebelumnya dari grup yang sama
+  //     const updatedSelectAddOns = allSelectAddOns.filter(
+  //       (addon) => addon.group_id !== data.id
+  //     );
+
+  //     // Hapus item yang telah dipilih sebelumnya dari grup yang sama
+  //     const updatedHandleSelect = handleSelect.filter(
+  //       (element) => element.split(",")[0] !== `${index}`
+  //     );
+
+  //     // Update state handleSelect dengan item yang telah diperbarui
+  //     setHandleSelect(updatedHandleSelect);
+
+  //     // Update state allSelectAddOns dengan add-on yang telah diperbarui
+  //     setAllSelectAddOns(updatedSelectAddOns);
+  //   }
+
+  //   // Tambahkan add-on yang baru dipilih ke grup
+  //   setHandleSelect((prevHandleSelect) => [
+  //     ...prevHandleSelect,
+  //     `${index},${data2_temp.id}`,
+  //   ]);
+
+  //   // Tambahkan add-on yang baru dipilih ke state allSelectAddOns
+  //   setAllSelectAddOns((prevAllSelectAddOns) => [
+  //     ...prevAllSelectAddOns,
+  //     data2_temp,
+  //   ]);
+  // };
+
+  // const handleSelectAllAddons = (data2, index, data) => {
+  //   const data2_temp = { ...data2, group_id: data.id };
+
+  //   // Check if the add-on is already selected
+  //   const isSelected = allSelectAddOns.some(
+  //     (element) => element.id === data2_temp.id
+  //   );
+
+  //   if (isSelected) {
+  //     // If already selected, remove it from the selection
+  //     setHandleSelect((prevHandleSelect) =>
+  //       prevHandleSelect.filter(
+  //         (element) => element !== `${index},${data2_temp.id}`
+  //       )
+  //     );
+
+  //     setAllSelectAddOns((prevAllSelectAddOns) =>
+  //       prevAllSelectAddOns.filter((element) => element.id !== data2_temp.id)
+  //     );
+  //   } else {
+  //     // If not selected, add it to the selection
+  //     setHandleSelect((prevHandleSelect) => [
+  //       ...prevHandleSelect,
+  //       `${index},${data2_temp.id}`,
+  //     ]);
+
+  //     setAllSelectAddOns((prevAllSelectAddOns) => [
+  //       ...prevAllSelectAddOns,
+  //       data2_temp,
+  //     ]);
+  //   }
+  // };
 
   const handleGetProduct = async () => {
     try {
@@ -303,12 +397,12 @@ const ProductDetail = () => {
           <Loading />
         </div>
       ) : (
-        <div className="bg-gray-100  pt-16 pb-10" key={detail.id}>
+        <div className="bg-white  pt-16 pb-10" key={detail.id}>
           <div className="lg:p-12  sm:p-7 flex flex-wrap lg:justify-center md:flex-nowrap bg-white">
             <div className="flex-wrap ">
               <img
                 src={detail.image == null ? Lg : `${API_URL}/${detail.image}`}
-                className="lg:w-72 lg:h-72 md:w-96 md:h-80 w-screen h-80  lg:rounded-xl md:rounded-xl object-cover cursor-pointer shadow-xl"
+                className="lg:w-72 lg:h-72 md:w-96 md:h-80 w-screen h-[200px]  lg:rounded-xl md:rounded-xl object-cover cursor-pointer shadow-xl"
                 alt={detail.name}
                 onClick={
                   () =>
@@ -319,16 +413,16 @@ const ProductDetail = () => {
               />
             </div>
             <div className="lg:pl-10 p-5 md:pl-10 lg:pr-20 flex-wrap lg:pt-10">
-              <div className="mb-2 text-3xl font-bold tracking-tight text-gray-900">
+              <div className="mb-2 lg:text-3xl md:text-3xl sm:text-3xl text-2xl font-bold tracking-tight text-gray-900">
                 {detail.name}
               </div>
               <div className="flex">
-                <div className="mb-3 mt-3 p-1 pl-2 pr-2 rounded-lg font-normal text-gray-500 bg-gray-200">
+                <div className="mb-3 lg:mt-3 md:mt-3 mt-1 sm:mt-3 p-1 pl-2 pr-2 rounded-lg font-normal text-gray-500 bg-gray-200">
                   {detail.Product_Category?.name}
                 </div>
               </div>
 
-              <div className="inline-flex items-center lg:pt-16 md:pt-16 py-2 text-2xl font-medium text-center text-[#F20000]">
+              <div className="inline-flex items-center lg:mt-16 md:mt-16 sm:mt-16 -mt-10 py-2 text-2xl font-medium text-center">
                 Rp {detail.price.toLocaleString("id-ID")}
               </div>
               <div className="lg:flex md:flex hidden  mr-5 right-0">
@@ -353,7 +447,7 @@ const ProductDetail = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-5 lg:p-12  lg:mt-8 pt-5 lg:pl-[50px] sm:pl-[50px] sm:pr-[50px] pr-12 lg:pb-12 pb-6 block">
+          <div className="bg-white p-5 lg:p-12 lg:mt-8 md:mt-8 sm:mt-8 -mt-10 lg:pl-[50px] sm:pl-[50px] sm:pr-[50px] pr-12 lg:pb-12 md:pb-12 sm:pb-12 pb-2 block">
             <div className="font-semibold mb-2">Keterangan :</div>
             <div className="">
               {detail.description === "null" ? (
