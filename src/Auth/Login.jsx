@@ -150,7 +150,7 @@ const Login = () => {
                 <div className="mb-5">
                   <label
                     htmlFor="website-admin"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 "
                   >
                     Staff Id
                   </label>
@@ -179,7 +179,7 @@ const Login = () => {
                 <div className="mb-5">
                   <label
                     htmlFor="website-admin"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 "
                   >
                     Email
                   </label>
@@ -207,7 +207,7 @@ const Login = () => {
                 <div className="mb-2">
                   <label
                     htmlFor="website-admin"
-                    className="block mb-2 text-sm font-medium text-gray-90"
+                    className="block mb-2 text-sm font-medium text-gray-900"
                   >
                     Password
                   </label>
