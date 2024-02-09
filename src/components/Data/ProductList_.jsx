@@ -8,7 +8,7 @@ import { FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Iklan from "../iklan/Iklan";
 
-const ProductList_ = ({ searchTerm, selectedCategory, favorite }) => {
+const ProductList_ = ({ openModal, searchTerm, selectedCategory, favorite }) => {
   const [showMore, setShowMore] = useState(false);
   const [visibleData, setVisibleData] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -206,8 +206,12 @@ const ProductList_ = ({ searchTerm, selectedCategory, favorite }) => {
   //close  function ngurangi data
   return (
     <div className="px-2 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
-      <div className="font-bold text-gray-900 mb-3 text-xl sm:ml-0 md:ml-0 lg:ml-0 ml-1">
-        Daftar Produk
+      <div className="flex justify-between font-bold text-gray-900 mb-3 md:text-xl text-lg sm:ml-0 md:ml-0 lg:ml-0 ml-1">
+        <div>Daftar Produk</div>
+        <div className="flex">
+          <div>Category</div>
+          <div onClick={openModal}>...</div>
+        </div>
       </div>
 
       <div>

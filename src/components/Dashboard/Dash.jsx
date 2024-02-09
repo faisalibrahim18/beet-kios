@@ -12,7 +12,15 @@ const Dash = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [favorite, setFavorite] = useState(false);
   const [category, setCategory] = useState([]);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
+  const openModal = () => {
+    setIsCategoryOpen(true);
+  };
+  const closeModal = () => {
+    setIsCategoryOpen(false);
+  };
+  console.log(isCategoryOpen);
   // get data logo, product dan category
   useEffect(() => {
     const getProduct = async () => {
@@ -156,6 +164,8 @@ const Dash = () => {
           }`}
         >
           <Category
+            isCategoryOpen={isCategoryOpen}
+            closeModal={() => setIsCategoryOpen(false)}
             category={category}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
@@ -164,8 +174,9 @@ const Dash = () => {
         {/* close data category */}
 
         {/* data product */}
-        <div className="flex-grow lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[10px] pl-[70px] sm:pl-[100px] md:pl-[140px]">
+        <div className="flex-grow lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[10px] pl-[0px] sm:pl-[100px] md:pl-[140px]">
           <ProductList_
+            openModal={openModal}
             searchTerm={searchTerm}
             selectedCategory={selectedCategory}
             favorite={favorite}
