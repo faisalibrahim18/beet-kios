@@ -424,7 +424,7 @@ function CheckOut({ isOpen, closeModal }) {
               business_id: parseInt(data_Business.business_id),
               status: "Done",
             };
-            console.log("sendData", sendDataKitchen);
+            // console.log("sendData", sendDataKitchen);
             const resTransaction = await axios.post(
               `${API_URL}/api/v1/transaction/save/qr  `,
               sendDataKitchen,
@@ -436,7 +436,7 @@ function CheckOut({ isOpen, closeModal }) {
               }
             );
 
-            console.log("transaksi", resTransaction);
+            // console.log("transaksi", resTransaction);
             const getUserBusiness = await axios.get(
               `${API_URL}/api/v1/auth/get-user?business_id=${parseInt(
                 data_Business.business_id
@@ -448,13 +448,13 @@ function CheckOut({ isOpen, closeModal }) {
                 },
               }
             );
-            console.log("getUserBusiness", getUserBusiness.data.data);
+            // console.log("getUserBusiness", getUserBusiness.data.data);
 
             if (resTransaction.data.statusCode === 201) {
               if (getUserBusiness) {
                 const deviceUser = [];
                 getUserBusiness.data.data.forEach((value) => {
-                  console.log("looping device ", value.device);
+                  // console.log("looping device ", value.device);
                   if (value.device) {
                     const splitDevice = value.device.split("-");
                     if (splitDevice.length === 5) {
@@ -713,7 +713,7 @@ function CheckOut({ isOpen, closeModal }) {
       const confirmation = await Swal.fire({
         icon: "success",
         title: "Pembayaran Cash.",
-        text: "Anda yakin ingin menutup modal dan kembali ke dashboard?",
+        text: "Anda yakin ingin menutup halaman ini dan kembali ke dashboard?",
         showConfirmButton: true,
         showCancelButton: true,
         confirmButtonText: "Ya",
@@ -774,20 +774,6 @@ function CheckOut({ isOpen, closeModal }) {
           queue_number: counter,
           status: "Done",
         };
-        //  parameter_send.queue_number = this.state.queue_number;
-        //   kitchen = true;
-
-        // console.log("datasend", sendData);
-        // const response1 = await axios.post(
-        //   `${API_URL}/api/v1/transaction-customer`,
-        //   sendData,
-        //   {
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   }
-        // );
 
         const response1 = await axios.post(
           `${API_URL}/api/v1/transaction`,
@@ -799,7 +785,93 @@ function CheckOut({ isOpen, closeModal }) {
             },
           }
         );
-        console.log("datasend", response1);
+
+        const sendDataKitchen = {
+          receipt_id: receiptId,
+          items: cartData,
+          outlet_id: parseInt(data_Business.outlet_id),
+          business_id: parseInt(data_Business.business_id),
+          status: "Done",
+        };
+        // console.log("sendData", sendDataKitchen);
+        const resTransaction = await axios.post(
+          `${API_URL}/api/v1/transaction/save/qr  `,
+          sendDataKitchen,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // console.log("transaksi", resTransaction);
+        const getUserBusiness = await axios.get(
+          `${API_URL}/api/v1/auth/get-user?business_id=${parseInt(
+            data_Business.business_id
+          )}&outlet_id=${parseInt(data_Business.outlet_id)}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        // console.log("getUserBusiness", getUserBusiness.data.data);
+
+        if (resTransaction.data.statusCode === 201) {
+          if (getUserBusiness) {
+            const deviceUser = [];
+            getUserBusiness.data.data.forEach((value) => {
+              // console.log("looping device ", value.device);
+              if (value.device) {
+                const splitDevice = value.device.split("-");
+                if (splitDevice.length === 5) {
+                  deviceUser.push(value);
+                }
+              }
+            });
+            // console.log("deviceUser", deviceUser);
+            const resultDevice = deviceUser.map((value) => value.device);
+
+            // console.log("include_player_ids yang akan dikirim", resultDevice);
+            const bodyOneSignal = {
+              app_id: "545db6bf-4448-4444-b9c8-70fb9fae225b",
+              include_player_ids: resultDevice,
+              contents: {
+                en: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+                id: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+              },
+              headings: {
+                en: "Request Self Order baru ",
+                id: "Request Self Order baru ",
+              },
+              subtitle: {
+                en: "Request Self Order baru ",
+                id: "Request Self Order baru",
+              },
+            };
+            fetch("https://onesignal.com/api/v1/notifications", {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:
+                  "Basic ZGJiNjZmYWEtNTQ2Ny00MmExLTgwZjMtZDRhN2U2YWUwMjk0",
+              },
+              body: JSON.stringify(bodyOneSignal),
+            })
+              .then((response) => response.json())
+              .then((responseJson) => {
+                const result = responseJson;
+                console.log("responseJSON send notif ==> ", result);
+              })
+              .catch((_err) => {
+                console.log("ERR ==> ", _err);
+              });
+          }
+        }
+        // console.log("datasend", response1);
         closeModal();
         handlePaymentCashApprovalActions(transactionData);
 

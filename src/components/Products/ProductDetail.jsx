@@ -39,7 +39,7 @@ const ProductDetail = () => {
             },
           }
         );
-        console.log(response);
+        // console.log(response);
         setDetail(response.data.data);
         setLoading(false);
       } catch (error) {

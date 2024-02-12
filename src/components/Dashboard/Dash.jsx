@@ -20,7 +20,7 @@ const Dash = () => {
   const closeModal = () => {
     setIsCategoryOpen(false);
   };
-  console.log(isCategoryOpen);
+  // console.log(isCategoryOpen);
   // get data logo, product dan category
   useEffect(() => {
     const getProduct = async () => {
