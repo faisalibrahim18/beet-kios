@@ -412,7 +412,7 @@ const ProductDetail = () => {
                 }
               />
             </div>
-            <div className="lg:pl-10 p-5 md:pl-10 lg:pr-20 flex-wrap lg:pt-10">
+            <div className="lg:pl-10 cursor-context-menu p-5 md:pl-10 lg:pr-20 flex-wrap lg:pt-10">
               <div className="mb-2 lg:text-3xl md:text-3xl sm:text-3xl text-2xl font-bold tracking-tight text-gray-900">
                 {detail.name}
               </div>
@@ -447,7 +447,7 @@ const ProductDetail = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-5 lg:p-12 lg:mt-8 md:mt-8 sm:mt-8 -mt-10 lg:pl-[50px] sm:pl-[50px] sm:pr-[50px] pr-12 lg:pb-12 md:pb-12 sm:pb-12 pb-2 block">
+          <div className="bg-white cursor-context-menu p-5 lg:p-12 lg:mt-8 md:mt-8 sm:mt-8 -mt-10 lg:pl-[50px] sm:pl-[50px] sm:pr-[50px] pr-12 lg:pb-12 md:pb-12 sm:pb-12 pb-2 block">
             <div className="font-semibold mb-2">Keterangan :</div>
             <div className="">
               {detail.description === "null" ? (
@@ -464,10 +464,12 @@ const ProductDetail = () => {
           <div className="pt-2  bg-white pb-3 ">
             {" "}
             {/* add-On */}
-            <div className="sm:pl-[30px] pl-3 sm:pr-[30px]">
+            <div className="sm:pl-[30px] pl-3 sm:pr-[30px] cursor-context-menu">
               {allAddons.length > 0 ? (
                 <>
-                  <h5 className="font-semibold">Tambahan</h5>
+                  <h5 className="font-semibold cursor-context-menu">
+                    Tambahan
+                  </h5>
                   <hr />
                   {allAddons.map((data, index) => (
                     <div key={index}>
@@ -536,13 +538,13 @@ const ProductDetail = () => {
                   ))}
                 </>
               ) : (
-                <h5 className="available-addon">Tambahan tidak Tersedia.</h5>
+                <h5 className="available-addon cursor-context-menu">Tambahan tidak Tersedia.</h5>
               )}
             </div>
           </div>
           {/* notes */}
           <div className="sm:pl-[30px] pl-3 pr-3 sm:pr-[40px] bg-white">
-            <label className="flex mb-1.5">
+            <label className="flex mb-1.5 cursor-context-menu">
               <div className="font-semibold">Catatan</div>
               <div className="font-semibold ml-1 text-gray-400">
                 (opsional)
@@ -615,7 +617,7 @@ const ProductDetail = () => {
                     <BsCartPlus size={25} />
                   </span>
                   {/* <!-- Hanya tampilkan ikon cart di ukuran mobile --> */}
-                  <span className="hidden md:inline lg:inline sm:inline">
+                  <span className="hidden md:inline lg:inline sm:inline cursor-pointer">
                     Tambah ke Keranjang
                   </span>
                 </button>

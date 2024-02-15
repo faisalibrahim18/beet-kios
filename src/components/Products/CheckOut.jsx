@@ -417,24 +417,24 @@ function CheckOut({ isOpen, closeModal }) {
             // kirim data ke kitchen
 
             // console.log("cart", cartData);
-            const sendDataKitchen = {
-              receipt_id: receiptId,
-              items: cartData,
-              outlet_id: parseInt(data_Business.outlet_id),
-              business_id: parseInt(data_Business.business_id),
-              status: "Done",
-            };
+            // const sendDataKitchen = {
+            //   receipt_id: receiptId,
+            //   items: cartData,
+            //   outlet_id: parseInt(data_Business.outlet_id),
+            //   business_id: parseInt(data_Business.business_id),
+            //   status: "Done",
+            // };
             // console.log("sendData", sendDataKitchen);
-            const resTransaction = await axios.post(
-              `${API_URL}/api/v1/transaction/save/qr  `,
-              sendDataKitchen,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+            // const resTransaction = await axios.post(
+            //   `${API_URL}/api/v1/transaction/save/qr  `,
+            //   sendDataKitchen,
+            //   {
+            //     headers: {
+            //       "Content-Type": "application/json",
+            //       Authorization: `Bearer ${token}`,
+            //     },
+            //   }
+            // );
 
             // console.log("transaksi", resTransaction);
             const getUserBusiness = await axios.get(
@@ -450,7 +450,7 @@ function CheckOut({ isOpen, closeModal }) {
             );
             // console.log("getUserBusiness", getUserBusiness.data.data);
 
-            if (resTransaction.data.statusCode === 201) {
+            if (response1.data.statusCode === 201) {
               if (getUserBusiness) {
                 const deviceUser = [];
                 getUserBusiness.data.data.forEach((value) => {
@@ -470,8 +470,8 @@ function CheckOut({ isOpen, closeModal }) {
                   app_id: "545db6bf-4448-4444-b9c8-70fb9fae225b",
                   include_player_ids: resultDevice,
                   contents: {
-                    en: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
-                    id: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+                    en: "Mohon konfirmasi order pada menu Kitchen aplikasi BeetPOS anda",
+                    id: "Mohon konfirmasi order pada menu Kitchen aplikasi BeetPOS anda",
                   },
                   headings: {
                     en: "Request Self Order baru ",
@@ -495,7 +495,7 @@ function CheckOut({ isOpen, closeModal }) {
                   .then((response) => response.json())
                   .then((responseJson) => {
                     const result = responseJson;
-                    console.log("responseJSON send notif ==> ", result);
+                    // console.log("responseJSON send notif ==> ", result);
                   })
                   .catch((_err) => {
                     console.log("ERR ==> ", _err);
@@ -505,7 +505,7 @@ function CheckOut({ isOpen, closeModal }) {
             // close kirim data ke kitchen
             setLoading1(false);
             setUrlVendor(urlVendor);
-            handlePaymentQrApprovalActions(transactionData, StatusPayment);
+            handlePaymentQrApprovalActions(transactionData);
 
             clearInterval(intervalId);
             // setCounter((prevCounter) => prevCounter + 1);
@@ -527,13 +527,12 @@ function CheckOut({ isOpen, closeModal }) {
 
   // action ketika selesai pembayaran qr
   const handlePaymentQrApprovalActions = async (
-    transactionData,
-    StatusPayment
+    transactionData
   ) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
     // generateReceiptContent();
-    printReceiptQr(transactionData, StatusPayment);
+    printReceiptQr(transactionData);
     Swal.fire({
       title: "Pembayaran sukses!",
       // text: "Text lain sesuai kebutuhan",
@@ -550,7 +549,7 @@ function CheckOut({ isOpen, closeModal }) {
   // close  action ketika selesai pembayaran qr
 
   // generate data receipt qr
-  const generateReceiptQrContent = (transactionData, StatusPayment) => {
+  const generateReceiptQrContent = (transactionData) => {
     const tax = taxAndService.tax;
     const service = taxAndService.charge;
     const totaltax = totalValues.totalTax;
@@ -573,7 +572,7 @@ function CheckOut({ isOpen, closeModal }) {
         totalservice={totalservice}
         counter={counter}
         transactionData={transactionData} // transactionData is passed as a prop
-        StatusPayment={StatusPayment}
+    
       />
     );
 
@@ -582,13 +581,12 @@ function CheckOut({ isOpen, closeModal }) {
   // close generate data receipt qr
 
   //  print receipt Qr
-  const printReceiptQr = (transactionData, StatusPayment) => {
+  const printReceiptQr = (transactionData) => {
     const printWindow = window.open();
     // console.log("print ke sini");
     if (printWindow) {
       const receiptContent = generateReceiptQrContent(
-        transactionData,
-        StatusPayment
+        transactionData
       );
 
       printWindow.document.write(`
@@ -619,13 +617,12 @@ function CheckOut({ isOpen, closeModal }) {
   // Paymnet Cash
   // action ketika selesai pembayaran cash
   const handlePaymentCashApprovalActions = async (
-    transactionData,
-    StatusPayment
+    transactionData
   ) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
     // generateReceiptContent();
-    printReceiptCash(transactionData, StatusPayment);
+    printReceiptCash(transactionData);
     Swal.fire({
       title: "Pembayaran sukses!",
       // text: "Text lain sesuai kebutuhan",
@@ -642,7 +639,7 @@ function CheckOut({ isOpen, closeModal }) {
   // close  action ketika selesai pembayaran cash
 
   // generate data receipt cash
-  const generateReceiptCashContent = (transactionData, StatusPayment) => {
+  const generateReceiptCashContent = (transactionData) => {
     const tax = taxAndService.tax;
     const service = taxAndService.charge;
     const totaltax = totalValues.totalTax;
@@ -665,7 +662,7 @@ function CheckOut({ isOpen, closeModal }) {
         totalservice={totalservice}
         counter={counter}
         transactionData={transactionData} // transactionData is passed as a prop
-        StatusPayment={StatusPayment}
+
       />
     );
 
@@ -674,13 +671,12 @@ function CheckOut({ isOpen, closeModal }) {
   // close generate data receipt
 
   //  print receipt
-  const printReceiptCash = (transactionData, StatusPayment) => {
+  const printReceiptCash = (transactionData) => {
     const printWindow = window.open();
     // console.log("print ke sini");
     if (printWindow) {
       const receiptContent = generateReceiptCashContent(
-        transactionData,
-        StatusPayment
+        transactionData
       );
 
       printWindow.document.write(`
@@ -794,16 +790,16 @@ function CheckOut({ isOpen, closeModal }) {
           status: "Done",
         };
         // console.log("sendData", sendDataKitchen);
-        const resTransaction = await axios.post(
-          `${API_URL}/api/v1/transaction/save/qr  `,
-          sendDataKitchen,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        // const resTransaction = await axios.post(
+        //   `${API_URL}/api/v1/transaction/save/qr  `,
+        //   sendDataKitchen,
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //   }
+        // );
 
         // console.log("transaksi", resTransaction);
         const getUserBusiness = await axios.get(
@@ -819,7 +815,7 @@ function CheckOut({ isOpen, closeModal }) {
         );
         // console.log("getUserBusiness", getUserBusiness.data.data);
 
-        if (resTransaction.data.statusCode === 201) {
+        if (response1.data.statusCode === 201) {
           if (getUserBusiness) {
             const deviceUser = [];
             getUserBusiness.data.data.forEach((value) => {
@@ -839,8 +835,8 @@ function CheckOut({ isOpen, closeModal }) {
               app_id: "545db6bf-4448-4444-b9c8-70fb9fae225b",
               include_player_ids: resultDevice,
               contents: {
-                en: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
-                id: "Mohon konfirmasi order pada menu booking aplikasi BeetPOS anda",
+                en: "Mohon konfirmasi order pada menu Kitchen aplikasi BeetPOS anda",
+                id: "Mohon konfirmasi order pada menu Kitchen aplikasi BeetPOS anda",
               },
               headings: {
                 en: "Request Self Order baru ",
@@ -864,7 +860,7 @@ function CheckOut({ isOpen, closeModal }) {
               .then((response) => response.json())
               .then((responseJson) => {
                 const result = responseJson;
-                console.log("responseJSON send notif ==> ", result);
+                // console.log("responseJSON send notif ==> ", result);
               })
               .catch((_err) => {
                 console.log("ERR ==> ", _err);
@@ -890,7 +886,7 @@ function CheckOut({ isOpen, closeModal }) {
   return (
     <div>
       {isOpen && (
-        <div className="fixed inset-0 z-50 mt-20 flex place-items-start  justify-center transition-opacity duration-300 overflow-auto">
+        <div className="fixed cursor-context-menu  inset-0 z-50 mt-20 flex place-items-start  justify-center transition-opacity duration-300 overflow-auto">
           <div className="fixed inset-0">
             <div className="absolute inset-0 bg-black opacity-70" />
           </div>

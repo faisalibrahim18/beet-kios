@@ -7,6 +7,7 @@ import ProductsDetail from "./pages/Products/ProductsDetail";
 import ProductKeranjang from "./pages/Products/ProductKeranjang";
 import CheckOut from "./pages/Products/CheckOut";
 import NewPassword from "./Auth/NewPassword";
+import LogOut from "./Auth/LogOut";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Login />} />
+          <Route exact path="/logout" element={<LogOut />} />
           <Route exact path="/forgotPassword" element={<Forgot />} />
           <Route exact path="/new_Password" element={<NewPassword />} />
           <Route exact path="/dashboard" element={<Dashboard />} />

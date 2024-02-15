@@ -85,7 +85,7 @@ const Category = ({
     <>
       {/* tampilan utama */}
       <div className="md:block sm:block lg:block hidden md:w-full xs:w-[60px] sm:w-[120px] w-[75px] lg:mb-[370px] sm:mb-[270px] md:mb-[250px] mb-[160px]">
-        <div className="text-gray-800 text-sm text-center font-semibold p-2">
+        <div className="cursor-context-menu text-gray-800 text-sm text-center font-semibold p-2">
           Pilihan Kategori
         </div>
 
@@ -93,7 +93,7 @@ const Category = ({
           <div className="py-3">
             <div>
               <div
-                className={`bg-gray-100  text-sm  hover:bg-gray-300 w-full p-4 text-center ${
+                className={`bg-gray-100  text-sm cursor-pointer hover:bg-gray-300 w-full p-4 text-center ${
                   selectedCategory === "all"
                     ? "text-[#091F4B] font-medium bg-gray-300 "
                     : ""
@@ -108,7 +108,7 @@ const Category = ({
             {isFavoriteAvailable && (
               <div>
                 <div
-                  className={`bg-gray-100 text-sm  hover:bg-gray-300 w-full p-4 text-center ${
+                  className={`bg-gray-100 text-sm cursor-pointer  hover:bg-gray-300 w-full p-4 text-center ${
                     selectedCategory === "favorite"
                       ? "text-[#091F4B] font-medium bg-gray-300 "
                       : ""

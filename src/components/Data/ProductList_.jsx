@@ -23,7 +23,7 @@ const ProductList_ = ({
   const [notes, setNotes] = useState("");
   const [isFavoriteAvailable, setIsFavoriteAvailable] = useState(true);
   const [itemsToShow, setItemsToShow] = useState(
-    showMore ? searchTerm.length : 12
+    showMore ? searchTerm.length : 16
   );
   const [totalItem, setTotalItem] = useState(1);
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -212,10 +212,10 @@ const ProductList_ = ({
   //close  function ngurangi data
   return (
     <div className="px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 pt-6 ">
-      <div className="flex justify-between font-bold text-gray-900 mb-3 md:text-xl text-lg sm:ml-0 md:ml-0 lg:ml-0 ml-1">
+      <div className="flex cursor-context-menu justify-between font-bold text-gray-900 mb-3 md:text-xl text-lg sm:ml-0 md:ml-0 lg:ml-0 ml-1">
         <div>Daftar Produk</div>
         <div className="flex md:hidden sm:hidden lg:hidden">
-          <div>Category</div>
+          <div>Kategori</div>
           <div onClick={openModal} className="mt-2 ml-1">
             {" "}
             <BiDetail />
@@ -240,7 +240,7 @@ const ProductList_ = ({
                   />
                 </Link>
               </div>
-              <div className=" relative">
+              <div className=" relative cursor-context-menu">
                 <div className="sm:pl-3 pl-2 pr-1 sm:pr-3 pb-1.5 flex justify-between">
                   <div>
                     <div>
@@ -262,7 +262,7 @@ const ProductList_ = ({
                   </div>
                   {item.is_favorite && (
                     <div className="mt-1 text-yellow-500 mr-2">
-                      <BsFillStarFill size={18}/>
+                      <BsFillStarFill size={18} />
                     </div>
                   )}
                 </div>
@@ -337,7 +337,7 @@ const ProductList_ = ({
 
         {/* button muat lebih banyak/tampilkan kurang */}
         <div>
-          {visibleData.length >= 12 && (
+          {visibleData.length >= 16 && (
             <div className="flex justify-center mt-6 mb-8">
               {visibleData.length > 3 && (
                 <div>

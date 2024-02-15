@@ -174,7 +174,7 @@ const Dash = () => {
         {/* close data category */}
 
         {/* data product */}
-        <div className="flex-grow lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[10px] pl-[0px] sm:pl-[100px] md:pl-[140px]">
+        <div className="flex-grow lg:mt-[50px] sm:mt-[50px] md:mt-[30px] mt-[10px] pl-[0px] sm:pl-[100px] md:pl-[110px]">
           <ProductList_
             openModal={openModal}
             searchTerm={searchTerm}

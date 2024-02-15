@@ -255,7 +255,9 @@ const ProductKeranjang = () => {
         </div>
         <div className="lg:pl-12 p-5 lg:flex-1 md:flex block">
           <div className="lg:w-2/3 md:w-2/3">
-            <h2 className="text-2xl font-bold">Keranjang Belanja</h2>
+            <h2 className="text-2xl font-bold cursor-context-menu">
+              Keranjang Belanja
+            </h2>
 
             {cart && cart.length === 0 ? (
               <div className="text-center flex justify-center lg:pl-96 md:pl-56">
@@ -270,7 +272,7 @@ const ProductKeranjang = () => {
                       margin: "0 auto", // Pusatkan gambar horizontal
                     }}
                   />
-                  <div className="font-semibold text-gray-500">
+                  <div className="font-semibold text-gray-500 cursor-context-menu">
                     Keranjang belanja Anda masih kosong.
                   </div>
                 </div>
@@ -313,7 +315,7 @@ const ProductKeranjang = () => {
                         <div>
                           {cart.map((item) => (
                             <div
-                              className="flex flex-wrap justify-between items-center shadow-[#091F4B] shadow-sm border rounded-lg mb-1 mt-4 p-2 lg:mx-4"
+                              className="flex flex-wrap justify-between items-center shadow-[#091F4B] shadow-sm border rounded-lg mb-1 mt-4 p-2 lg:mx-4 cursor-context-menu"
                               key={item.id}
                             >
                               <div className="flex items-center pl-3">
@@ -412,7 +414,7 @@ const ProductKeranjang = () => {
                   </button>
                 </div>
               </div> */}
-              <div className="lg:pl-10 md:pl-5 w-full">
+              <div className="lg:pl-10 md:pl-5 w-full cursor-context-menu">
                 <div className="border border-[#091F4B] mt-8 p-3 rounded-2xl">
                   <div className="flex">
                     <div className=" text-gray-500 md:w-2/3 w-3/4">
@@ -457,7 +459,6 @@ const ProductKeranjang = () => {
           selectedOutlets={selectedOutlets} // Pass selected item IDs to the Checkout component
         />
       )}
-     
     </>
   );
 };

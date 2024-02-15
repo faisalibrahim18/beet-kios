@@ -11,7 +11,6 @@ const PrintReceiptQR = ({
   totaltax,
   counter,
   totalservice,
-
 }) => {
   if (!cart || cart.length === 0) {
     return <div>Cart is empty</div>;
@@ -43,6 +42,7 @@ const PrintReceiptQR = ({
         maxWidth: "80mm",
         margin: "0px",
         fontSize: "10px",
+        marginBottom: "50px",
       }}
     >
       {/* Header */}
@@ -171,10 +171,11 @@ const PrintReceiptQR = ({
           <b>{counter}</b>
         </div>
       </div>
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", marginBottom: "70px" }}>
         {" "}
         Terima kasih atas kunjungan Anda.
       </div>
+      <div style={{ textAlign: "center", marginBottom: "70px" }}> -</div>
     </div>
   );
 };

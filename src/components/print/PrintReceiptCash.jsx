@@ -42,6 +42,7 @@ const PrintReceiptCash = ({
         maxWidth: "80mm",
         margin: "0px",
         fontSize: "10px",
+        marginBottom: "50px",
       }}
     >
       {/* Header */}
@@ -170,10 +171,11 @@ const PrintReceiptCash = ({
           <b>{counter}</b>
         </div>
       </div>
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", marginBottom: "70px" }}>
         {" "}
         Terima kasih atas kunjungan Anda.
       </div>
+      <div style={{ textAlign: "center", marginBottom: "70px" }}> -</div>
     </div>
   );
 };
