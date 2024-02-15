@@ -1,6 +1,4 @@
 import React from "react";
-import bnr from "../../assets/bnr3.png";
-import bnr2 from "../../assets/bnr4.png";
 // import bnr_robo from "../../assets/bnr_robo2.png";
 import bnr_robo from "../../assets/bnr_robo3.png";
 // import bnr2_robo from "../../assets/bnr2_robo.png";
@@ -39,16 +37,6 @@ const Iklan = () => {
             />
           </div>
         </SwiperSlide>
-
-        {/* <SwiperSlide>
-          <div className="h-[240px] w-full relative">
-            <img
-              src={bnr2}
-              alt="Slider 2"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </SwiperSlide> */}
       </Swiper>
     </div>
   );

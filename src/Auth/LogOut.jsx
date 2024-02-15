@@ -6,26 +6,22 @@ const LogOut = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleLogOut = () => {
-      localStorage.removeItem("cart");
-      localStorage.removeItem("user");
-      localStorage.removeItem("logo");
-      localStorage.removeItem("queueNumber");
-      localStorage.removeItem("token");
+    const logout = () => {
+      localStorage.clear();
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-right",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+      Toast.fire({
+        icon: "success",
+        text: "Anda Berhasil Logout.",
+      });
+      navigate("/");
     };
-    handleLogOut();
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-    });
-    Toast.fire({
-      icon: "success",
-      text: "Anda Berhasil Logout.",
-    });
-    navigate("/");
+    logout();
   }, []);
 
   return <div></div>;
