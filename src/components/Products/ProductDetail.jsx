@@ -23,7 +23,9 @@ const ProductDetail = () => {
   const [handleSelect, setHandleSelect] = useState([]);
   const [product, setProduct] = useState({});
   const [totalItem, setTotalItem] = useState(1);
+  const navigate = useNavigate();
 
+  // get data produk detail
   useEffect(() => {
     const getData = async () => {
       try {
@@ -51,60 +53,37 @@ const ProductDetail = () => {
     };
     getData();
   }, [id]);
+  // close get data produk detail
 
+  // Fungsi untuk membuka modal gambar
   const openModal = (imageUrl) => {
-    // Fungsi untuk membuka modal
     const modalImage = document.getElementById("modalImage");
     modalImage.src = imageUrl;
     const modal = document.getElementById("imageModal");
     modal.classList.remove("hidden");
   };
+  // close Fungsi untuk membuka modal gambar
 
+  // Fungsi untuk menutup modal gambar
   const closeModal = () => {
-    // Fungsi untuk menutup modal
     const modal = document.getElementById("imageModal");
     modal.classList.add("hidden");
   };
+  // close Fungsi untuk menutup modal gambar
 
-  useEffect(() => {
-    const getData1 = async () => {
-      try {
-        const API_URL = import.meta.env.VITE_API_KEY;
-        const token = localStorage.getItem("token");
-
-        const response = await axios.get(
-          // `${API_URL}/api/v1/customer-app/transaction/emenu?id=22221`,
-          `${API_URL}/api/v1/customer-app/transaction/emenu?customer_account_id=26&order=newest&per_page=8&page=1`,
-          // `${API_URL}/api/v1/customer-app/transaction/emenu?customer_account_id=26&order=newest`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        // console.log("data", response);
-      } catch (error) {
-        if (error.response) {
-          console.log(error.response.data.message);
-          setLoading(false);
-        }
-      }
-    };
-    getData1();
-  }, [id]);
-
+  // fungsi untuk menambahkan jumlah item
   const incrementQuantity = () => {
     setTotalItem(totalItem + 1);
   };
+  // close Fungsi untuk menambahkan jumlah item
 
+  // Fungsi untuk mengusi jumlah item
   const decrementQuantity = () => {
     if (totalItem > 1) {
       setTotalItem(totalItem - 1);
     }
   };
-  const navigate = useNavigate();
+  // Fungsi untuk mengusi jumlah item
 
   const isSameCartItem = (itemA, itemB) => {
     // return item1.idItem === item2.idItem;
@@ -114,6 +93,7 @@ const ProductDetail = () => {
     );
   };
 
+  // fungsi untuk menambahkan data ke keranjang
   const handleAddCart = () => {
     try {
       const addonsTotalPrice = allSelectAddOns.reduce(
@@ -219,6 +199,7 @@ const ProductDetail = () => {
       console.error("Error adding item to cart:", error);
     }
   };
+  // close fungsi untuk menambahkan data ke keranjang
 
   // Gunakan useEffect untuk memperbarui localStorage ketika cart berubah
   useEffect(() => {
@@ -226,6 +207,8 @@ const ProductDetail = () => {
     setCart(storedCart);
     handleGetProduct();
   }, []);
+
+  // fungsi untuk memilih data dari Addon/Tambahan
   const handleSelectAllAddons = (data2, index, data) => {
     const data2_temp = { ...data2, group_id: data.id };
 
@@ -280,6 +263,7 @@ const ProductDetail = () => {
       }
     }
   };
+  // fungsi untuk memilih data dari Addon/Tambahan
 
   // const handleSelectAllAddons = (data2, index, data) => {
   //   const data2_temp = { ...data2, group_id: data.id };
@@ -354,6 +338,7 @@ const ProductDetail = () => {
   //   }
   // };
 
+  // fungsi untuk mengget data Addon/Tambahan
   const handleGetProduct = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -388,15 +373,21 @@ const ProductDetail = () => {
       console.log(error);
     }
   };
+  // close fungsi untuk mengget data Addon/Tambahan
 
   return (
     <>
+      {/* Header */}
       <Topbar detail={detail} loading={loading} cart={cart} />
+      {/* close Header */}
       {loading ? (
+        // Loading Screen
         <div className="pt-20 flex text-center justify-center items-center h-screen">
           <Loading />
         </div>
       ) : (
+        // Close Loading Screen
+        // data produk detail
         <div className="bg-white  pt-16 pb-10" key={detail.id}>
           <div className="lg:p-12  sm:p-7 flex flex-wrap lg:justify-center md:flex-nowrap bg-white">
             <div className="flex-wrap ">
@@ -447,6 +438,8 @@ const ProductDetail = () => {
               </div>
             </div>
           </div>
+
+          {/* bagian catatan/description */}
           <div className="bg-white cursor-context-menu p-5 lg:p-12 lg:mt-8 md:mt-8 sm:mt-8 -mt-10 lg:pl-[50px] sm:pl-[50px] sm:pr-[50px] pr-12 lg:pb-12 md:pb-12 sm:pb-12 pb-2 block">
             <div className="font-semibold mb-2">Keterangan :</div>
             <div className="">
@@ -459,11 +452,12 @@ const ProductDetail = () => {
               )}
             </div>
           </div>
+          {/* close agian catatan/description */}
 
           <hr className="" />
+          {/* add-On/Tambahan */}
           <div className="pt-2  bg-white pb-3 ">
             {" "}
-            {/* add-On */}
             <div className="sm:pl-[30px] pl-3 sm:pr-[30px] cursor-context-menu">
               {allAddons.length > 0 ? (
                 <>
@@ -538,10 +532,14 @@ const ProductDetail = () => {
                   ))}
                 </>
               ) : (
-                <h5 className="available-addon cursor-context-menu">Tambahan tidak Tersedia.</h5>
+                <h5 className="available-addon cursor-context-menu">
+                  Tambahan tidak Tersedia.
+                </h5>
               )}
             </div>
           </div>
+          {/* close Add-on/Tambahan */}
+
           {/* notes */}
           <div className="sm:pl-[30px] pl-3 pr-3 sm:pr-[40px] bg-white">
             <label className="flex mb-1.5 cursor-context-menu">
@@ -560,6 +558,8 @@ const ProductDetail = () => {
               placeholder="Ketik sesuatu di sini..."
             />
           </div>
+          {/* close Notes */}
+
           {/* Modal gambar */}
           <div
             id="imageModal"
@@ -581,8 +581,10 @@ const ProductDetail = () => {
               />
             </div>
           </div>
+          {/* close modal Gambar */}
 
           <div className="lg:block flex justify-center lg:p-2 p-4">
+            {/* button  plus/tambah dan minus/kurang  */}
             <div className="lg:hidden md:hidden block lg:ml-10 lg:mr-0 mr-2">
               <div className="bg-[#091F4B] rounded-xl flex items-center justify-between py-2 ">
                 <button
@@ -603,7 +605,9 @@ const ProductDetail = () => {
                 </button>
               </div>
             </div>
+            {/* close button  plus/tambah dan minus/kurang  */}
 
+            {/* button tambahkan ke keranjang */}
             <div className="lg:flex lg:justify-center">
               <div className=""></div>
               <div className="">
@@ -623,8 +627,10 @@ const ProductDetail = () => {
                 </button>
               </div>
             </div>
+            {/* close button tambahkan ke keranjang */}
           </div>
         </div>
+        // close data produk detail
       )}
     </>
   );

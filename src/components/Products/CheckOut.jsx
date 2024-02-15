@@ -27,7 +27,6 @@ function CheckOut({ isOpen, closeModal }) {
   const navigate = useNavigate();
   const data_Business = JSON.parse(localStorage.getItem("user"));
 
-  // console.log("payyyyyyy", payment);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -198,8 +197,6 @@ function CheckOut({ isOpen, closeModal }) {
   // close tax and service
 
   useEffect(() => {
-    // handlePaymentApprovalActions();
-    // incrementCounter();
     const intervalId = setInterval(() => {}, 1000);
 
     return () => clearInterval(intervalId);
@@ -286,7 +283,7 @@ function CheckOut({ isOpen, closeModal }) {
   };
   const totalValues = calculateTotalPrice();
   // close pergitungan jumlah total
-  // console.log("toaa", totalValues);
+
   //  Payment Qr
   // handle buat pembayaran/checkout QR
   const handlePayment = async () => {
@@ -526,9 +523,7 @@ function CheckOut({ isOpen, closeModal }) {
   //  close handle buat pembayaran/checkout Qr
 
   // action ketika selesai pembayaran qr
-  const handlePaymentQrApprovalActions = async (
-    transactionData
-  ) => {
+  const handlePaymentQrApprovalActions = async (transactionData) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
     // generateReceiptContent();
@@ -572,7 +567,6 @@ function CheckOut({ isOpen, closeModal }) {
         totalservice={totalservice}
         counter={counter}
         transactionData={transactionData} // transactionData is passed as a prop
-    
       />
     );
 
@@ -585,9 +579,7 @@ function CheckOut({ isOpen, closeModal }) {
     const printWindow = window.open();
     // console.log("print ke sini");
     if (printWindow) {
-      const receiptContent = generateReceiptQrContent(
-        transactionData
-      );
+      const receiptContent = generateReceiptQrContent(transactionData);
 
       printWindow.document.write(`
           <html>
@@ -611,14 +603,12 @@ function CheckOut({ isOpen, closeModal }) {
       console.error("Failed to open print window");
     }
   };
-  //  close print receipt
+  //  close print receipt Qr
   // close PaymentQr
 
   // Paymnet Cash
   // action ketika selesai pembayaran cash
-  const handlePaymentCashApprovalActions = async (
-    transactionData
-  ) => {
+  const handlePaymentCashApprovalActions = async (transactionData) => {
     // Panggil fungsi untuk mencetak struk
     // setShowPrintReceipt(true);
     // generateReceiptContent();
@@ -662,7 +652,6 @@ function CheckOut({ isOpen, closeModal }) {
         totalservice={totalservice}
         counter={counter}
         transactionData={transactionData} // transactionData is passed as a prop
-
       />
     );
 
@@ -675,9 +664,7 @@ function CheckOut({ isOpen, closeModal }) {
     const printWindow = window.open();
     // console.log("print ke sini");
     if (printWindow) {
-      const receiptContent = generateReceiptCashContent(
-        transactionData
-      );
+      const receiptContent = generateReceiptCashContent(transactionData);
 
       printWindow.document.write(`
           <html>
@@ -923,17 +910,6 @@ function CheckOut({ isOpen, closeModal }) {
                           title="Konten Pembayaran"
                           allow="geolocation"
                         />
-                        {/* <div className="flex justify-center ">
-                          <div className=" mt-5 mr-3">
-                            *Jika sudah melakukan pembayaran. diKlik
-                          </div>
-                          <button
-                            className="bg-[#091F4B] p-3 mt-3 text-white rounded-md"
-                            onClick={HandleSelesaiPembayaran}
-                          >
-                            Pembayaran selesai{" "}
-                          </button>
-                        </div> */}
                       </div>
                     )}
                     {/*close  untuk menampilkan iframe dan memunculkan jenis pembayaran */}
