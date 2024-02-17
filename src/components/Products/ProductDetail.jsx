@@ -119,7 +119,7 @@ const ProductDetail = () => {
         fullDataProduct: product,
         allAddons: allSelectAddOns,
         totalAmount: amount * totalItem,
-        addons: [],
+        addons: allSelectAddOns,
         sales_type_id: 613,
         notes: notes,
         product_id: product.id,

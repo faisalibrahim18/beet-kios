@@ -10,6 +10,7 @@ import PrintReceiptCash from "../print/PrintReceiptCash";
 import ReactDOMServer from "react-dom/server";
 import dayjs from "dayjs";
 import PrintReceiptQR from "../print/PrintReceiptQR";
+import { HiTicket } from "react-icons/hi2";
 
 function CheckOut({ isOpen, closeModal }) {
   const [cart, setCart] = useState([]);
@@ -26,6 +27,20 @@ function CheckOut({ isOpen, closeModal }) {
   const [transactionData, setTransactionData] = useState(null);
   const navigate = useNavigate();
   const data_Business = JSON.parse(localStorage.getItem("user"));
+  const [selectedPromo, setSelectedPromo] = useState(null);
+  const [promos, setPromos] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handlePromoSelection = (promo) => {
+    setSelectedPromo(promo);
+    applyPromo(promo);
+    setModalOpen(false); // Tutup modal saat promo dipilih
+  };
+
+  const closeModalPromo = () => {
+    // setSelectedPromo(null); // Reset selectedPromo saat modal ditutup
+    setModalOpen(false); // Tutup modal
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,6 +72,27 @@ function CheckOut({ isOpen, closeModal }) {
         setPaymentCash(cashPayments[0]);
         setPaymentQr(qrPayments[0]);
         setPayment(response.data.data.rows);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_KEY;
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${API_URL}/api/v1/special-promo`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setPromos(response.data.data);
+        console.log("promo", response);
       } catch (error) {
         console.error(error);
       }
@@ -241,6 +277,7 @@ function CheckOut({ isOpen, closeModal }) {
   }, []);
 
   // perhitungan jumlah total
+  // Perhitungan jumlah total
   const calculateTotalPrice = () => {
     let totalTax = 0;
     let totalService = 0;
@@ -253,14 +290,7 @@ function CheckOut({ isOpen, closeModal }) {
       const service = Math.ceil((resultTotal * taxAndService.charge) / 100);
 
       // Calculate addons total
-      let addonsTotal = item.price_addons_total || 0; // Ambil nilai dari price_addons_total
-      // let addonsTotal = 0;
-      // if (item.fullDataAddons) {
-      //   addonsTotal = item.fullDataAddons.reduce(
-      //     (accumulator, addon) => accumulator + addon.price,
-      //     0
-      //   );
-      // }
+      let addonsTotal = item.price_addons_total || 0;
 
       const paymentTotal = resultTotal + addonsTotal;
 
@@ -281,7 +311,30 @@ function CheckOut({ isOpen, closeModal }) {
       totalResultTotal,
     };
   };
+
   const totalValues = calculateTotalPrice();
+
+  // fungsi untuk mengaplikasikan promo
+  const applyPromo = (promo, totalPrice) => {
+    // Menghitung total harga dengan mempertimbangkan promo yang dipilih
+    if (promo) {
+      let discount = 0;
+      if (promo.type === "percentage") {
+        discount = totalPrice * (promo.value / 100);
+      } else if (promo.type === "currency") {
+        discount = promo.value;
+      }
+      return totalPrice - discount;
+    }
+    return totalPrice;
+  };
+
+  // Memanggil applyPromo dan menyimpan hasilnya dalam totalPriceAfterPromo
+  const totalPriceAfterPromo = applyPromo(
+    selectedPromo,
+    totalValues.totalResultTotal
+  );
+  // console.log("Total", totalValues);
   // close pergitungan jumlah total
 
   //  Payment Qr
@@ -295,8 +348,8 @@ function CheckOut({ isOpen, closeModal }) {
 
       const totalAmount = calculateTotalPrice().totalResultTotal;
       const result = {
-        tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
-        service: Math.ceil((totalAmount * taxAndService.charge) / 100),
+        tax: totalValues.totalTax,
+        service: totalValues.totalService,
         paymentTotal: totalAmount,
       };
 
@@ -329,8 +382,8 @@ function CheckOut({ isOpen, closeModal }) {
             currencyCode: "IDR",
             payment_tax: result.tax,
             payment_service: result.service,
-            payment_total: result.paymentTotal,
-            amount: result.resultAmount,
+            payment_total: totalValues.totalPaymentTotal,
+            amount: totalPriceAfterPromo,
             callbackSuccess: "",
             callbackFailure: "",
             message: "",
@@ -387,11 +440,12 @@ function CheckOut({ isOpen, closeModal }) {
               customer_id: data_Business.user_id,
               sales_type_id: salesTypeId.id,
               payment_method_id: paymentQr.id,
-              payment_discount: 0,
+              payment_discount:
+                totalValues.totalResultTotal - totalPriceAfterPromo,
               payment_tax: result.tax,
               payment_service: result.service,
-              payment_total: result.paymentTotal,
-              amount: result.resultAmount,
+              payment_total: totalPriceAfterPromo,
+              amount: totalValues.totalPaymentTotal,
               payment_change: 0,
               kitchen: true,
               queue_number: counter,
@@ -550,7 +604,8 @@ function CheckOut({ isOpen, closeModal }) {
     const totaltax = totalValues.totalTax;
     const totalservice = totalValues.totalService;
     const Subtotal = totalValues.totalPaymentTotal;
-    const total = totalValues.totalResultTotal;
+    const total = totalPriceAfterPromo;
+    const diskon = totalValues.totalResultTotal - totalPriceAfterPromo;
     const cartData1 = JSON.parse(localStorage.getItem("cart")) || [];
 
     // console.log("Value of transactionData:", transactionData);
@@ -563,6 +618,7 @@ function CheckOut({ isOpen, closeModal }) {
         service={service}
         Subtotal={Subtotal}
         total={total}
+        diskon={diskon}
         totaltax={totaltax}
         totalservice={totalservice}
         counter={counter}
@@ -635,7 +691,8 @@ function CheckOut({ isOpen, closeModal }) {
     const totaltax = totalValues.totalTax;
     const totalservice = totalValues.totalService;
     const Subtotal = totalValues.totalPaymentTotal;
-    const total = totalValues.totalResultTotal;
+    const total = totalPriceAfterPromo;
+    const diskon = totalValues.totalResultTotal - totalPriceAfterPromo;
     const cartData1 = JSON.parse(localStorage.getItem("cart")) || [];
 
     // console.log("Value of transactionData:", transactionData);
@@ -648,6 +705,7 @@ function CheckOut({ isOpen, closeModal }) {
         service={service}
         Subtotal={Subtotal}
         total={total}
+        diskon={diskon}
         totaltax={totaltax}
         totalservice={totalservice}
         counter={counter}
@@ -713,12 +771,13 @@ function CheckOut({ isOpen, closeModal }) {
         const cartData = JSON.parse(localStorage.getItem("cart")) || [];
 
         const totalAmount = calculateTotalPrice().totalResultTotal;
+
         const result = {
-          tax: Math.ceil((totalAmount * taxAndService.tax) / 100),
-          service: Math.ceil((totalAmount * taxAndService.charge) / 100),
+          tax: totalValues.totalTax,
+          service: totalValues.totalService,
           paymentTotal: totalAmount,
         };
-
+        console.log("ini tax", result);
         result.resultAmount = Math.ceil(result.paymentTotal);
         const response = await axios.get(
           `${API_URL}/api/v1/business-noverify/${data_Business.business_id}`
@@ -747,17 +806,18 @@ function CheckOut({ isOpen, closeModal }) {
           customer_id: data_Business.user_id,
           sales_type_id: salesTypeId.id,
           payment_method_id: paymentCash.id,
-          payment_discount: 0,
+          payment_discount: totalValues.totalResultTotal - totalPriceAfterPromo,
           payment_tax: result.tax,
           payment_service: result.service,
-          payment_total: result.paymentTotal,
-          amount: result.resultAmount,
+          payment_total: totalPriceAfterPromo,
+          amount: totalValues.totalPaymentTotal,
           payment_change: 0,
           kitchen: true,
           queue_number: counter,
           status: "Done",
         };
 
+        // console.log("dgfasjgudas", sendData);
         const response1 = await axios.post(
           `${API_URL}/api/v1/transaction`,
           sendData,
@@ -971,6 +1031,15 @@ function CheckOut({ isOpen, closeModal }) {
 
                           <hr className="border-2 ml-2 border-gray-400 mb-2 mt-2 rounded-lg" />
                           <li className="flex justify-between pl-2">
+                            <span>SubTotal</span>
+                            <span>
+                              Rp.{" "}
+                              {totalValues.totalPaymentTotal.toLocaleString(
+                                "id-ID"
+                              )}
+                            </span>
+                          </li>
+                          <li className="flex justify-between pl-2">
                             <span>
                               Tax{" "}
                               <span className="ml-1 text-xs">
@@ -993,17 +1062,122 @@ function CheckOut({ isOpen, closeModal }) {
                               {totalValues.totalService.toLocaleString("id-ID")}
                             </span>
                           </li>
+                          <li className="flex justify-between pl-2">
+                            <span>Diskon</span>
+                            <span>
+                              - Rp.{" "}
+                              {(
+                                totalValues.totalResultTotal -
+                                totalPriceAfterPromo
+                              ).toLocaleString("id-ID")}
+                            </span>
+                          </li>
                         </ul>
                       </div>
 
                       {/* <hr className="" /> */}
                       <div className="flex justify-between pr-3 pt-2">
+                        {/* <div className="checkout-section">
+                          <h2 className="text-lg font-semibold mb-4">
+                            Ringkasan Pembelian
+                          </h2>
+                          <p>Subtotal: {totalValues.totalResultTotal}</p>
+                          {selectedPromo && (
+                            <p>
+                              Promo: -
+                              {totalValues.totalResultTotal -
+                                totalPriceAfterPromo}
+                            </p>
+                          )}
+                          <p className="text-xl font-bold">
+                            Total: {totalPriceAfterPromo}
+                          </p>
+                        </div> */}
+
                         <span className="font-semibold">Total Harga:</span>
                         <span>
-                          Rp.{" "}
-                          {totalValues.totalResultTotal.toLocaleString("id-ID")}
+                          Rp. {totalPriceAfterPromo.toLocaleString("id-ID")}
                         </span>
                       </div>
+                    </div>
+
+                    <div className="p-4">
+                      <div className="mb-4  ">
+                        <span className="text-lg font-bold  cursor-context-menu">
+                          Promo
+                        </span>
+                        <span
+                          onClick={() => setModalOpen(true)}
+                          className={`ml-3 font-semibold cursor-pointer ${
+                            selectedPromo
+                              ? "bg-gray-100 p-2 -mt-1 rounded-md text-blue-500"
+                              : "text-black mt-1"
+                          }`}
+                        >
+                          {selectedPromo
+                            ? `Anda memilih promo :  ${selectedPromo.name}`
+                            : "Silakan pilih promo"}
+                        </span>
+                      </div>
+                      {modalOpen && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                          <div className="modal bg-white p-7 rounded-md max-w-md w-full">
+                            <div className="flex justify-end">
+                              <button
+                                onClick={closeModalPromo}
+                                className="text-gray-600 font-semibold hover:text-gray-800 text-4xl"
+                              >
+                                &times;
+                              </button>
+                            </div>
+                            <h2 className="text-xl font-bold mb-4">
+                              Pilih Promo
+                            </h2>
+                            {promos.length === 0 ? (
+                              <p className="text-gray-600 text-center mb-4">
+                                Tidak ada promo yang tersedia saat ini.
+                              </p>
+                            ) : (
+                              <ul className="space-y-2">
+                                {promos.map((promo) => (
+                                  <li
+                                    key={promo.id}
+                                    onClick={() => {
+                                      setSelectedPromo(promo);
+                                      setModalOpen(false);
+                                    }}
+                                    className="flex justify-between items-center bg-gray-100 cursor-pointer hover:bg-gray-200 p-2 rounded-md"
+                                  >
+                                    <div className="flex">
+                                      {" "}
+                                      <span className="mr-2 text-4xl">
+                                        <HiTicket />
+                                      </span>{" "}
+                                      <span className="mt-1.5 font-semibold">
+                                        {" "}
+                                        {promo.name}
+                                      </span>
+                                    </div>
+                                    {selectedPromo &&
+                                      selectedPromo.id === promo.id && (
+                                        <button
+                                          className="text-red-500"
+                                          onClick={(e) => {
+                                            e.stopPropagation(); // Mencegah propagasi klik ke atas
+                                            setSelectedPromo(null);
+                                            setModalOpen(false);
+                                          }}
+                                        >
+                                          Batalkan
+                                        </button>
+                                      )}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Tombol Bayar */}

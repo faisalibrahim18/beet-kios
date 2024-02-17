@@ -7,6 +7,7 @@ const PrintReceiptQR = ({
   tax,
   service,
   total,
+  diskon,
   Subtotal,
   totaltax,
   counter,
@@ -153,6 +154,14 @@ const PrintReceiptQR = ({
           <div style={{ textAlign: "right" }}>
             Rp. {totalservice.toLocaleString("id-ID")}
           </div>
+        </div>
+      </div>
+
+      {/* diskon */}
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div>Diskon</div>
+        <div style={{ textAlign: "right" }}>
+          - Rp. {diskon.toLocaleString("id-ID")}
         </div>
       </div>
       {/* Total */}
