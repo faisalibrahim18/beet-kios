@@ -1,5 +1,5 @@
 import Lg from "../../assets/lg_robo.jfif";
-import Lg1 from "../../assets/logo-bs.png";
+import Lg1 from "../../assets/lgo_r.png";
 
 const Topbar2 = () => {
   return (
@@ -21,7 +21,7 @@ const Topbar2 = () => {
             <img
               src={Lg1}
               alt=""
-              className="lg:w-[160px] lg:mt-6 md:mt-4 mt-3 md:w-[130px] w-[100px] m-2 mr-4"
+              className="lg:w-[130px]  sm:w-[120px] lg:mt-4 md:mt-4 mt-3 md:w-[100px] w-[75px] m-2 mr-4"
             />
           </div>
           {/* close logo beetpos */}

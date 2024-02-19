@@ -186,7 +186,7 @@ const ProductList_ = ({
   const toggleShowMore = () => {
     setLoadingMore(true);
     setShowMore(!showMore);
-    setItemsToShow(!showMore ? searchTerm.length : 12); // Update itemsToShow
+    setItemsToShow(!showMore ? searchTerm.length : 16); // Update itemsToShow
     setVisibleData(!showMore ? searchTerm : searchTerm.slice(0, itemsToShow));
 
     // setTimeout(() => {

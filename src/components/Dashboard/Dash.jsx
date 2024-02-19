@@ -17,7 +17,7 @@ const Dash = () => {
   const openModal = () => {
     setIsCategoryOpen(true);
   };
-  
+
   // get data logo, product dan category
   useEffect(() => {
     const getProduct = async () => {
@@ -68,6 +68,10 @@ const Dash = () => {
             },
           }
         );
+        const activeProducts = productResponse.data.data.filter(
+          (item) => item.status === "active"
+        );
+        // console.log("dataa", productResponse)
         //  close get data product
         const isAnyFavorite = productResponse.data.data.some(
           (item) => item.is_favorite
@@ -90,7 +94,7 @@ const Dash = () => {
           (value) => value.Products.length > 0 && !value.hidden
         );
 
-        setSearchTerm(productResponse.data.data);
+        setSearchTerm(activeProducts);
         setCategory(resCategoryProduct);
       } catch (error) {
         console.log(error);

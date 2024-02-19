@@ -1,8 +1,8 @@
 import React from "react";
 // import bnr_robo from "../../assets/bnr_robo2.png";
-import bnr_robo from "../../assets/bnr_robo3.png";
+import bnr2_robo from "../../assets/banner_.png";
 // import bnr2_robo from "../../assets/bnr2_robo.png";
-import bnr2_robo from "../../assets/roboshop.png";
+// import bnr2_robo from "../../assets/lgo_r.png";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/scrollbar";
@@ -19,7 +19,7 @@ const Iklan = () => {
         className="mySwiper max-w-screen "
         autoplay={{ delay: 3000, disableOnInteraction: false }}
       >
-        <SwiperSlide>
+        {/* <SwiperSlide>
           <div className=" sm:h-auto  w-full relative">
             <img
               src={bnr_robo}
@@ -27,7 +27,7 @@ const Iklan = () => {
               className="w-full h-full object-cover"
             />
           </div>
-        </SwiperSlide>
+        </SwiperSlide> */}
         <SwiperSlide>
           <div className=" sm:h-auto  w-full relative">
             <img

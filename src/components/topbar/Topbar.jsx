@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import Swal from "sweetalert2";
-import Lg from "../../assets/logo-bs.png";
+import Lg from "../../assets/lgo_r.png";
 import "animate.css/animate.min.css"; // Impor animate.css
 
 const Topbar = ({ cart, detail, products, loading }) => {
@@ -61,7 +61,7 @@ const Topbar = ({ cart, detail, products, loading }) => {
                   <Link to={"/dashboard"} on>
                     <img
                       src={Lg}
-                      className="bg-transparent lg:mt-2 md:mt-3  mt-1.5  w-[100px] md:w-[130px] lg:w-[160px]"
+                      className="bg-transparent lg:mt-2 md:mt-2  mt-2  w-[75px] md:w-[100px] sm:w-[120px] lg:w-[130px]"
                     />
                   </Link>
                 </div>
