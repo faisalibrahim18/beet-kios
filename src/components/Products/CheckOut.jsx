@@ -404,6 +404,37 @@ function CheckOut({ isOpen, closeModal }) {
         `${API_URL}/api/v1/signature/generate-url-vendor`,
         generateSignature
       );
+      console.log("datdaa", generateUrlVendor);
+
+      const paymentTypeId = 4; // Set the ID of the desired payment type
+
+      const processUrl = {
+        data: {
+          request: {
+            vendorIdentifier: dataBusiness.cz_vendor_identifier,
+            entityId: dataBusiness.cz_entity_id,
+            referenceId: "TEST-BEETKios" - TRANSIDMERCHANT,
+            paymentType: paymentTypeId,
+            customerMobilePhone: "",
+            message: "",
+            customerLatitude: "-6.1675794999999995",
+            customerLongitude: "106.7824544",
+          },
+        },
+        signature: "",
+      };
+
+      const response2 = await axios.post(
+        "https://api-link.cashlez.com/process_url",
+        processUrl,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("data response Process Url", response2);
       // handlePaymentApprovalActions(transactionData);
       if (generateUrlVendor.data && generateUrlVendor.data.data.response) {
         setLoading1(false);
@@ -423,7 +454,8 @@ function CheckOut({ isOpen, closeModal }) {
               },
             }
           );
-          // console.log("status", response1.data.data.response);
+
+          console.log("status", response1.data.data.response);
           const StatusPayment = response1.data.data.response.processStatus;
           if (response1.data.data.response.processStatus === "APPROVED") {
             handleTransaction();
@@ -1102,7 +1134,7 @@ function CheckOut({ isOpen, closeModal }) {
                     </div>
 
                     <div className="p-4">
-                      <div className="mb-4  ">
+                      <div className="mb-4">
                         <span className="text-lg font-bold  cursor-context-menu">
                           Promo
                         </span>
@@ -1120,8 +1152,8 @@ function CheckOut({ isOpen, closeModal }) {
                         </span>
                       </div>
                       {modalOpen && (
-                        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-                          <div className="modal bg-white p-7 rounded-md max-w-md w-full">
+                        <div className="z-50 overflow-y-auto overflow-x-auto lg:mb-0 sm:mb-0 md:mb-0 mb-[60px] fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                          <div className="modal m-4 lg:mt-0 sm:mt-0 md:mt-0 mt-[150px]  bg-white p-7 rounded-md max-w-md w-full">
                             <div className="flex justify-end">
                               <button
                                 onClick={closeModalPromo}

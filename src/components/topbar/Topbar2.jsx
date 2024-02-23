@@ -4,7 +4,7 @@ import Lg1 from "../../assets/lgo_r.png";
 const Topbar2 = () => {
   return (
     <>
-      <div>
+      <div className="">
         <div className="bg-white shadow fixed z-50 bg-opacity-85 w-full flex justify-between ">
           {/* logo robo */}
           <div className="">
