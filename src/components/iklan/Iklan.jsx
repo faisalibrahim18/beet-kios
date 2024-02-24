@@ -30,8 +30,12 @@ const Iklan = () => {
           },
         }
       );
-      setIklan(response.data.data);
-      console.log("iklan", response);
+      // Filter data berdasarkan properti 'active'
+      const activeIklan = response.data.data.filter(
+        (item) => item.active === true
+      );
+      setIklan(activeIklan);
+      // console.log("iklan", activeIklan);
     } catch (error) {
       console.log(error);
     }

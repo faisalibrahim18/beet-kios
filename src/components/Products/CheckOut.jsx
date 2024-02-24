@@ -30,13 +30,20 @@ function CheckOut({ isOpen, closeModal }) {
   const [selectedPromo, setSelectedPromo] = useState(null);
   const [promos, setPromos] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [dataqrStatic, setDataQrStatic] = useState(false);
+  const [qrStatic, setQrStatic] = useState([]);
+  const API_URL = import.meta.env.VITE_API_KEY;
 
+  // console.log("sasa", qrStatic);
   const handlePromoSelection = (promo) => {
     setSelectedPromo(promo);
     applyPromo(promo);
     setModalOpen(false); // Tutup modal saat promo dipilih
   };
 
+  const handleQrStatic = () => {
+    setDataQrStatic(true);
+  };
   const closeModalPromo = () => {
     // setSelectedPromo(null); // Reset selectedPromo saat modal ditutup
     setModalOpen(false); // Tutup modal
@@ -66,7 +73,12 @@ function CheckOut({ isOpen, closeModal }) {
         const qrPayments = response.data.data.rows.filter(
           (payment) => payment.name === "Cashlez QR"
         );
-
+        // Filter data untuk pembayaran QR
+        const qrStatic = response.data.data.rows.filter(
+          (payment) => payment.name === "Ovo"
+        );
+        console.log("qr static", qrStatic[0]);
+        setQrStatic(qrStatic[0]);
         // console.log("cash", cashPayments[0].id);
         // console.log("Qr", qrPayments[0].id);
         setPaymentCash(cashPayments[0]);
@@ -979,6 +991,8 @@ function CheckOut({ isOpen, closeModal }) {
               &times;
             </button>
 
+            {/* Bagian yang ingin dimunculkan */}
+
             {loading ? (
               <div className="p-40 flex justify-center">
                 <Loading />
@@ -1133,6 +1147,7 @@ function CheckOut({ isOpen, closeModal }) {
                       </div>
                     </div>
 
+                    {/* bagian promo */}
                     <div className="p-4">
                       <div className="mb-4">
                         <span className="text-lg font-bold  cursor-context-menu">
@@ -1152,7 +1167,7 @@ function CheckOut({ isOpen, closeModal }) {
                         </span>
                       </div>
                       {modalOpen && (
-                        <div className="z-50 overflow-y-auto overflow-x-auto lg:mb-0 sm:mb-0 md:mb-0 mb-[60px] fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                        <div className="z-50 overflow-y-auto overflow-x-auto lg:mb-0 sm:mb-0 md:mb-[110px] mb-[60px] fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
                           <div className="modal m-4 lg:mt-0 sm:mt-0 md:mt-0 mt-[150px]  bg-white p-7 rounded-md max-w-md w-full">
                             <div className="flex justify-end">
                               <button
@@ -1211,6 +1226,7 @@ function CheckOut({ isOpen, closeModal }) {
                         </div>
                       )}
                     </div>
+                    {/* close Bagian promo */}
 
                     {/* Tombol Bayar */}
                     <div className="text-center ">
@@ -1220,11 +1236,17 @@ function CheckOut({ isOpen, closeModal }) {
                       >
                         Cash
                       </button>
+                      {/* <button
+                        className="bg-[#091F4B] text-white px-20 py-2 rounded-2xl hover-bg-[#8f387d] mt-2"
+                        onClick={handleQrStatic}
+                      >
+                        QRIS Static
+                      </button> */}
                       <button
                         className="bg-[#091F4B] text-white px-20 py-2 rounded-2xl hover-bg-[#8f387d] mt-2"
                         onClick={() => handlePayment(nominal)}
                       >
-                        QRIS/CARD
+                        QRIS
                       </button>
                     </div>
                   </div>

@@ -84,7 +84,7 @@ const PrintReceiptQR = ({
         </div>
         <div>
           {" "}
-          <span>QRIS/Card</span>{" "}
+          <span>QRIS</span>{" "}
         </div>
       </div>
       <hr />
